@@ -7,6 +7,8 @@ var TOLD;
                 this._canvas = null;
                 this._image = null;
                 this._imageUrl = null;
+                this._offsetX = 0;
+                this._offsetY = 0;
                 this._pieces = null;
                 var self = this;
 
@@ -19,10 +21,20 @@ var TOLD;
 
                 canvas.on({
                     'object:moving': function (e) {
-                        e.target.opacity = 0.5;
+                        var target = e.target;
+                        target.opacity = 0.5;
+
+                        // Snap to target
+                        var nearness = Math.abs(self._offsetX - target.left) + Math.abs(self._offsetY - target.top);
+                        if (nearness < 20) {
+                            target.setLeft(self._offsetX);
+                            target.setTop(self._offsetY);
+                        }
                     },
                     'object:modified': function (e) {
-                        e.target.opacity = 1;
+                        var target = e.target;
+
+                        target.opacity = 1;
                     }
                 });
 
@@ -50,6 +62,9 @@ var TOLD;
                 var sx = (width - sWidth) / 2;
                 var sy = (height - sHeight) / 2;
 
+                self._offsetX = sx;
+                self._offsetY = sy;
+
                 image.scale(tRatio);
                 image.hasBorders = false;
                 image.hasControls = false;
@@ -65,6 +80,7 @@ var TOLD;
 
                         piece.scale(tRatio);
 
+                        // BUG: IN FABRICJS - Sometimes some of the pieces are unclickable
                         piece.perPixelTargetFind = true;
                         piece.targetFindTolerance = 4;
                         piece.hasBorders = false;
@@ -93,7 +109,7 @@ var TOLD;
                     var height = mainImage.height;
 
                     // TEMP: Create a n*n puzzle
-                    var pSide = 3;
+                    var pSide = 5;
 
                     var pieces = [];
 
@@ -108,7 +124,6 @@ var TOLD;
 
                                 fabric.Image.fromURL(self._imageUrl, function (img) {
                                     var piece = img;
-                                    pieces.push(piece);
 
                                     var pAny = piece;
 
@@ -123,6 +138,8 @@ var TOLD;
                                             ctx.rect(pAny._clipLeft - width / 2, pAny._clipTop - height / 2, pAny._clipWidth, pAny._clipHeight);
                                         }
                                     });
+
+                                    pieces.push(piece);
 
                                     if (pieces.length === pSide * pSide) {
                                         onCreatedPieces(pieces);

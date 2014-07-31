@@ -8,6 +8,8 @@ module TOLD.MemPuzzle {
         private _image: fabric.IImage = null;
         private _imageUrl: string = null;
 
+        private _offsetX: number = 0;
+        private _offsetY: number = 0;
         private _pieces: fabric.IImage[] = null;
 
         constructor(canvasId: string, imgUrl: string) {
@@ -22,10 +24,20 @@ module TOLD.MemPuzzle {
 
             canvas.on({
                 'object:moving': function (e: any) {
-                    e.target.opacity = 0.5;
+                    var target = <fabric.IImage> e.target;
+                    target.opacity = 0.5;
+
+                    // Snap to target
+                    var nearness = Math.abs(self._offsetX - target.left) + Math.abs(self._offsetY - target.top);
+                    if (nearness < 20) {
+                        target.setLeft(self._offsetX);
+                        target.setTop(self._offsetY);
+                    }
                 },
                 'object:modified': function (e: any) {
-                    e.target.opacity = 1;
+                    var target = <fabric.IImage> e.target;
+
+                    target.opacity = 1;
                 }
             });
 
@@ -54,6 +66,9 @@ module TOLD.MemPuzzle {
             var sx = (width - sWidth) / 2;
             var sy = (height - sHeight) / 2;
 
+            self._offsetX = sx;
+            self._offsetY = sy;
+
             image.scale(tRatio);
             image.hasBorders = false;
             image.hasControls = false;
@@ -72,6 +87,7 @@ module TOLD.MemPuzzle {
 
                     piece.scale(tRatio);
 
+                    // BUG: IN FABRICJS - Sometimes some of the pieces are unclickable
                     piece.perPixelTargetFind = true;
                     (<any>piece).targetFindTolerance = 4;
                     piece.hasBorders = false;
@@ -103,7 +119,7 @@ module TOLD.MemPuzzle {
                 var height = mainImage.height;
 
                 // TEMP: Create a n*n puzzle
-                var pSide = 3;
+                var pSide = 5;
 
                 var pieces = <fabric.IImage[]>[];
 
@@ -120,7 +136,6 @@ module TOLD.MemPuzzle {
                             fabric.Image.fromURL(self._imageUrl, function (img) {
 
                                 var piece = img;
-                                pieces.push(piece);
 
                                 var pAny = <any>piece;
 
@@ -139,6 +154,8 @@ module TOLD.MemPuzzle {
                                             pAny._clipHeight);
                                     }
                                 });
+
+                                pieces.push(piece);
 
                                 if (pieces.length === pSide * pSide) {
                                     onCreatedPieces(pieces);
