@@ -1,30 +1,44 @@
-﻿var TOLD;
+﻿///<reference path="Scripts/typings/fabricjs/fabricjs.d.ts"/>
+var TOLD;
 (function (TOLD) {
     (function (_MemPuzzle) {
         var MemPuzzle = (function () {
             function MemPuzzle(canvasId, imgUrl) {
-                var _this = this;
-                this.canvas = null;
-                this.context = null;
-                this.image = null;
-                this.canvas = document.getElementById(canvasId);
-                this.context = this.canvas.getContext('2d');
+                this._canvas = null;
+                this._image = null;
+                this._imageUrl = null;
+                this._pieces = null;
+                var self = this;
 
-                // Load image
-                this.image = new Image();
-                this.image.src = imgUrl;
+                self._imageUrl = imgUrl;
 
-                // Let the image load
-                this.image.onload = function () {
-                    _this.createPuzzle();
-                };
+                var canvas = self._canvas = new fabric.Canvas(canvasId, {
+                    hoverCursor: 'pointer',
+                    selection: false
+                });
+
+                canvas.on({
+                    'object:moving': function (e) {
+                        e.target.opacity = 0.5;
+                    },
+                    'object:modified': function (e) {
+                        e.target.opacity = 1;
+                    }
+                });
+
+                fabric.Image.fromURL(imgUrl, function (img) {
+                    self._image = img;
+                    self.createPuzzle();
+                });
             }
             MemPuzzle.prototype.createPuzzle = function () {
-                var image = this.image;
-                var context = this.context;
+                var self = this;
 
-                var width = this.canvas.width;
-                var height = this.canvas.height;
+                var canvas = self._canvas;
+
+                var image = self._image;
+                var width = self._canvas.getWidth();
+                var height = self._canvas.getHeight();
 
                 // Scale image
                 var rWidth = width / image.width;
@@ -36,62 +50,88 @@
                 var sx = (width - sWidth) / 2;
                 var sy = (height - sHeight) / 2;
 
-                var sImage = document.createElement("canvas");
-                var sContext = sImage.getContext('2d');
-                sImage.width = sWidth;
-                sImage.height = sHeight;
-                sContext.drawImage(image, 0, 0, sWidth, sHeight);
+                image.scale(tRatio);
+                image.hasBorders = false;
+                image.hasControls = false;
 
-                // DEBUG: Draw image
-                //context.drawImage(image, 0, 0);
-                //context.drawImage(sImage, 0, 0);
-                //context.drawImage(sImage, sx, sy);
-                //return;
-                // Create puzzle pieces
-                var pieces = this.createPuzzlePieces(sImage, 0);
+                // DEBUG: Draw Image
+                //canvas.add(image);
+                this.createPuzzlePieces(self._imageUrl, 0, function (pieces) {
+                    self._pieces = pieces;
 
-                for (var i = 0; i < pieces.length; i++) {
-                    var piece = pieces[i];
-                    var cvsPiece = piece;
+                    for (var i = 0; i < pieces.length; i++) {
+                        var piece = pieces[i];
+                        canvas.add(piece);
 
-                    var diff = 100;
-                    var x = sx + diff * Math.random() - diff / 2;
-                    var y = sy + diff * Math.random() - diff / 2;
+                        piece.scale(tRatio);
 
-                    context.drawImage(cvsPiece, x, y);
-                }
+                        piece.perPixelTargetFind = true;
+                        piece.targetFindTolerance = 4;
+                        piece.hasBorders = false;
+                        piece.hasControls = false;
+
+                        // Randomize
+                        var diff = 100;
+                        var x = sx + diff * Math.random() - diff / 2;
+                        var y = sy + diff * Math.random() - diff / 2;
+
+                        piece.setLeft(x);
+                        piece.setTop(y);
+                    }
+
+                    canvas.renderAll();
+                });
             };
 
-            MemPuzzle.prototype.createPuzzlePieces = function (image, difficulty) {
-                var width = image.width;
-                var height = image.height;
-
-                // TEMP: Create a n*n puzzle
-                var pSide = 5;
+            MemPuzzle.prototype.createPuzzlePieces = function (imageUrl, difficulty, onCreatedPieces) {
+                var self = this;
 
                 var pieces = [];
 
-                var rWidth = width / pSide;
-                var rHeight = height / pSide;
+                fabric.Image.fromURL(imageUrl, function (mainImage) {
+                    var width = mainImage.width;
+                    var height = mainImage.height;
 
-                for (var x = 0; x < pSide; x++) {
-                    for (var y = 0; y < pSide; y++) {
-                        var i = x * pSide + y;
+                    // TEMP: Create a n*n puzzle
+                    var pSide = 3;
 
-                        var piece = document.createElement("canvas");
-                        var pContext = piece.getContext('2d');
-                        piece.width = width;
-                        piece.height = height;
+                    var pieces = [];
 
-                        pContext.rect(x * rWidth, y * rHeight, rWidth, rHeight);
-                        pContext.clip();
-                        pContext.drawImage(image, 0, 0);
+                    var pWidth = width / pSide;
+                    var pHeight = height / pSide;
 
-                        pieces.push(piece);
+                    for (var x = 0; x < pSide; x++) {
+                        for (var y = 0; y < pSide; y++) {
+                            (function () {
+                                var xInner = x;
+                                var yInner = y;
+
+                                fabric.Image.fromURL(self._imageUrl, function (img) {
+                                    var piece = img;
+                                    pieces.push(piece);
+
+                                    var pAny = piece;
+
+                                    pAny._clipLeft = xInner * pWidth;
+                                    pAny._clipTop = yInner * pHeight;
+                                    pAny._clipWidth = pWidth;
+                                    pAny._clipHeight = pHeight;
+
+                                    piece.set({
+                                        clipTo: function (ctx) {
+                                            // Clip origin is at center of image
+                                            ctx.rect(pAny._clipLeft - width / 2, pAny._clipTop - height / 2, pAny._clipWidth, pAny._clipHeight);
+                                        }
+                                    });
+
+                                    if (pieces.length === pSide * pSide) {
+                                        onCreatedPieces(pieces);
+                                    }
+                                });
+                            })();
+                        }
                     }
-                }
-
-                return pieces;
+                });
             };
             return MemPuzzle;
         })();
