@@ -83,7 +83,6 @@ module TOLD.MemPuzzle {
                 // Draw pieces
                 for (var i = 0; i < pieces.length; i++) {
                     var piece = pieces[i];
-                    canvas.add(piece);
 
                     piece.scale(tRatio);
 
@@ -101,6 +100,8 @@ module TOLD.MemPuzzle {
                     piece.setLeft(x);
                     piece.setTop(y);
 
+
+                    canvas.add(piece);
                 }
 
                 canvas.renderAll();
@@ -158,7 +159,10 @@ module TOLD.MemPuzzle {
                                 pieces.push(piece);
 
                                 if (pieces.length === pSide * pSide) {
-                                    onCreatedPieces(pieces);
+
+                                    setTimeout(() => {
+                                        onCreatedPieces(pieces);
+                                    }, 10);
                                 }
                             });
                         })();
