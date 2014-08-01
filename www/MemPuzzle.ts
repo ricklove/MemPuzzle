@@ -204,8 +204,11 @@ module TOLD.MemPuzzle {
                         var right = left + clipWidth;
                         var bottom = top + clipHeight;
 
-                        hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top });
-                        vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom });
+                        var hIsInside = Math.random() > 0.5;
+                        var vIsInside = Math.random() > 0.5;
+
+                        hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInside);
+                        vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInside);
                     }
                 }
 
@@ -388,7 +391,7 @@ module TOLD.MemPuzzle {
             ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
         }
 
-        private createPuzzleEdge(start: IPoint, end: IPoint): IEdge {
+        private createPuzzleEdge(start: IPoint, end: IPoint, isInside= true): IEdge {
 
             // Hard code a basic shape
             var unitPoints = <IPoint[]>[
@@ -419,8 +422,7 @@ module TOLD.MemPuzzle {
             };
 
             // Maybe reverse pVect
-            var reverse = false;
-            if (reverse) {
+            if (!isInside) {
                 pVect = {
                     x: -pVect.x,
                     y: -pVect.y

@@ -62,9 +62,13 @@ Tasks
 
 - Store edges
 
+### 11:00-11:05
+
+- Randomly switch from concave to convex edge
+
+
 # TODO
 
-
-- Reverse side path's points when needed
+- Create overlap of 1 pixel on edges
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
 - Change colors
