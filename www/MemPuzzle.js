@@ -101,7 +101,7 @@ var TOLD;
             };
 
             MemPuzzle.prototype.createPuzzle = function (makeOutsideFlat, difficulty, randomize) {
-                if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = false; }
+                if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
                 if (typeof difficulty === "undefined") { difficulty = 0; }
                 if (typeof randomize === "undefined") { randomize = false; }
                 var self = this;
@@ -172,21 +172,32 @@ var TOLD;
                     var width = mainImage.width;
                     var height = mainImage.height;
 
-                    // Create an n*n puzzle
-                    var pSideCount = 3;
-                    var pWidth = width / pSideCount;
-                    var pHeight = height / pSideCount;
+                    // Create an h*v puzzle
+                    var minSideCount = 2;
+                    var hSideCount = minSideCount;
+                    var vSideCount = minSideCount;
+
+                    var widthHeightRatio = width / height;
+
+                    if (widthHeightRatio > 1) {
+                        hSideCount = Math.floor(widthHeightRatio * minSideCount);
+                    } else {
+                        vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
+                    }
+
+                    var pWidth = width / hSideCount;
+                    var pHeight = height / vSideCount;
 
                     var hEdges = [];
                     var vEdges = [];
 
-                    for (var x = 0; x < pSideCount + 1; x++) {
+                    for (var h = 0; h < hSideCount + 1; h++) {
                         hEdges.push([]);
                         vEdges.push([]);
 
-                        for (var y = 0; y < pSideCount + 1; y++) {
-                            var clipLeft = x * pWidth;
-                            var clipTop = y * pHeight;
+                        for (var v = 0; v < vSideCount + 1; v++) {
+                            var clipLeft = h * pWidth;
+                            var clipTop = v * pHeight;
                             var clipWidth = pWidth;
                             var clipHeight = pHeight;
 
@@ -199,35 +210,35 @@ var TOLD;
                             var hIsInset = Math.random() > 0.5;
                             var vIsInset = Math.random() > 0.5;
 
-                            var hIsOutside = (y === 0) || (y === pSideCount);
-                            var vIsOutside = (x === 0) || (x === pSideCount);
+                            var hIsOutside = (v === 0) || (v === vSideCount);
+                            var vIsOutside = (h === 0) || (h === hSideCount);
 
                             if (!makeOutsideFlat) {
                                 if (hIsOutside) {
                                     hIsOutside = false;
-                                    hIsInset = (y === 0);
+                                    hIsInset = (v === 0);
                                 }
 
                                 if (vIsOutside) {
                                     vIsOutside = false;
-                                    vIsInset = (x !== 0);
+                                    vIsInset = (h !== 0);
                                 }
                             }
 
                             if (!hIsOutside) {
-                                hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInset);
+                                hEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInset);
                             } else {
                                 var s = { x: left, y: top };
                                 var e = { x: right, y: top };
-                                hEdges[x][y] = { start: s, end: e, points: [s, e] };
+                                hEdges[h][v] = { start: s, end: e, points: [s, e] };
                             }
 
                             if (!vIsOutside) {
-                                vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInset);
+                                vEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInset);
                             } else {
                                 var s = { x: left, y: top };
                                 var e = { x: left, y: bottom };
-                                vEdges[x][y] = { start: s, end: e, points: [s, e] };
+                                vEdges[h][v] = { start: s, end: e, points: [s, e] };
                             }
                         }
                     }
@@ -237,11 +248,11 @@ var TOLD;
                     //self.drawEdges(vEdges);
                     var pieces = [];
 
-                    for (var x = 0; x < pSideCount; x++) {
-                        for (var y = 0; y < pSideCount; y++) {
+                    for (var h = 0; h < hSideCount; h++) {
+                        for (var v = 0; v < vSideCount; v++) {
                             (function () {
-                                var xInner = x;
-                                var yInner = y;
+                                var xInner = h;
+                                var yInner = v;
 
                                 fabric.Image.fromURL(imageData, function (img) {
                                     var piece = img;
@@ -315,7 +326,7 @@ var TOLD;
 
                                     pieces.push(piece);
 
-                                    if (pieces.length === pSideCount * pSideCount) {
+                                    if (pieces.length === hSideCount * vSideCount) {
                                         setTimeout(function () {
                                             onCreatedPieces(pieces);
                                         }, 10);

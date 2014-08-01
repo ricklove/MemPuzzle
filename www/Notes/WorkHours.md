@@ -77,7 +77,10 @@ Tasks
 - Create outside flat edge
 - Sans Serif Font
 
-# TODO
+### 11:50-11:58
 
 - Fix big puzzle piece (not using h/v properly)
+
+# TODO
+
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
