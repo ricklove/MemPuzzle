@@ -8,9 +8,11 @@ var TOLD;
                 //private _imageCanvasElement: HTMLCanvasElement = null;
                 this._imageCanvas = null;
                 this._imageData = null;
-                this._scale = null;
-                this._offsetX = 0;
-                this._offsetY = 0;
+                this._puzzleScale = null;
+                this._puzzleX = 0;
+                this._puzzleY = 0;
+                this._puzzleWidth = 0;
+                this._puzzleHeight = 0;
                 this._pieces = null;
                 var self = this;
                 var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
@@ -34,10 +36,10 @@ var TOLD;
                         target.opacity = 0.5;
 
                         // Snap to target
-                        var nearness = Math.abs(self._offsetX - target.left) + Math.abs(self._offsetY - target.top);
+                        var nearness = Math.abs(self._puzzleX - target.left) + Math.abs(self._puzzleY - target.top);
                         if (nearness < LOCKRADIUS) {
-                            target.setLeft(self._offsetX);
-                            target.setTop(self._offsetY);
+                            target.setLeft(self._puzzleX);
+                            target.setTop(self._puzzleY);
                             // Lock when correct
                             //target.lockMovementX = true;
                             //target.lockMovementY = true;
@@ -57,12 +59,12 @@ var TOLD;
                 var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
                 var STACK_X = MemPuzzle.STACK_X;
                 var STACK_Y = MemPuzzle.STACK_Y;
-                var scale = self._scale;
+                var scale = self._puzzleScale;
 
                 for (var i = 0; i < pieces.length; i++) {
                     var piece = pieces[i];
 
-                    var nearness = Math.abs(self._offsetX - piece.image.left) + Math.abs(self._offsetY - piece.image.top);
+                    var nearness = Math.abs(self._puzzleX - piece.image.left) + Math.abs(self._puzzleY - piece.image.top);
 
                     if (shouldStackAll || nearness > LOCKRADIUS) {
                         // Move to stack
@@ -165,10 +167,14 @@ var TOLD;
                 var sx = (width - sWidth) / 2 + padding;
                 var sy = (height - sHeight) / 2 + padding;
 
-                self._scale = tRatio;
+                self._puzzleScale = tRatio;
 
-                self._offsetX = sx;
-                self._offsetY = sy;
+                self._puzzleX = sx;
+                self._puzzleY = sy;
+                self._puzzleWidth = sWidth;
+                self._puzzleHeight = sHeight;
+
+                this.createPuzzleOutline();
 
                 this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, function (pieces) {
                     self._pieces = pieces;
@@ -406,6 +412,29 @@ var TOLD;
                         }
                     }
                 });
+            };
+
+            MemPuzzle.prototype.createPuzzleOutline = function () {
+                var self = this;
+                var canvas = self._canvas;
+
+                var outline = new fabric.Rect({
+                    left: self._puzzleX,
+                    top: self._puzzleY,
+                    width: self._puzzleWidth,
+                    height: self._puzzleHeight,
+                    stroke: "blue",
+                    opacity: 0.5,
+                    strokeWidth: 2,
+                    fill: "rgba(0,0,0,0)",
+                    hasBorders: false,
+                    hasControls: false,
+                    lockMovementX: true,
+                    lockMovementY: true,
+                    selectable: false
+                });
+
+                canvas.add(outline);
             };
 
             MemPuzzle.prototype.drawEdges = function (edges) {

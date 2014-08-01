@@ -94,9 +94,12 @@ Tasks
 	- Create IPiece
 	- Stack Pieces on puzzle create
 
+### 16:40-16:57
 
+- Draw Outline
+
+---
 
 # TODO
 
-- Draw Outline
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
