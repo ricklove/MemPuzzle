@@ -46,6 +46,6 @@ Tasks
 
 - Create Notes
 
-### 4:00-
+### 4:00-5:40
 
 - Display a Word as a Puzzle
