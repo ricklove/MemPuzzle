@@ -197,11 +197,30 @@ var TOLD;
 
                                             ctx.moveTo(left, top);
 
-                                            ctx.lineTo(right, top);
-                                            ctx.lineTo(right, bottom);
-                                            ctx.lineTo(left, bottom);
-                                            ctx.lineTo(left, top);
+                                            //ctx.lineTo(right, top);
+                                            //ctx.lineTo(right, bottom);
+                                            //ctx.lineTo(left, bottom);
+                                            //ctx.lineTo(left, top);
+                                            var sides = [
+                                                self.createPuzzleShape({ x: left, y: top }, { x: right, y: top }),
+                                                self.createPuzzleShape({ x: right, y: top }, { x: right, y: bottom }),
+                                                self.createPuzzleShape({ x: right, y: bottom }, { x: left, y: bottom }),
+                                                self.createPuzzleShape({ x: left, y: bottom }, { x: left, y: top })
+                                            ];
 
+                                            for (var iSideNum = 0; iSideNum < sides.length; iSideNum++) {
+                                                var side = sides[iSideNum];
+
+                                                for (var iSide = 0; iSide < side.length; iSide++) {
+                                                    var s = side[iSide];
+                                                    ctx.lineTo(s.x, s.y);
+                                                }
+                                            }
+
+                                            //ctx.lineTo(right, top);
+                                            //ctx.lineTo(right, bottom);
+                                            //ctx.lineTo(left, bottom);
+                                            //ctx.lineTo(left, top);
                                             ctx.closePath();
                                         }
                                     });
@@ -218,6 +237,58 @@ var TOLD;
                         }
                     }
                 });
+            };
+
+            MemPuzzle.prototype.drawShapeTest = function () {
+                var self = this;
+                var ctx = self._canvas.getContext();
+
+                var left = 10;
+                var top = 10;
+                var right = 210;
+                var bottom = 210;
+
+                var sides = [
+                    self.createPuzzleShape({ x: left, y: top }, { x: right, y: top }),
+                    self.createPuzzleShape({ x: right, y: top }, { x: right, y: bottom }),
+                    self.createPuzzleShape({ x: right, y: bottom }, { x: left, y: bottom }),
+                    self.createPuzzleShape({ x: left, y: bottom }, { x: left, y: top })
+                ];
+
+                for (var iSideNum = 0; iSideNum < sides.length; iSideNum++) {
+                    var side = sides[iSideNum];
+
+                    ctx.moveTo(side[0].x, side[0].y);
+
+                    // Line through points
+                    //for (var iSide = 0; iSide < side.length; iSide++) {
+                    //    var s = side[iSide];
+                    //    ctx.lineTo(s.x, s.y);
+                    //}
+                    // Curve through points
+                    MemPuzzle.curveThroughPoints(ctx, side);
+
+                    ctx.stroke();
+                }
+                //var ctx = self._canvas.getContext();
+                //ctx.moveTo(side[0].x, side[0].y);
+                //for (var iSide = 0; iSide < side.length; iSide++) {
+                //    var s = side[iSide];
+                //    ctx.lineTo(s.x, s.y);
+                //}
+                //ctx.stroke();
+            };
+
+            // Based on: http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+            MemPuzzle.curveThroughPoints = function (ctx, points) {
+                for (var i = 0; i < points.length - 2; i++) {
+                    var xc = (points[i].x + points[i + 1].x) / 2;
+                    var yc = (points[i].y + points[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+                }
+
+                // Last Point
+                ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
             };
 
             MemPuzzle.prototype.createPuzzleShape = function (start, end) {
@@ -238,7 +309,6 @@ var TOLD;
                     { x: 1, y: 0 }
                 ];
 
-                // Randomize
                 // Apply to vector and perp-vector
                 var vect = {
                     x: end.x - start.x,
@@ -264,6 +334,17 @@ var TOLD;
                 for (var i = 0; i < unitPoints.length; i++) {
                     var u = unitPoints[i];
 
+                    // Randomize
+                    if (i !== 0 && i !== unitPoints.length - 1) {
+                        var rMax = 0.04;
+                        var rMaxHalf = rMax * 0.5;
+
+                        var xRand = Math.random() * rMax - rMaxHalf;
+                        var yRand = Math.random() * rMax - rMaxHalf;
+                        u = { x: u.x + xRand, y: u.y + yRand };
+                    }
+
+                    // Make final point
                     finalPoints.push({
                         x: start.x + (vect.x * u.x) + (pVect.x * u.y),
                         y: start.y + (vect.y * u.x) + (pVect.y * u.y)
