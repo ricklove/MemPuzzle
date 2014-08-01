@@ -110,7 +110,7 @@ var TOLD;
                     var height = mainImage.height;
 
                     // TEMP: Create a n*n puzzle
-                    var pSide = 5;
+                    var pSide = 3;
 
                     var pieces = [];
 
