@@ -66,9 +66,14 @@ Tasks
 
 - Randomly switch from concave to convex edge
 
+### 11:05-11:21
+
+- Create underlap of 2 pixel on edges
+- Change colors
+- Create Padding
+
 
 # TODO
 
-- Create overlap of 1 pixel on edges
+
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
-- Change colors

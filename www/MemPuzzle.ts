@@ -21,6 +21,8 @@ module TOLD.MemPuzzle {
                 selection: false
             });
 
+            canvas.backgroundColor = "lightgrey";
+
             canvas.on({
                 'object:moving': function (e: any) {
                     var target = <fabric.IImage> e.target;
@@ -87,17 +89,20 @@ module TOLD.MemPuzzle {
             //image.clear();
 
             // Draw Text
+            var textPadding = 10;
+
             var textObject = new fabric.Text(text, <fabric.ITextOptions> {
                 fontSize: (self._canvas.getHeight()),
                 //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
-                top: -self._canvas.getHeight() * 0.25
+                top: -self._canvas.getHeight() * 0.25 + textPadding,
+                left: textPadding,
             });
             image.add(textObject);
 
             // Set to fit text
-            image.backgroundColor = "lightgray";
-            image.setWidth(textObject.width);
-            image.setHeight(textObject.height * 0.8);
+            image.backgroundColor = "white";
+            image.setWidth(textObject.width + textPadding * 2);
+            image.setHeight(textObject.height * 0.8 + textPadding * 2);
 
             image.renderAll();
 
@@ -113,18 +118,21 @@ module TOLD.MemPuzzle {
             var canvas = self._canvas;
 
             var image = self._imageCanvas;
-            var width = self._canvas.getWidth();
-            var height = self._canvas.getHeight();
 
             // Calculate Image Scale
+            var padding = 10;
+
+            var width = self._canvas.getWidth() - padding * 2;
+            var height = self._canvas.getHeight() - padding * 2;
+
             var rWidth = width / image.getWidth();
             var rHeight = height / image.getHeight();
 
             var tRatio = Math.min(rWidth, rHeight);
             var sWidth = image.getWidth() * tRatio;
             var sHeight = image.getHeight() * tRatio;
-            var sx = (width - sWidth) / 2;
-            var sy = (height - sHeight) / 2;
+            var sx = (width - sWidth) / 2 + padding;
+            var sy = (height - sHeight) / 2 + padding;
 
             self._offsetX = sx;
             self._offsetY = sy;
@@ -212,8 +220,9 @@ module TOLD.MemPuzzle {
                     }
                 }
 
-                self.drawEdges(hEdges);
-                self.drawEdges(vEdges);
+                // DEBUG
+                //self.drawEdges(hEdges);
+                //self.drawEdges(vEdges);
 
 
                 var pieces = <fabric.IImage[]>[];
@@ -258,15 +267,26 @@ module TOLD.MemPuzzle {
                                         var bottomEdge = hEdges[xInner][yInner + 1];
                                         var leftEdge = vEdges[xInner][yInner];
 
+                                        var bEdgePoints = bottomEdge.points.map(p=> {
+                                            return { x: p.x, y: p.y - 2 }
+                                            //return { x: p.x, y: p.y + 1 }
+                                        }).reverse();
+
                                         bottomEdge = {
-                                            points: bottomEdge.points.slice(0).reverse(),
-                                            start: bottomEdge.end,
-                                            end: bottomEdge.start
+                                            points: bEdgePoints,
+                                            start: bEdgePoints[0],
+                                            end: bEdgePoints[bEdgePoints.length - 1]
                                         };
+
+                                        var lEdgePoints = leftEdge.points.map(p=> {
+                                            return { x: p.x + 2, y: p.y }
+                                            //return { x: p.x - 1, y: p.y }
+                                        }).reverse();
+
                                         leftEdge = {
-                                            points: leftEdge.points.slice(0).reverse(),
-                                            start: leftEdge.end,
-                                            end: leftEdge.start
+                                            points: lEdgePoints,
+                                            start: lEdgePoints[0],
+                                            end: lEdgePoints[lEdgePoints.length - 1]
                                         };
 
                                         var edges = [
@@ -447,8 +467,8 @@ module TOLD.MemPuzzle {
 
                 // Make final point
                 finalPoints.push({
-                    x: start.x + (vect.x * u.x) + (pVect.x * u.y),
-                    y: start.y + (vect.y * u.x) + (pVect.y * u.y),
+                    x: Math.floor(start.x + (vect.x * u.x) + (pVect.x * u.y)),
+                    y: Math.floor(start.y + (vect.y * u.x) + (pVect.y * u.y)),
                 });
             }
 
