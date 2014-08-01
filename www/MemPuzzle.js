@@ -156,7 +156,7 @@ var TOLD;
                     var width = mainImage.width;
                     var height = mainImage.height;
 
-                    // TEMP: Create a n*n puzzle
+                    // Create a n*n puzzle
                     var pSide = 3;
 
                     var pieces = [];
@@ -183,7 +183,26 @@ var TOLD;
                                     piece.set({
                                         clipTo: function (ctx) {
                                             // Clip origin is at center of image
-                                            ctx.rect(pAny._clipLeft - width / 2, pAny._clipTop - height / 2, pAny._clipWidth, pAny._clipHeight);
+                                            //ctx.rect(
+                                            //    pAny._clipLeft - width / 2,
+                                            //    pAny._clipTop - height / 2,
+                                            //    pAny._clipWidth,
+                                            //    pAny._clipHeight);
+                                            ctx.beginPath();
+
+                                            var left = pAny._clipLeft - width / 2;
+                                            var top = pAny._clipTop - height / 2;
+                                            var right = left + pAny._clipWidth;
+                                            var bottom = top + pAny._clipHeight;
+
+                                            ctx.moveTo(left, top);
+
+                                            ctx.lineTo(right, top);
+                                            ctx.lineTo(right, bottom);
+                                            ctx.lineTo(left, bottom);
+                                            ctx.lineTo(left, top);
+
+                                            ctx.closePath();
                                         }
                                     });
 
@@ -199,6 +218,59 @@ var TOLD;
                         }
                     }
                 });
+            };
+
+            MemPuzzle.prototype.createPuzzleShape = function (start, end) {
+                // Hard code a basic shape
+                var unitPoints = [
+                    { x: 0, y: 0 },
+                    { x: 0.2, y: 0 },
+                    { x: 0.45, y: 0 },
+                    { x: 0.45, y: 0.05 },
+                    { x: 0.4, y: 0.05 },
+                    { x: 0.4, y: 0.15 },
+                    { x: 0.5, y: 0.2 },
+                    { x: 0.6, y: 0.15 },
+                    { x: 0.6, y: 0.05 },
+                    { x: 0.55, y: 0.05 },
+                    { x: 0.55, y: 0 },
+                    { x: 0.8, y: 0 },
+                    { x: 1, y: 0 }
+                ];
+
+                // Randomize
+                // Apply to vector and perp-vector
+                var vect = {
+                    x: end.x - start.x,
+                    y: end.y - start.y
+                };
+
+                var pVect = {
+                    x: -vect.y,
+                    y: vect.x
+                };
+
+                // Maybe reverse pVect
+                var reverse = false;
+                if (reverse) {
+                    pVect = {
+                        x: -pVect.x,
+                        y: -pVect.y
+                    };
+                }
+
+                var finalPoints = [];
+
+                for (var i = 0; i < unitPoints.length; i++) {
+                    var u = unitPoints[i];
+
+                    finalPoints.push({
+                        x: start.x + (vect.x * u.x) + (pVect.x * u.y),
+                        y: start.y + (vect.y * u.x) + (pVect.y * u.y)
+                    });
+                }
+
+                return finalPoints;
             };
             return MemPuzzle;
         })();

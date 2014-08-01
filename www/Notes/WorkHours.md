@@ -49,3 +49,9 @@ Tasks
 ### 4:00-5:40
 
 - Display a Word as a Puzzle
+
+### 6:15-
+
+- Create puzzle shape
+	- Create simple shape calculation
+	- Divide rect into line parts
