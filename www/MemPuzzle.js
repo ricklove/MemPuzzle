@@ -57,7 +57,8 @@ var TOLD;
             //        self.createPuzzle();
             //    });
             //}
-            MemPuzzle.prototype.createPuzzleFromText = function (text) {
+            MemPuzzle.prototype.createPuzzleFromText = function (text, shouldUseSans) {
+                if (typeof shouldUseSans === "undefined") { shouldUseSans = true; }
                 var self = this;
 
                 var image = self._imageCanvas;
@@ -78,6 +79,7 @@ var TOLD;
                 var textPadding = 10;
 
                 var textObject = new fabric.Text(text, {
+                    fontFamily: shouldUseSans ? "Arial" : "Georgia",
                     fontSize: (self._canvas.getHeight()),
                     //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
                     top: -self._canvas.getHeight() * 0.25 + textPadding,
@@ -98,7 +100,10 @@ var TOLD;
                 self.createPuzzle();
             };
 
-            MemPuzzle.prototype.createPuzzle = function () {
+            MemPuzzle.prototype.createPuzzle = function (makeOutsideFlat, difficulty, randomize) {
+                if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = false; }
+                if (typeof difficulty === "undefined") { difficulty = 0; }
+                if (typeof randomize === "undefined") { randomize = false; }
                 var self = this;
 
                 var canvas = self._canvas;
@@ -123,7 +128,7 @@ var TOLD;
                 self._offsetX = sx;
                 self._offsetY = sy;
 
-                this.createPuzzlePieces(self._imageData, 0, function (pieces) {
+                this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, function (pieces) {
                     self._pieces = pieces;
 
                     for (var i = 0; i < pieces.length; i++) {
@@ -141,9 +146,12 @@ var TOLD;
                         var y = sy;
 
                         // Randomize
-                        //var diff = 100;
-                        //x += diff * Math.random() - diff / 2;
-                        //y += diff * Math.random() - diff / 2;
+                        if (randomize) {
+                            var diff = 100;
+                            x += diff * Math.random() - diff / 2;
+                            y += diff * Math.random() - diff / 2;
+                        }
+
                         piece.setLeft(x);
                         piece.setTop(y);
 
@@ -155,7 +163,7 @@ var TOLD;
                 });
             };
 
-            MemPuzzle.prototype.createPuzzlePieces = function (imageData, difficulty, onCreatedPieces) {
+            MemPuzzle.prototype.createPuzzlePieces = function (imageData, difficulty, makeOutsideFlat, onCreatedPieces) {
                 var self = this;
 
                 var pieces = [];
@@ -188,11 +196,39 @@ var TOLD;
                             var right = left + clipWidth;
                             var bottom = top + clipHeight;
 
-                            var hIsInside = Math.random() > 0.5;
-                            var vIsInside = Math.random() > 0.5;
+                            var hIsInset = Math.random() > 0.5;
+                            var vIsInset = Math.random() > 0.5;
 
-                            hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInside);
-                            vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInside);
+                            var hIsOutside = (y === 0) || (y === pSideCount);
+                            var vIsOutside = (x === 0) || (x === pSideCount);
+
+                            if (!makeOutsideFlat) {
+                                if (hIsOutside) {
+                                    hIsOutside = false;
+                                    hIsInset = (y === 0);
+                                }
+
+                                if (vIsOutside) {
+                                    vIsOutside = false;
+                                    vIsInset = (x !== 0);
+                                }
+                            }
+
+                            if (!hIsOutside) {
+                                hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInset);
+                            } else {
+                                var s = { x: left, y: top };
+                                var e = { x: right, y: top };
+                                hEdges[x][y] = { start: s, end: e, points: [s, e] };
+                            }
+
+                            if (!vIsOutside) {
+                                vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInset);
+                            } else {
+                                var s = { x: left, y: top };
+                                var e = { x: left, y: bottom };
+                                vEdges[x][y] = { start: s, end: e, points: [s, e] };
+                            }
                         }
                     }
 
@@ -356,8 +392,8 @@ var TOLD;
                 ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
             };
 
-            MemPuzzle.prototype.createPuzzleEdge = function (start, end, isInside) {
-                if (typeof isInside === "undefined") { isInside = true; }
+            MemPuzzle.prototype.createPuzzleEdge = function (start, end, isInset) {
+                if (typeof isInset === "undefined") { isInset = true; }
                 // Hard code a basic shape
                 var unitPoints = [
                     { x: 0, y: 0 },
@@ -387,7 +423,7 @@ var TOLD;
                 };
 
                 // Maybe reverse pVect
-                if (!isInside) {
+                if (!isInset) {
                     pVect = {
                         x: -pVect.x,
                         y: -pVect.y

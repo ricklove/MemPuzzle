@@ -71,7 +71,7 @@ module TOLD.MemPuzzle {
         //    });
         //}
 
-        createPuzzleFromText(text: string) {
+        createPuzzleFromText(text: string, shouldUseSans= true) {
             var self = this;
 
             var image = self._imageCanvas;
@@ -92,6 +92,7 @@ module TOLD.MemPuzzle {
             var textPadding = 10;
 
             var textObject = new fabric.Text(text, <fabric.ITextOptions> {
+                fontFamily: shouldUseSans ? "Arial" : "Georgia",
                 fontSize: (self._canvas.getHeight()),
                 //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
                 top: -self._canvas.getHeight() * 0.25 + textPadding,
@@ -112,7 +113,7 @@ module TOLD.MemPuzzle {
             self.createPuzzle();
         }
 
-        private createPuzzle() {
+        private createPuzzle(makeOutsideFlat= false, difficulty= 0, randomize= false) {
             var self = this;
 
             var canvas = self._canvas;
@@ -137,7 +138,7 @@ module TOLD.MemPuzzle {
             self._offsetX = sx;
             self._offsetY = sy;
 
-            this.createPuzzlePieces(self._imageData, 0, (pieces) => {
+            this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, (pieces) => {
 
                 self._pieces = pieces;
 
@@ -158,10 +159,11 @@ module TOLD.MemPuzzle {
                     var y = sy;
 
                     // Randomize
-                    //var diff = 100;
-                    //x += diff * Math.random() - diff / 2;
-                    //y += diff * Math.random() - diff / 2;
-
+                    if (randomize) {
+                        var diff = 100;
+                        x += diff * Math.random() - diff / 2;
+                        y += diff * Math.random() - diff / 2;
+                    }
 
                     piece.setLeft(x);
                     piece.setTop(y);
@@ -176,7 +178,7 @@ module TOLD.MemPuzzle {
 
         }
 
-        private createPuzzlePieces(imageData: string, difficulty: number, onCreatedPieces: (pieces: fabric.IImage[]) => void) {
+        private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: fabric.IImage[]) => void) {
             var self = this;
 
             var pieces = <fabric.IImage[]>[];
@@ -212,11 +214,40 @@ module TOLD.MemPuzzle {
                         var right = left + clipWidth;
                         var bottom = top + clipHeight;
 
-                        var hIsInside = Math.random() > 0.5;
-                        var vIsInside = Math.random() > 0.5;
+                        var hIsInset = Math.random() > 0.5;
+                        var vIsInset = Math.random() > 0.5;
 
-                        hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInside);
-                        vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInside);
+                        var hIsOutside = (y === 0) || (y === pSideCount);
+                        var vIsOutside = (x === 0) || (x === pSideCount);
+
+
+                        if (!makeOutsideFlat) {
+                            if (hIsOutside) {
+                                hIsOutside = false;
+                                hIsInset = (y === 0);
+                            }
+
+                            if (vIsOutside) {
+                                vIsOutside = false;
+                                vIsInset = (x !== 0);
+                            }
+                        }
+
+                        if (!hIsOutside) {
+                            hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInset);
+                        } else {
+                            var s = { x: left, y: top };
+                            var e = { x: right, y: top };
+                            hEdges[x][y] = { start: s, end: e, points: [s, e] };
+                        }
+
+                        if (!vIsOutside) {
+                            vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInset);
+                        } else {
+                            var s = { x: left, y: top };
+                            var e = { x: left, y: bottom };
+                            vEdges[x][y] = { start: s, end: e, points: [s, e] };
+                        }
                     }
                 }
 
@@ -411,7 +442,7 @@ module TOLD.MemPuzzle {
             ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
         }
 
-        private createPuzzleEdge(start: IPoint, end: IPoint, isInside= true): IEdge {
+        private createPuzzleEdge(start: IPoint, end: IPoint, isInset= true): IEdge {
 
             // Hard code a basic shape
             var unitPoints = <IPoint[]>[
@@ -442,7 +473,7 @@ module TOLD.MemPuzzle {
             };
 
             // Maybe reverse pVect
-            if (!isInside) {
+            if (!isInset) {
                 pVect = {
                     x: -pVect.x,
                     y: -pVect.y

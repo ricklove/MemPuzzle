@@ -72,8 +72,12 @@ Tasks
 - Change colors
 - Create Padding
 
+### 11:25-11:50
+
+- Create outside flat edge
+- Sans Serif Font
 
 # TODO
 
-
+- Fix big puzzle piece (not using h/v properly)
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
