@@ -5,12 +5,13 @@
 </head>
 <body>
     <canvas id="cvsPuzzle" width="600" height="400" style="border: 0px solid red"></canvas>
+    <button id="btnStack">Stack</button>
 
     <script src="fabric.min.js"></script>
     <script src="MemPuzzle.js"></script>
 
     <script>
-        var puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
+        puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
         //puzzle.createPuzzleFromImage("test.png");
         //puzzle.createPuzzleFromText("testlTjJ");
         //puzzle.createPuzzleFromText("Tiger");
@@ -18,6 +19,8 @@
         //puzzle.createPuzzleFromText("whale");
         puzzle.createPuzzleFromText("please");
         //puzzle.drawShapeTest();
+
+
     </script>
 </body>
 </html>

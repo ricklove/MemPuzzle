@@ -88,10 +88,15 @@ Tasks
 - Randomize z-index of pieces
 
 ### 15:53-15:59
+### 16:01-16:39
+
 - Stack pieces in corner
 	- Create IPiece
+	- Stack Pieces on puzzle create
+
+
 
 # TODO
 
-
+- Draw Outline
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)

@@ -8,10 +8,12 @@ var TOLD;
                 //private _imageCanvasElement: HTMLCanvasElement = null;
                 this._imageCanvas = null;
                 this._imageData = null;
+                this._scale = null;
                 this._offsetX = 0;
                 this._offsetY = 0;
                 this._pieces = null;
                 var self = this;
+                var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
 
                 var canvas = self._canvas = new fabric.Canvas(canvasId, {
                     hoverCursor: 'pointer',
@@ -21,13 +23,19 @@ var TOLD;
                 canvas.backgroundColor = "lightgrey";
 
                 canvas.on({
+                    //'mouse:down': function (e: any) {
+                    //    if (e.target === void 0) {
+                    //        self.stackPieces();
+                    //        canvas.renderAll();
+                    //    }
+                    //},
                     'object:moving': function (e) {
                         var target = e.target;
                         target.opacity = 0.5;
 
                         // Snap to target
                         var nearness = Math.abs(self._offsetX - target.left) + Math.abs(self._offsetY - target.top);
-                        if (nearness < 20) {
+                        if (nearness < LOCKRADIUS) {
                             target.setLeft(self._offsetX);
                             target.setTop(self._offsetY);
                             // Lock when correct
@@ -42,6 +50,34 @@ var TOLD;
                     }
                 });
             }
+            MemPuzzle.prototype.stackPieces = function (shouldStackAll) {
+                if (typeof shouldStackAll === "undefined") { shouldStackAll = false; }
+                var self = this;
+                var pieces = self._pieces;
+                var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
+                var STACK_X = MemPuzzle.STACK_X;
+                var STACK_Y = MemPuzzle.STACK_Y;
+                var scale = self._scale;
+
+                for (var i = 0; i < pieces.length; i++) {
+                    var piece = pieces[i];
+
+                    var nearness = Math.abs(self._offsetX - piece.image.left) + Math.abs(self._offsetY - piece.image.top);
+
+                    if (shouldStackAll || nearness > LOCKRADIUS) {
+                        // Move to stack
+                        piece.image.setLeft(STACK_X - piece.x * scale);
+                        piece.image.setTop(STACK_Y - piece.y * scale);
+
+                        //piece.image.bringToFront();
+                        piece.image.scale(scale);
+                    }
+                }
+
+                self._canvas.renderAll();
+                //setTimeout(self._canvas.renderAll, 10);
+            };
+
             //createPuzzleFromImage(imgUrl: string) {
             //    var self = this;
             //    fabric.Image.fromURL(imgUrl, function (img) {
@@ -103,10 +139,11 @@ var TOLD;
                 self.createPuzzle();
             };
 
-            MemPuzzle.prototype.createPuzzle = function (makeOutsideFlat, difficulty, randomize) {
+            MemPuzzle.prototype.createPuzzle = function (makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces) {
                 if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
                 if (typeof difficulty === "undefined") { difficulty = 0; }
-                if (typeof randomize === "undefined") { randomize = true; }
+                if (typeof shouldRandomizePieces === "undefined") { shouldRandomizePieces = false; }
+                if (typeof shouldStackPieces === "undefined") { shouldStackPieces = true; }
                 var self = this;
 
                 var canvas = self._canvas;
@@ -127,6 +164,8 @@ var TOLD;
                 var sHeight = image.getHeight() * tRatio;
                 var sx = (width - sWidth) / 2 + padding;
                 var sy = (height - sHeight) / 2 + padding;
+
+                self._scale = tRatio;
 
                 self._offsetX = sx;
                 self._offsetY = sy;
@@ -150,7 +189,7 @@ var TOLD;
                         var y = sy;
 
                         // Randomize
-                        if (randomize) {
+                        if (shouldRandomizePieces) {
                             var diff = 200;
                             x += diff * Math.random() - diff / 2;
                             y += diff * Math.random() - diff / 2;
@@ -182,6 +221,10 @@ var TOLD;
                     }
 
                     canvas.renderAll();
+
+                    if (shouldStackPieces) {
+                        self.stackPieces(true);
+                    }
                 });
             };
 
@@ -492,6 +535,9 @@ var TOLD;
 
                 return { points: finalPoints, start: start, end: end };
             };
+            MemPuzzle.STACK_X = 30;
+            MemPuzzle.STACK_Y = 30;
+            MemPuzzle.LOCKRADIUS = 20;
             return MemPuzzle;
         })();
         _MemPuzzle.MemPuzzle = MemPuzzle;

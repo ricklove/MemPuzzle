@@ -4,10 +4,16 @@ module TOLD.MemPuzzle {
 
     export class MemPuzzle {
 
+        static STACK_X = 30;
+        static STACK_Y = 30;
+        static LOCKRADIUS = 20;
+
+
         private _canvas: fabric.ICanvas = null;
         //private _imageCanvasElement: HTMLCanvasElement = null;
         private _imageCanvas: fabric.ICanvas = null;
         private _imageData: string = null;
+        private _scale: number = null;
 
         private _offsetX: number = 0;
         private _offsetY: number = 0;
@@ -15,6 +21,7 @@ module TOLD.MemPuzzle {
 
         constructor(canvasId: string) {
             var self = this;
+            var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
 
             var canvas = self._canvas = new fabric.Canvas(canvasId, {
                 hoverCursor: 'pointer',
@@ -24,13 +31,19 @@ module TOLD.MemPuzzle {
             canvas.backgroundColor = "lightgrey";
 
             canvas.on({
+                //'mouse:down': function (e: any) {
+                //    if (e.target === void 0) {
+                //        self.stackPieces();
+                //        canvas.renderAll();
+                //    }
+                //},
                 'object:moving': function (e: any) {
                     var target = <fabric.IImage> e.target;
                     target.opacity = 0.5;
 
                     // Snap to target
                     var nearness = Math.abs(self._offsetX - target.left) + Math.abs(self._offsetY - target.top);
-                    if (nearness < 20) {
+                    if (nearness < LOCKRADIUS) {
                         target.setLeft(self._offsetX);
                         target.setTop(self._offsetY);
 
@@ -46,6 +59,36 @@ module TOLD.MemPuzzle {
                 }
             });
 
+        }
+
+        stackPieces(shouldStackAll= false) {
+            var self = this;
+            var pieces = self._pieces;
+            var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
+            var STACK_X = MemPuzzle.STACK_X;
+            var STACK_Y = MemPuzzle.STACK_Y;
+            var scale = self._scale;
+
+
+            for (var i = 0; i < pieces.length; i++) {
+
+                var piece = pieces[i];
+
+                var nearness = Math.abs(self._offsetX - piece.image.left) + Math.abs(self._offsetY - piece.image.top);
+
+                if (shouldStackAll || nearness > LOCKRADIUS) {
+                    // Move to stack
+                    piece.image.setLeft(STACK_X - piece.x * scale);
+                    piece.image.setTop(STACK_Y - piece.y * scale);
+                    //piece.image.bringToFront();
+
+                    piece.image.scale(scale);
+                }
+
+            }
+
+            self._canvas.renderAll();
+            //setTimeout(self._canvas.renderAll, 10);
         }
 
         //createPuzzleFromImage(imgUrl: string) {
@@ -117,7 +160,7 @@ module TOLD.MemPuzzle {
             self.createPuzzle();
         }
 
-        private createPuzzle(makeOutsideFlat= true, difficulty= 0, randomize= true) {
+        private createPuzzle(makeOutsideFlat= true, difficulty= 0, shouldRandomizePieces= false, shouldStackPieces = true) {
             var self = this;
 
             var canvas = self._canvas;
@@ -138,6 +181,8 @@ module TOLD.MemPuzzle {
             var sHeight = image.getHeight() * tRatio;
             var sx = (width - sWidth) / 2 + padding;
             var sy = (height - sHeight) / 2 + padding;
+
+            self._scale = tRatio;
 
             self._offsetX = sx;
             self._offsetY = sy;
@@ -164,7 +209,7 @@ module TOLD.MemPuzzle {
                     var y = sy;
 
                     // Randomize
-                    if (randomize) {
+                    if (shouldRandomizePieces) {
                         var diff = 200;
                         x += diff * Math.random() - diff / 2;
                         y += diff * Math.random() - diff / 2;
@@ -196,6 +241,11 @@ module TOLD.MemPuzzle {
                 }
 
                 canvas.renderAll();
+
+                if (shouldStackPieces) {
+                    self.stackPieces(true);
+                }
+
             });
 
         }
@@ -305,7 +355,7 @@ module TOLD.MemPuzzle {
                             fabric.Image.fromURL(imageData, function (img) {
 
                                 var piece = {
-                                    image: img, 
+                                    image: img,
                                     x: xInner * pWidth,
                                     y: yInner * pHeight,
                                     width: pWidth,
