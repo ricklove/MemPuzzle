@@ -5,17 +5,15 @@ module TOLD.MemPuzzle {
     export class MemPuzzle {
 
         private _canvas: fabric.ICanvas = null;
-        private _image: fabric.IImage = null;
-        private _imageUrl: string = null;
+        private _image: HTMLCanvasElement = null;
+        private _imageData: string = null;
 
         private _offsetX: number = 0;
         private _offsetY: number = 0;
         private _pieces: fabric.IImage[] = null;
 
-        constructor(canvasId: string, imgUrl: string) {
+        constructor(canvasId: string) {
             var self = this;
-
-            self._imageUrl = imgUrl;
 
             var canvas = self._canvas = new fabric.Canvas(canvasId, {
                 hoverCursor: 'pointer',
@@ -41,8 +39,28 @@ module TOLD.MemPuzzle {
                 }
             });
 
+        }
+
+        createPuzzleFromImage(imgUrl: string) {
+            var self = this;
+
             fabric.Image.fromURL(imgUrl, function (img) {
-                self._image = img;
+
+                var image = self._image;
+
+                if (image === null) {
+                    image = self._image = document.createElement("canvas");
+                }
+
+                image.width = img.width;
+                image.height = img.height;
+
+                var context = image.getContext('2d');
+                context.clearRect(0, 0, image.width, image.height);
+                context.drawImage(img.getElement(), 0, 0, image.width, image.height);
+
+                self._imageData = image.toDataURL();
+
                 self.createPuzzle();
             });
         }
@@ -56,7 +74,7 @@ module TOLD.MemPuzzle {
             var width = self._canvas.getWidth();
             var height = self._canvas.getHeight();
 
-            // Scale image
+            // Calculate Image Scale
             var rWidth = width / image.width;
             var rHeight = height / image.height;
 
@@ -69,14 +87,7 @@ module TOLD.MemPuzzle {
             self._offsetX = sx;
             self._offsetY = sy;
 
-            image.scale(tRatio);
-            image.hasBorders = false;
-            image.hasControls = false;
-
-            // DEBUG: Draw Image
-            //canvas.add(image);
-
-            this.createPuzzlePieces(self._imageUrl, 0, (pieces) => {
+            this.createPuzzlePieces(self._imageData, 0, (pieces) => {
 
                 self._pieces = pieces;
 
@@ -109,12 +120,12 @@ module TOLD.MemPuzzle {
 
         }
 
-        createPuzzlePieces(imageUrl: string, difficulty: number, onCreatedPieces: (pieces: fabric.IImage[]) => void) {
+        createPuzzlePieces(imageData: string, difficulty: number, onCreatedPieces: (pieces: fabric.IImage[]) => void) {
             var self = this;
 
             var pieces = <fabric.IImage[]>[];
 
-            fabric.Image.fromURL(imageUrl, function (mainImage) {
+            fabric.Image.fromURL(imageData, function (mainImage) {
 
                 var width = mainImage.width;
                 var height = mainImage.height;
@@ -134,7 +145,7 @@ module TOLD.MemPuzzle {
                             var xInner = x;
                             var yInner = y;
 
-                            fabric.Image.fromURL(self._imageUrl, function (img) {
+                            fabric.Image.fromURL(imageData, function (img) {
 
                                 var piece = img;
 

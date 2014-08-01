@@ -3,16 +3,14 @@ var TOLD;
 (function (TOLD) {
     (function (_MemPuzzle) {
         var MemPuzzle = (function () {
-            function MemPuzzle(canvasId, imgUrl) {
+            function MemPuzzle(canvasId) {
                 this._canvas = null;
                 this._image = null;
-                this._imageUrl = null;
+                this._imageData = null;
                 this._offsetX = 0;
                 this._offsetY = 0;
                 this._pieces = null;
                 var self = this;
-
-                self._imageUrl = imgUrl;
 
                 var canvas = self._canvas = new fabric.Canvas(canvasId, {
                     hoverCursor: 'pointer',
@@ -37,12 +35,30 @@ var TOLD;
                         target.opacity = 1;
                     }
                 });
+            }
+            MemPuzzle.prototype.createPuzzleFromImage = function (imgUrl) {
+                var self = this;
 
                 fabric.Image.fromURL(imgUrl, function (img) {
-                    self._image = img;
+                    var image = self._image;
+
+                    if (image === null) {
+                        image = self._image = document.createElement("canvas");
+                    }
+
+                    image.width = img.width;
+                    image.height = img.height;
+
+                    var context = image.getContext('2d');
+                    context.clearRect(0, 0, image.width, image.height);
+                    context.drawImage(img.getElement(), 0, 0, image.width, image.height);
+
+                    self._imageData = image.toDataURL();
+
                     self.createPuzzle();
                 });
-            }
+            };
+
             MemPuzzle.prototype.createPuzzle = function () {
                 var self = this;
 
@@ -52,7 +68,7 @@ var TOLD;
                 var width = self._canvas.getWidth();
                 var height = self._canvas.getHeight();
 
-                // Scale image
+                // Calculate Image Scale
                 var rWidth = width / image.width;
                 var rHeight = height / image.height;
 
@@ -65,13 +81,7 @@ var TOLD;
                 self._offsetX = sx;
                 self._offsetY = sy;
 
-                image.scale(tRatio);
-                image.hasBorders = false;
-                image.hasControls = false;
-
-                // DEBUG: Draw Image
-                //canvas.add(image);
-                this.createPuzzlePieces(self._imageUrl, 0, function (pieces) {
+                this.createPuzzlePieces(self._imageData, 0, function (pieces) {
                     self._pieces = pieces;
 
                     for (var i = 0; i < pieces.length; i++) {
@@ -100,12 +110,12 @@ var TOLD;
                 });
             };
 
-            MemPuzzle.prototype.createPuzzlePieces = function (imageUrl, difficulty, onCreatedPieces) {
+            MemPuzzle.prototype.createPuzzlePieces = function (imageData, difficulty, onCreatedPieces) {
                 var self = this;
 
                 var pieces = [];
 
-                fabric.Image.fromURL(imageUrl, function (mainImage) {
+                fabric.Image.fromURL(imageData, function (mainImage) {
                     var width = mainImage.width;
                     var height = mainImage.height;
 
@@ -123,7 +133,7 @@ var TOLD;
                                 var xInner = x;
                                 var yInner = y;
 
-                                fabric.Image.fromURL(self._imageUrl, function (img) {
+                                fabric.Image.fromURL(imageData, function (img) {
                                     var piece = img;
 
                                     var pAny = piece;
