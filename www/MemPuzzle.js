@@ -156,16 +156,42 @@ var TOLD;
                     var width = mainImage.width;
                     var height = mainImage.height;
 
-                    // Create a n*n puzzle
-                    var pSide = 3;
+                    // Create an n*n puzzle
+                    var pSideCount = 3;
+                    var pWidth = width / pSideCount;
+                    var pHeight = height / pSideCount;
+
+                    var hEdges = [];
+                    var vEdges = [];
+
+                    for (var x = 0; x < pSideCount + 1; x++) {
+                        hEdges.push([]);
+                        vEdges.push([]);
+
+                        for (var y = 0; y < pSideCount + 1; y++) {
+                            var clipLeft = x * pWidth;
+                            var clipTop = y * pHeight;
+                            var clipWidth = pWidth;
+                            var clipHeight = pHeight;
+
+                            // Clip origin is at center of image
+                            var left = clipLeft - width / 2;
+                            var top = clipTop - height / 2;
+                            var right = left + clipWidth;
+                            var bottom = top + clipHeight;
+
+                            hEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top });
+                            vEdges[x][y] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom });
+                        }
+                    }
+
+                    self.drawEdges(hEdges);
+                    self.drawEdges(vEdges);
 
                     var pieces = [];
 
-                    var pWidth = width / pSide;
-                    var pHeight = height / pSide;
-
-                    for (var x = 0; x < pSide; x++) {
-                        for (var y = 0; y < pSide; y++) {
+                    for (var x = 0; x < pSideCount; x++) {
+                        for (var y = 0; y < pSideCount; y++) {
                             (function () {
                                 var xInner = x;
                                 var yInner = y;
@@ -173,62 +199,65 @@ var TOLD;
                                 fabric.Image.fromURL(imageData, function (img) {
                                     var piece = img;
 
-                                    var pAny = piece;
-
-                                    pAny._clipLeft = xInner * pWidth;
-                                    pAny._clipTop = yInner * pHeight;
-                                    pAny._clipWidth = pWidth;
-                                    pAny._clipHeight = pHeight;
-
+                                    ////var pAny = <any>piece;
+                                    ////pAny._clipLeft = xInner * pWidth;
+                                    ////pAny._clipTop = yInner * pHeight;
+                                    ////pAny._clipWidth = pWidth;
+                                    ////pAny._clipHeight = pHeight;
                                     piece.set({
                                         clipTo: function (ctx) {
-                                            // Clip origin is at center of image
-                                            //ctx.rect(
-                                            //    pAny._clipLeft - width / 2,
-                                            //    pAny._clipTop - height / 2,
-                                            //    pAny._clipWidth,
-                                            //    pAny._clipHeight);
-                                            ctx.beginPath();
+                                            //// Clip origin is at center of image
+                                            ////var left = pAny._clipLeft - width / 2;
+                                            ////var top = pAny._clipTop - height / 2;
+                                            ////var right = left + pAny._clipWidth;
+                                            ////var bottom = top + pAny._clipHeight;
+                                            ////var edges = [
+                                            ////    self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }),
+                                            ////    self.createPuzzleEdge({ x: right, y: top }, { x: right, y: bottom }),
+                                            ////    self.createPuzzleEdge({ x: right, y: bottom }, { x: left, y: bottom }),
+                                            ////    self.createPuzzleEdge({ x: left, y: bottom }, { x: left, y: top }),
+                                            ////];
+                                            var topEdge = hEdges[xInner][yInner];
+                                            var rightEdge = vEdges[xInner + 1][yInner];
+                                            var bottomEdge = hEdges[xInner][yInner + 1];
+                                            var leftEdge = vEdges[xInner][yInner];
 
-                                            var left = pAny._clipLeft - width / 2;
-                                            var top = pAny._clipTop - height / 2;
-                                            var right = left + pAny._clipWidth;
-                                            var bottom = top + pAny._clipHeight;
+                                            bottomEdge = {
+                                                points: bottomEdge.points.slice(0).reverse(),
+                                                start: bottomEdge.end,
+                                                end: bottomEdge.start
+                                            };
+                                            leftEdge = {
+                                                points: leftEdge.points.slice(0).reverse(),
+                                                start: leftEdge.end,
+                                                end: leftEdge.start
+                                            };
 
-                                            ctx.moveTo(left, top);
-
-                                            //ctx.lineTo(right, top);
-                                            //ctx.lineTo(right, bottom);
-                                            //ctx.lineTo(left, bottom);
-                                            //ctx.lineTo(left, top);
-                                            var sides = [
-                                                self.createPuzzleShape({ x: left, y: top }, { x: right, y: top }),
-                                                self.createPuzzleShape({ x: right, y: top }, { x: right, y: bottom }),
-                                                self.createPuzzleShape({ x: right, y: bottom }, { x: left, y: bottom }),
-                                                self.createPuzzleShape({ x: left, y: bottom }, { x: left, y: top })
+                                            var edges = [
+                                                topEdge,
+                                                rightEdge,
+                                                bottomEdge,
+                                                leftEdge
                                             ];
 
-                                            for (var iSideNum = 0; iSideNum < sides.length; iSideNum++) {
-                                                var side = sides[iSideNum];
+                                            ctx.beginPath();
+                                            ctx.moveTo(edges[0].start.x, edges[0].start.y);
 
-                                                MemPuzzle.curveThroughPoints(ctx, side);
-                                                //for (var iSide = 0; iSide < side.length; iSide++) {
-                                                //    var s = side[iSide];
-                                                //    ctx.lineTo(s.x, s.y);
-                                                //}
+                                            for (var iSideNum = 0; iSideNum < edges.length; iSideNum++) {
+                                                var edge = edges[iSideNum];
+
+                                                MemPuzzle.curveThroughPoints(ctx, edge.points);
+                                                // DEBUG
+                                                //ctx.lineTo(edge.end.x, edge.end.y);
                                             }
 
-                                            //ctx.lineTo(right, top);
-                                            //ctx.lineTo(right, bottom);
-                                            //ctx.lineTo(left, bottom);
-                                            //ctx.lineTo(left, top);
                                             ctx.closePath();
                                         }
                                     });
 
                                     pieces.push(piece);
 
-                                    if (pieces.length === pSide * pSide) {
+                                    if (pieces.length === pSideCount * pSideCount) {
                                         setTimeout(function () {
                                             onCreatedPieces(pieces);
                                         }, 10);
@@ -240,6 +269,24 @@ var TOLD;
                 });
             };
 
+            MemPuzzle.prototype.drawEdges = function (edges) {
+                var self = this;
+                var ctx = self._canvas.getContext();
+
+                for (var x = 0; x < edges.length; x++) {
+                    for (var y = 0; y < edges[x].length; y++) {
+                        var edge = edges[x][y];
+
+                        ctx.moveTo(edge.start.x, edge.start.y);
+
+                        // Curve through points
+                        MemPuzzle.curveThroughPoints(ctx, edge.points);
+
+                        ctx.stroke();
+                    }
+                }
+            };
+
             MemPuzzle.prototype.drawShapeTest = function () {
                 var self = this;
                 var ctx = self._canvas.getContext();
@@ -249,25 +296,20 @@ var TOLD;
                 var right = 210;
                 var bottom = 210;
 
-                var sides = [
-                    self.createPuzzleShape({ x: left, y: top }, { x: right, y: top }),
-                    self.createPuzzleShape({ x: right, y: top }, { x: right, y: bottom }),
-                    self.createPuzzleShape({ x: right, y: bottom }, { x: left, y: bottom }),
-                    self.createPuzzleShape({ x: left, y: bottom }, { x: left, y: top })
+                var edges = [
+                    self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }),
+                    self.createPuzzleEdge({ x: right, y: top }, { x: right, y: bottom }),
+                    self.createPuzzleEdge({ x: right, y: bottom }, { x: left, y: bottom }),
+                    self.createPuzzleEdge({ x: left, y: bottom }, { x: left, y: top })
                 ];
 
-                for (var iSideNum = 0; iSideNum < sides.length; iSideNum++) {
-                    var side = sides[iSideNum];
+                for (var iEdgeNum = 0; iEdgeNum < edges.length; iEdgeNum++) {
+                    var edge = edges[iEdgeNum];
 
-                    ctx.moveTo(side[0].x, side[0].y);
+                    ctx.moveTo(edge.start.x, edge.start.y);
 
-                    // Line through points
-                    //for (var iSide = 0; iSide < side.length; iSide++) {
-                    //    var s = side[iSide];
-                    //    ctx.lineTo(s.x, s.y);
-                    //}
                     // Curve through points
-                    MemPuzzle.curveThroughPoints(ctx, side);
+                    MemPuzzle.curveThroughPoints(ctx, edge.points);
 
                     ctx.stroke();
                 }
@@ -292,18 +334,18 @@ var TOLD;
                 ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
             };
 
-            MemPuzzle.prototype.createPuzzleShape = function (start, end) {
+            MemPuzzle.prototype.createPuzzleEdge = function (start, end) {
                 // Hard code a basic shape
                 var unitPoints = [
                     { x: 0, y: 0 },
                     { x: 0.2, y: 0 },
                     { x: 0.45, y: 0 },
                     { x: 0.45, y: 0.05 },
-                    { x: 0.4, y: 0.05 },
-                    { x: 0.4, y: 0.15 },
-                    { x: 0.5, y: 0.2 },
-                    { x: 0.6, y: 0.15 },
-                    { x: 0.6, y: 0.05 },
+                    { x: 0.4, y: 0.1 },
+                    { x: 0.4, y: 0.2 },
+                    { x: 0.5, y: 0.25 },
+                    { x: 0.6, y: 0.2 },
+                    { x: 0.6, y: 0.1 },
                     { x: 0.55, y: 0.05 },
                     { x: 0.55, y: 0 },
                     { x: 0.8, y: 0 },
@@ -352,7 +394,7 @@ var TOLD;
                     });
                 }
 
-                return finalPoints;
+                return { points: finalPoints, start: start, end: end };
             };
             return MemPuzzle;
         })();

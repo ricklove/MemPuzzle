@@ -46,6 +46,7 @@ Tasks
 
 - Create Notes
 
+
 ### 4:00-5:40
 
 - Display a Word as a Puzzle
@@ -57,9 +58,13 @@ Tasks
 	- Divide rect into line parts
 	- Create curvy side
 
+### 10:01-10:55
+
+- Store edges
 
 # TODO
 
-- Store side paths
+
 - Reverse side path's points when needed
-- Cache puzzle pieces as imags (to prevent recalculating clip path each render)
+- Cache puzzle pieces as images (to prevent recalculating clip path each render)
+- Change colors
