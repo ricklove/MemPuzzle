@@ -30,6 +30,9 @@ var TOLD;
                         if (nearness < 20) {
                             target.setLeft(self._offsetX);
                             target.setTop(self._offsetY);
+                            // Lock when correct
+                            //target.lockMovementX = true;
+                            //target.lockMovementY = true;
                         }
                     },
                     'object:modified': function (e) {
@@ -103,7 +106,7 @@ var TOLD;
             MemPuzzle.prototype.createPuzzle = function (makeOutsideFlat, difficulty, randomize) {
                 if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
                 if (typeof difficulty === "undefined") { difficulty = 0; }
-                if (typeof randomize === "undefined") { randomize = false; }
+                if (typeof randomize === "undefined") { randomize = true; }
                 var self = this;
 
                 var canvas = self._canvas;
@@ -147,16 +150,34 @@ var TOLD;
 
                         // Randomize
                         if (randomize) {
-                            var diff = 100;
+                            var diff = 200;
                             x += diff * Math.random() - diff / 2;
                             y += diff * Math.random() - diff / 2;
+                            //if (x < 0) { x = 0; }
+                            //if (y < 0) { y = 0; }
+                            //if (x > canvas.getWidth() - piece.width) { x = canvas.getWidth() - piece.width; }
+                            //if (y > canvas.getHeight() - piece.height) { y = canvas.getHeight() - piece.height; }
                         }
 
                         piece.setLeft(x);
                         piece.setTop(y);
+                        // Add to canvas
+                        //canvas.add(piece);
+                    }
 
-                        // Add pieces
-                        canvas.add(piece);
+                    // Randomize z index
+                    var remainingPieces = pieces.map(function (p) {
+                        return p;
+                    });
+                    var randomPieces = [];
+
+                    while (remainingPieces.length > 0) {
+                        var r = remainingPieces.splice(Math.floor(Math.random() * remainingPieces.length), 1);
+                        randomPieces.push(r[0]);
+                    }
+
+                    for (var i = 0; i < randomPieces.length; i++) {
+                        canvas.add(randomPieces[i]);
                     }
 
                     canvas.renderAll();
@@ -173,15 +194,19 @@ var TOLD;
                     var height = mainImage.height;
 
                     // Create an h*v puzzle
-                    var minSideCount = 2;
+                    var minSideCount = 3;
                     var hSideCount = minSideCount;
                     var vSideCount = minSideCount;
 
                     var widthHeightRatio = width / height;
 
                     if (widthHeightRatio > 1) {
+                        widthHeightRatio = Math.max(1, widthHeightRatio * 0.66);
+
                         hSideCount = Math.floor(widthHeightRatio * minSideCount);
                     } else {
+                        widthHeightRatio = Math.min(1, widthHeightRatio * 1.5);
+
                         vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
                     }
 

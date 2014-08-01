@@ -81,6 +81,14 @@ Tasks
 
 - Fix big puzzle piece (not using h/v properly)
 
+### 11:59-12:06
+### 12:35-12:45
+
+- BEGIN: Stacking Pieces
+- Randomize z-index of pieces
+
 # TODO
+
+- Stack pieces in corner
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
