@@ -238,10 +238,13 @@ module TOLD.MemPuzzle {
 
                                             var side = sides[iSideNum];
 
-                                            for (var iSide = 0; iSide < side.length; iSide++) {
-                                                var s = side[iSide];
-                                                ctx.lineTo(s.x, s.y);
-                                            }
+                                            MemPuzzle.curveThroughPoints(ctx, side);
+
+
+                                            //for (var iSide = 0; iSide < side.length; iSide++) {
+                                            //    var s = side[iSide];
+                                            //    ctx.lineTo(s.x, s.y);
+                                            //}
                                         }
 
                                         //ctx.lineTo(right, top);

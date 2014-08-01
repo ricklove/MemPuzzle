@@ -50,8 +50,16 @@ Tasks
 
 - Display a Word as a Puzzle
 
-### 6:15-
+### 6:15-7:36
 
 - Create puzzle shape
 	- Create simple shape calculation
 	- Divide rect into line parts
+	- Create curvy side
+
+
+# TODO
+
+- Store side paths
+- Reverse side path's points when needed
+- Cache puzzle pieces as imags (to prevent recalculating clip path each render)
