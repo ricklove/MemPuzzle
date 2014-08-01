@@ -11,7 +11,7 @@ module TOLD.MemPuzzle {
 
         private _offsetX: number = 0;
         private _offsetY: number = 0;
-        private _pieces: fabric.IImage[] = null;
+        private _pieces: IPiece[] = null;
 
         constructor(canvasId: string) {
             var self = this;
@@ -149,14 +149,15 @@ module TOLD.MemPuzzle {
                 // Draw pieces
                 for (var i = 0; i < pieces.length; i++) {
                     var piece = pieces[i];
+                    var pImage = piece.image;
 
-                    piece.scale(tRatio);
+                    pImage.scale(tRatio);
 
                     // BUG: IN FABRICJS - Sometimes some of the pieces are unclickable
-                    piece.perPixelTargetFind = true;
-                    (<any>piece).targetFindTolerance = 4;
-                    piece.hasBorders = false;
-                    piece.hasControls = false;
+                    pImage.perPixelTargetFind = true;
+                    (<any>pImage).targetFindTolerance = 4;
+                    pImage.hasBorders = false;
+                    pImage.hasControls = false;
 
 
                     var x = sx;
@@ -174,8 +175,8 @@ module TOLD.MemPuzzle {
                         //if (y > canvas.getHeight() - piece.height) { y = canvas.getHeight() - piece.height; }
                     }
 
-                    piece.setLeft(x);
-                    piece.setTop(y);
+                    pImage.setLeft(x);
+                    pImage.setTop(y);
 
                     // Add to canvas
                     //canvas.add(piece);
@@ -183,7 +184,7 @@ module TOLD.MemPuzzle {
 
                 // Randomize z index
                 var remainingPieces = pieces.map(p=> p);
-                var randomPieces = <fabric.IImage[]>[];
+                var randomPieces = <IPiece[]>[];
 
                 while (remainingPieces.length > 0) {
                     var r = remainingPieces.splice(Math.floor(Math.random() * remainingPieces.length), 1);
@@ -191,7 +192,7 @@ module TOLD.MemPuzzle {
                 }
 
                 for (var i = 0; i < randomPieces.length; i++) {
-                    canvas.add(randomPieces[i]);
+                    canvas.add(randomPieces[i].image);
                 }
 
                 canvas.renderAll();
@@ -199,7 +200,7 @@ module TOLD.MemPuzzle {
 
         }
 
-        private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: fabric.IImage[]) => void) {
+        private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: IPiece[]) => void) {
             var self = this;
 
             var pieces = <fabric.IImage[]>[];
@@ -292,8 +293,7 @@ module TOLD.MemPuzzle {
                 //self.drawEdges(hEdges);
                 //self.drawEdges(vEdges);
 
-
-                var pieces = <fabric.IImage[]>[];
+                var pieces = <IPiece[]>[];
 
                 for (var h = 0; h < hSideCount; h++) {
                     for (var v = 0; v < vSideCount; v++) {
@@ -304,16 +304,15 @@ module TOLD.MemPuzzle {
 
                             fabric.Image.fromURL(imageData, function (img) {
 
-                                var piece = img;
+                                var piece = {
+                                    image: img, 
+                                    x: xInner * pWidth,
+                                    y: yInner * pHeight,
+                                    width: pWidth,
+                                    height: pHeight,
+                                };
 
-                                ////var pAny = <any>piece;
-
-                                ////pAny._clipLeft = xInner * pWidth;
-                                ////pAny._clipTop = yInner * pHeight;
-                                ////pAny._clipWidth = pWidth;
-                                ////pAny._clipHeight = pHeight;
-
-                                piece.set({
+                                piece.image.set({
                                     clipTo: (ctx: CanvasRenderingContext2D) => {
 
                                         //// Clip origin is at center of image
@@ -543,6 +542,14 @@ module TOLD.MemPuzzle {
             return { points: finalPoints, start: start, end: end };
         }
 
+    }
+
+    interface IPiece {
+        image: fabric.IImage;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
     }
 
     interface IEdge {

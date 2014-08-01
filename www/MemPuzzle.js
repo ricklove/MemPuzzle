@@ -136,14 +136,15 @@ var TOLD;
 
                     for (var i = 0; i < pieces.length; i++) {
                         var piece = pieces[i];
+                        var pImage = piece.image;
 
-                        piece.scale(tRatio);
+                        pImage.scale(tRatio);
 
                         // BUG: IN FABRICJS - Sometimes some of the pieces are unclickable
-                        piece.perPixelTargetFind = true;
-                        piece.targetFindTolerance = 4;
-                        piece.hasBorders = false;
-                        piece.hasControls = false;
+                        pImage.perPixelTargetFind = true;
+                        pImage.targetFindTolerance = 4;
+                        pImage.hasBorders = false;
+                        pImage.hasControls = false;
 
                         var x = sx;
                         var y = sy;
@@ -159,8 +160,8 @@ var TOLD;
                             //if (y > canvas.getHeight() - piece.height) { y = canvas.getHeight() - piece.height; }
                         }
 
-                        piece.setLeft(x);
-                        piece.setTop(y);
+                        pImage.setLeft(x);
+                        pImage.setTop(y);
                         // Add to canvas
                         //canvas.add(piece);
                     }
@@ -177,7 +178,7 @@ var TOLD;
                     }
 
                     for (var i = 0; i < randomPieces.length; i++) {
-                        canvas.add(randomPieces[i]);
+                        canvas.add(randomPieces[i].image);
                     }
 
                     canvas.renderAll();
@@ -280,14 +281,15 @@ var TOLD;
                                 var yInner = v;
 
                                 fabric.Image.fromURL(imageData, function (img) {
-                                    var piece = img;
+                                    var piece = {
+                                        image: img,
+                                        x: xInner * pWidth,
+                                        y: yInner * pHeight,
+                                        width: pWidth,
+                                        height: pHeight
+                                    };
 
-                                    ////var pAny = <any>piece;
-                                    ////pAny._clipLeft = xInner * pWidth;
-                                    ////pAny._clipTop = yInner * pHeight;
-                                    ////pAny._clipWidth = pWidth;
-                                    ////pAny._clipHeight = pHeight;
-                                    piece.set({
+                                    piece.image.set({
                                         clipTo: function (ctx) {
                                             //// Clip origin is at center of image
                                             ////var left = pAny._clipLeft - width / 2;

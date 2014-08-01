@@ -87,8 +87,11 @@ Tasks
 - BEGIN: Stacking Pieces
 - Randomize z-index of pieces
 
+### 15:53-15:59
+- Stack pieces in corner
+	- Create IPiece
+
 # TODO
 
-- Stack pieces in corner
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
