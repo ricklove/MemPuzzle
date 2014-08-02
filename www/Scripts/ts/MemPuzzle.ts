@@ -65,7 +65,7 @@ module TOLD.MemPuzzle {
 
         }
 
-        stackPieces(shouldStackAll= false, shouldSpreadOut= true) {
+        stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
             var self = this;
             var pieces = self._pieces;
             var LOCKRADIUS = MemPuzzle.LOCKRADIUS;

@@ -54,7 +54,7 @@ var TOLD;
             }
             MemPuzzle.prototype.stackPieces = function (shouldStackAll, shouldSpreadOut) {
                 if (typeof shouldStackAll === "undefined") { shouldStackAll = false; }
-                if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = true; }
+                if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = false; }
                 var self = this;
                 var pieces = self._pieces;
                 var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
