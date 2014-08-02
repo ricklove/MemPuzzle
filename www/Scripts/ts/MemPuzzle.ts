@@ -633,7 +633,7 @@ module TOLD.MemPuzzle {
             var self = this;
             var canvas = self._canvas;
 
-            var thickness = 5;
+            var thickness = 10;
 
             var outline = new fabric.Rect({
                 left: self._puzzleX - thickness,
