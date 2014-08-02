@@ -159,5 +159,7 @@ Remaining Features
 
 # TODO
 
+- Bring clicked puzzle piece to front
+- Find the visible pixels in the text and resize image for that
 - Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)

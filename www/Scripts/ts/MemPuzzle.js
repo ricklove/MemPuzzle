@@ -36,6 +36,7 @@ var TOLD;
                     'object:moving': function (e) {
                         var target = e.target;
                         target.opacity = 0.5;
+                        target.bringToFront();
 
                         // Snap to target
                         var nearness = Math.abs(self._puzzleX - target.left) + Math.abs(self._puzzleY - target.top);
@@ -164,19 +165,24 @@ var TOLD;
                 var doWork = function () {
                     var image = self.getImageCanvas();
 
-                    //image.setWidth(self._canvas.getWidth());
-                    //image.setHeight(self._canvas.getHeight());
+                    image.setWidth(self._canvas.getWidth());
+                    image.setHeight(self._canvas.getHeight());
+
                     //image._objects = [];
                     image.clear();
 
                     // Draw Text
                     var textPadding = 10;
+                    var cutoffTop = 0.25;
+                    var cutoffHeightKeep = 0.8;
 
+                    //cutoffTop = 0.25;
+                    //cutoffHeightKeep = 0.9;
                     var textObject = new fabric.Text(text, {
                         fontFamily: shouldUseSans ? puzzleFontName : serifFontName,
                         fontSize: (self._canvas.getHeight()),
                         //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
-                        top: -self._canvas.getHeight() * 0.25 + textPadding,
+                        top: -self._canvas.getHeight() * cutoffTop + textPadding,
                         left: textPadding
                     });
                     image.add(textObject);
@@ -184,7 +190,7 @@ var TOLD;
                     // Set to fit text
                     image.backgroundColor = "white";
                     image.setWidth(textObject.width + textPadding * 2);
-                    image.setHeight(textObject.height * 0.8 + textPadding * 2);
+                    image.setHeight(textObject.height * cutoffHeightKeep + textPadding * 2);
 
                     image.renderAll();
 
