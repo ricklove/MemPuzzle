@@ -188,7 +188,7 @@ module TOLD.MemPuzzle {
                 //image.setWidth(self._canvas.getWidth());
                 //image.setHeight(self._canvas.getHeight());
                 //image._objects = [];
-                //image.clear();
+                image.clear();
 
                 // Draw Text
                 var textPadding = 10;
