@@ -35,11 +35,12 @@
 
             var doWhenLoaded = function () {
 
-                if (!TOLD.MemPuzzle
+                if (!window.TOLD
+                    || !TOLD.MemPuzzle
                     || !TOLD.MemPuzzle.MemPuzzle
                     || !TOLD.MemPuzzle.Subject
                     || !TOLD.MemPuzzle.Subjects
-                    || !fabric) {
+                    || !window.fabric) {
 
                     setTimeout(doWhenLoaded, 500);
                     return;
