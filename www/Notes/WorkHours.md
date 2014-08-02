@@ -137,9 +137,15 @@ Remaining Features
 - Respond to Complete Puzzle
 - Goto next word on completion
 
+### 4:34-4:46
+
+- Show target picture at beginning of puzzle
+
+
 ---
 
 # TODO
 
+- Handle simple puzzles ("I")
 - Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)

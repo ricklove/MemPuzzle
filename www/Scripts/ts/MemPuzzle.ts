@@ -203,7 +203,7 @@ module TOLD.MemPuzzle {
             self.createPuzzle(onPuzzleComplete);
         }
 
-        private createPuzzle(onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true) {
+        private createPuzzle(onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true, timeToShowCompletedPuzzle= 2000) {
             var self = this;
             var PADDING = MemPuzzle.PADDING;
 
@@ -239,6 +239,7 @@ module TOLD.MemPuzzle {
             self._puzzleWidth = sWidth;
             self._puzzleHeight = sHeight;
 
+            this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
             this.createPuzzleOutline();
 
             this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, (pieces) => {
@@ -297,6 +298,8 @@ module TOLD.MemPuzzle {
             });
 
         }
+
+        
 
         private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: IPiece[]) => void) {
             var self = this;
@@ -492,6 +495,38 @@ module TOLD.MemPuzzle {
                     }
                 }
 
+            });
+        }
+
+        private createPuzzleCompleted(imageData: string, timeToShow: number) {
+            var self = this;
+            var canvas = self._canvas;
+
+            var scale = self._puzzleScale;
+            var x = self._puzzleX;
+            var y = self._puzzleY;
+
+            fabric.Image.fromURL(imageData, function (mainImage) {
+
+                mainImage.set({
+                    scaleX: scale,
+                    scaleY: scale,
+
+                    left: x,
+                    top: y,
+
+                    hasBorders: false,
+                    hasControls: false,
+                    lockMovementX: true,
+                    lockMovementY: true,
+                    selectable: false,
+                });
+
+                canvas.add(mainImage);
+
+                setTimeout(() => {
+                    mainImage.remove();
+                }, timeToShow);
             });
         }
 

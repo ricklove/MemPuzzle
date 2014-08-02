@@ -182,13 +182,14 @@ var TOLD;
                 self.createPuzzle(onPuzzleComplete);
             };
 
-            MemPuzzle.prototype.createPuzzle = function (onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces) {
+            MemPuzzle.prototype.createPuzzle = function (onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces, timeToShowCompletedPuzzle) {
                 if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
                 }; }
                 if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
                 if (typeof difficulty === "undefined") { difficulty = 0; }
                 if (typeof shouldRandomizePieces === "undefined") { shouldRandomizePieces = false; }
                 if (typeof shouldStackPieces === "undefined") { shouldStackPieces = true; }
+                if (typeof timeToShowCompletedPuzzle === "undefined") { timeToShowCompletedPuzzle = 2000; }
                 var self = this;
                 var PADDING = MemPuzzle.PADDING;
 
@@ -222,6 +223,7 @@ var TOLD;
                 self._puzzleWidth = sWidth;
                 self._puzzleHeight = sHeight;
 
+                this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
                 this.createPuzzleOutline();
 
                 this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, function (pieces) {
@@ -451,6 +453,35 @@ var TOLD;
                             })();
                         }
                     }
+                });
+            };
+
+            MemPuzzle.prototype.createPuzzleCompleted = function (imageData, timeToShow) {
+                var self = this;
+                var canvas = self._canvas;
+
+                var scale = self._puzzleScale;
+                var x = self._puzzleX;
+                var y = self._puzzleY;
+
+                fabric.Image.fromURL(imageData, function (mainImage) {
+                    mainImage.set({
+                        scaleX: scale,
+                        scaleY: scale,
+                        left: x,
+                        top: y,
+                        hasBorders: false,
+                        hasControls: false,
+                        lockMovementX: true,
+                        lockMovementY: true,
+                        selectable: false
+                    });
+
+                    canvas.add(mainImage);
+
+                    setTimeout(function () {
+                        mainImage.remove();
+                    }, timeToShow);
                 });
             };
 
