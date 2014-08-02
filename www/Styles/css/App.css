@@ -1,0 +1,16 @@
+﻿/* http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax */
+/* Fonts from GoogleFonts: https://www.google.com/fonts */
+/* To download from GoogleFonts: Use Chrome Emulation User Agent: */
+/* http://stackoverflow.com/questions/15501319/how-to-transform-google-web-fonts-to-a-combined-css */
+/* http://sanchez.org.ph/use-host-and-download-google-fonts-on-your-own-website/ */
+/* eot - "IE7" */
+/* woff - "iPhone6" */
+/* ttf - "Android 2.3" */
+/* svg - "Mozilla/4.0 (iPad; CPU OS 4_0_1 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/4.1 Mobile/9A405 Safari/7534.48.3" */
+@font-face {
+    font-family: 'PuzzleFont';
+    src: url('Fonts/PatrickHand.eot?iefix') format('embedded-opentype'), url('Fonts/PatrickHand.woff') format('woff'), url('Fonts/PatrickHand.ttf') format('truetype'), url('Fonts/PatrickHand.svg#PatrickHand') format('svg');
+    /*src: url('Fonts/Handlee.eot?iefix') format('embedded-opentype'), url('Fonts/Handlee.woff') format('woff'), url('Fonts/Handlee.ttf') format('truetype'), url('Fonts/Handlee.svg#Handlee') format('svg');*/
+    font-style: normal;
+    font-weight: 400;
+}

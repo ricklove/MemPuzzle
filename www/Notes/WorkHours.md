@@ -146,6 +146,10 @@ Remaining Features
 - Reduce number of pieces for simple words
 - Change to monospace
 
+### 4:58-5:45
+
+- Use a custom handwriting font
+
 ---
 
 # TODO

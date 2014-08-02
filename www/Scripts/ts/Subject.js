@@ -30,7 +30,9 @@ var TOLD;
                     var entry = self._subject.entries[eIndex];
 
                     self._puzzle.createPuzzleFromText(entry.word, function () {
-                        self.gotoNextEntry();
+                        setTimeout(function () {
+                            self.gotoNextEntry();
+                        }, 1000);
                     }, true);
                 };
                 return SubjectController;

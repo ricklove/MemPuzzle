@@ -161,7 +161,7 @@ var TOLD;
                 var textPadding = 10;
 
                 var textObject = new fabric.Text(text, {
-                    fontFamily: shouldUseSans ? "Monospace" : "Georgia",
+                    fontFamily: shouldUseSans ? "PuzzleFont" : "Georgia",
                     fontSize: (self._canvas.getHeight()),
                     //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
                     top: -self._canvas.getHeight() * 0.25 + textPadding,
