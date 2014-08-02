@@ -23,6 +23,8 @@ module TOLD.MemPuzzle {
 
         private _pieces: IPiece[] = null;
 
+        private _onPuzzleComplete = () => { };
+
         constructor(canvasId: string) {
             var self = this;
             var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
@@ -54,15 +56,37 @@ module TOLD.MemPuzzle {
                         // Lock when correct
                         //target.lockMovementX = true;
                         //target.lockMovementY = true;
+
                     }
                 },
                 'object:modified': function (e: any) {
                     var target = <fabric.IImage> e.target;
 
                     target.opacity = 1;
+
+                    self.checkForComplete();
                 }
             });
 
+        }
+
+        private checkForComplete() {
+            var self = this;
+            var pieces = self._pieces;
+            var puzzleX = self._puzzleX;
+            var puzzleY = self._puzzleY;
+
+
+            for (var i = 0; i < pieces.length; i++) {
+                var piece = pieces[i];
+
+                if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
+                    return;
+                }
+            }
+
+            // Complete
+            self._onPuzzleComplete();
         }
 
         stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
@@ -137,7 +161,7 @@ module TOLD.MemPuzzle {
         //    });
         //}
 
-        createPuzzleFromText(text: string, shouldUseSans= false) {
+        createPuzzleFromText(text: string, onPuzzleComplete= () => { }, shouldUseSans= false) {
             var self = this;
 
             var image = self._imageCanvas;
@@ -176,16 +200,23 @@ module TOLD.MemPuzzle {
             // Save Data
             self._imageData = image.toDataURL("png");
 
-            self.createPuzzle();
+            self.createPuzzle(onPuzzleComplete);
         }
 
-        private createPuzzle(makeOutsideFlat= true, difficulty= 0, shouldRandomizePieces= false, shouldStackPieces = true) {
+        private createPuzzle(onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true) {
             var self = this;
             var PADDING = MemPuzzle.PADDING;
 
             var canvas = self._canvas;
 
             var image = self._imageCanvas;
+
+            // Clear Puzzle
+            canvas.clear();
+
+            // Set Puzzle complete
+            self._onPuzzleComplete = onPuzzleComplete;
+
 
             // Calculate Image Scale
 
@@ -568,7 +599,7 @@ module TOLD.MemPuzzle {
             ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
         }
 
-        private createPuzzleEdge(start: IPoint, end: IPoint, isInset= true): IEdge {
+        private createPuzzleEdge(start: IPoint, end: IPoint, isInset = true): IEdge {
 
             // Hard code a basic shape
             var unitPoints = <IPoint[]>[

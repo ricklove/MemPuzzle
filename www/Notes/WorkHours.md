@@ -132,10 +132,10 @@ Remaining Features
 
 - Load Sight Words List
 
-### 4:19-
+### 4:19-4:33
 
-- Responde to Complete Puzzle
-
+- Respond to Complete Puzzle
+- Goto next word on completion
 
 ---
 

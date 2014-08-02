@@ -46,7 +46,7 @@ module TOLD.MemPuzzle.Subject {
 
             var entry = self._subject.entries[eIndex];
 
-            self._puzzle.createPuzzleFromText(entry.word, true);
+            self._puzzle.createPuzzleFromText(entry.word, () => { self.gotoNextEntry(); }, true);
         }
     }
 }

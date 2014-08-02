@@ -14,6 +14,8 @@ var TOLD;
                 this._puzzleWidth = 0;
                 this._puzzleHeight = 0;
                 this._pieces = null;
+                this._onPuzzleComplete = function () {
+                };
                 var self = this;
                 var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
 
@@ -49,9 +51,29 @@ var TOLD;
                         var target = e.target;
 
                         target.opacity = 1;
+
+                        self.checkForComplete();
                     }
                 });
             }
+            MemPuzzle.prototype.checkForComplete = function () {
+                var self = this;
+                var pieces = self._pieces;
+                var puzzleX = self._puzzleX;
+                var puzzleY = self._puzzleY;
+
+                for (var i = 0; i < pieces.length; i++) {
+                    var piece = pieces[i];
+
+                    if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
+                        return;
+                    }
+                }
+
+                // Complete
+                self._onPuzzleComplete();
+            };
+
             MemPuzzle.prototype.stackPieces = function (shouldStackAll, shouldSpreadOut) {
                 if (typeof shouldStackAll === "undefined") { shouldStackAll = false; }
                 if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = false; }
@@ -115,7 +137,9 @@ var TOLD;
             //        self.createPuzzle();
             //    });
             //}
-            MemPuzzle.prototype.createPuzzleFromText = function (text, shouldUseSans) {
+            MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleComplete, shouldUseSans) {
+                if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
+                }; }
                 if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
                 var self = this;
 
@@ -155,10 +179,12 @@ var TOLD;
                 // Save Data
                 self._imageData = image.toDataURL("png");
 
-                self.createPuzzle();
+                self.createPuzzle(onPuzzleComplete);
             };
 
-            MemPuzzle.prototype.createPuzzle = function (makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces) {
+            MemPuzzle.prototype.createPuzzle = function (onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces) {
+                if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
+                }; }
                 if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
                 if (typeof difficulty === "undefined") { difficulty = 0; }
                 if (typeof shouldRandomizePieces === "undefined") { shouldRandomizePieces = false; }
@@ -169,6 +195,12 @@ var TOLD;
                 var canvas = self._canvas;
 
                 var image = self._imageCanvas;
+
+                // Clear Puzzle
+                canvas.clear();
+
+                // Set Puzzle complete
+                self._onPuzzleComplete = onPuzzleComplete;
 
                 // Calculate Image Scale
                 var width = self._canvas.getWidth() - PADDING * 2;
