@@ -128,6 +128,14 @@ Remaining Features
 
 - Create Subject Controller
 
+### 4:06-4:18
+
+- Load Sight Words List
+
+### 4:19-
+
+- Responde to Complete Puzzle
+
 
 ---
 
