@@ -14,29 +14,63 @@
         var stopLoading = TOLD.MemPuzzle.showLoading("cvsPuzzle");
     </script>
 
-    <script src="Scripts/js/External/fabric.min.js" defer="defer"></script>
+    <!--    <script src="Scripts/js/External/fabric.min.js" defer="defer"></script>
     <script src="Scripts/ts/MemPuzzle.js" defer="defer"></script>
     <script src="Scripts/ts/Subject.js" defer="defer"></script>
-    <script src="Scripts/ts/Subjects/SightWords.js" defer="defer"></script>
+    <script src="Scripts/ts/Subjects/SightWords.js" defer="defer"></script>-->
 
-    <script defer="defer">
-        setTimeout(function () {
-            stopLoading();
+    <script type="text/javascript">
 
-            puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
-            //puzzle.createPuzzleFromImage("test.png");
-            //puzzle.createPuzzleFromText("testlTjJ");
-            //puzzle.createPuzzleFromText("Tiger");
-            //puzzle.createPuzzleFromText("Psychology");
-            //puzzle.createPuzzleFromText("whale");
-            //puzzle.createPuzzleFromText("please");
-            //puzzle.createPuzzleFromText("Czechoslovakia ");
-            //puzzle.createPuzzleFromText("conscientious ");
-            //puzzle.drawShapeTest();
+        function addScript(src) {
+            var element = document.createElement("script");
+            element.src = src;
+            document.body.appendChild(element);
+        }
 
-            controller = new TOLD.MemPuzzle.Subject.SubjectController(puzzle);
-            controller.loadSubject(new TOLD.MemPuzzle.Subjects.SightWords());
-        }, 3000);
+        function runOnLoad() {
+            addScript("Scripts/js/External/fabric.min.js");
+            addScript("Scripts/ts/MemPuzzle.js");
+            addScript("Scripts/ts/Subject.js");
+            addScript("Scripts/ts/Subjects/SightWords.js");
+
+            var doWhenLoaded = function () {
+
+                if (!TOLD.MemPuzzle
+                    || !TOLD.MemPuzzle.MemPuzzle
+                    || !TOLD.MemPuzzle.Subject
+                    || !TOLD.MemPuzzle.Subjects
+                    || !fabric) {
+
+                    setTimeout(doWhenLoaded, 500);
+                    return;
+                }
+
+                stopLoading();
+
+                puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
+                //puzzle.createPuzzleFromImage("test.png");
+                //puzzle.createPuzzleFromText("testlTjJ");
+                //puzzle.createPuzzleFromText("Tiger");
+                //puzzle.createPuzzleFromText("Psychology");
+                //puzzle.createPuzzleFromText("whale");
+                //puzzle.createPuzzleFromText("please");
+                //puzzle.createPuzzleFromText("Czechoslovakia ");
+                //puzzle.createPuzzleFromText("conscientious ");
+                //puzzle.drawShapeTest();
+
+                controller = new TOLD.MemPuzzle.Subject.SubjectController(puzzle);
+                controller.loadSubject(new TOLD.MemPuzzle.Subjects.SightWords());
+            };
+
+            doWhenLoaded();
+        }
+
+        if (window.addEventListener)
+            window.addEventListener("load", runOnLoad, false);
+        else if (window.attachEvent)
+            window.attachEvent("onload", runOnLoad);
+        else window.onload = runOnLoad;
     </script>
+
 </body>
 </html>
