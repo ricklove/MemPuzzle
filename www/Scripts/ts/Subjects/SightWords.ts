@@ -8,7 +8,7 @@ module TOLD.MemPuzzle.Subjects {
 
             var words = SightWords.wordList.split(" ").map(w=> w.trim()).filter(w=> w.length > 0 && w[0] !== "#");
 
-            return { entries: words.map(w=> { return { word: w }; }) };
+            return { name: "Sight Words", entries: words.map(w=> { return { word: w }; }) };
         }
 
         private static wordList = ""//"Tag the go "

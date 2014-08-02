@@ -13,7 +13,7 @@ var TOLD;
                         return w.length > 0 && w[0] !== "#";
                     });
 
-                    return { entries: words.map(function (w) {
+                    return { name: "Sight Words", entries: words.map(function (w) {
                             return { word: w };
                         }) };
                 };

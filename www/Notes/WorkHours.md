@@ -155,11 +155,16 @@ Remaining Features
 
 - Wait for custom font to load
 
+### 7:24-7:35
+
+- Bring clicked puzzle piece to front
+- Resume index
+
+
 ---
 
 # TODO
 
-- Bring clicked puzzle piece to front
 - Find the visible pixels in the text and resize image for that
 - Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)

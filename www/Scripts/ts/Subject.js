@@ -7,28 +7,52 @@ var TOLD;
                 function SubjectController(puzzle) {
                     this._puzzle = puzzle;
                     this._subject = null;
-                    this._entryIndex = -1;
                 }
+                SubjectController.prototype.getEntryIndex = function () {
+                    var self = this;
+                    var indexStr = localStorage.getItem("EntryIndex_" + self._subject.name);
+                    var index = parseInt(indexStr);
+
+                    if (isNaN(index) || index < 0) {
+                        return -1;
+                    }
+
+                    return index;
+                };
+
+                SubjectController.prototype.setEntryIndex = function (index) {
+                    var self = this;
+                    localStorage.setItem("EntryIndex_" + self._subject.name, index + "");
+                };
+
                 SubjectController.prototype.loadSubject = function (subjectProvider) {
                     var self = this;
                     var subject = subjectProvider.getSubject();
 
                     self._subject = subject;
 
-                    self.gotoNextEntry();
+                    self.gotoNextEntry(false);
                 };
 
-                SubjectController.prototype.gotoNextEntry = function () {
+                SubjectController.prototype.gotoNextEntry = function (shouldGoNext) {
+                    if (typeof shouldGoNext === "undefined") { shouldGoNext = true; }
                     var self = this;
 
-                    var eIndex = self._entryIndex = self._entryIndex + 1;
+                    var eIndex = self.getEntryIndex();
 
-                    if (eIndex >= self._subject.entries.length) {
-                        eIndex = self._entryIndex = 0;
+                    if (shouldGoNext) {
+                        eIndex++;
                     }
 
-                    var entry = self._subject.entries[eIndex];
+                    if (eIndex < 0) {
+                        eIndex = 0;
+                    } else if (eIndex >= self._subject.entries.length) {
+                        eIndex = 0;
+                    }
 
+                    self.setEntryIndex(eIndex);
+
+                    var entry = self._subject.entries[eIndex];
                     self._puzzle.createPuzzleFromText(entry.word, function () {
                         setTimeout(function () {
                             self.gotoNextEntry();
