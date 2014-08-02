@@ -25,8 +25,8 @@ var TOLD;
                 });
 
                 canvas.backgroundColor = "lightgrey";
-                canvas.setWidth(window.innerWidth - 60);
-                canvas.setHeight(window.innerHeight - 60);
+                canvas.setWidth(document.body.clientWidth - 20);
+                canvas.setHeight(window.innerHeight - 30);
 
                 canvas.on({
                     //'mouse:down': function (e: any) {
