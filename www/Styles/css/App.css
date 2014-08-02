@@ -14,3 +14,10 @@
     font-style: normal;
     font-weight: 400;
 }
+
+@font-face {
+    font-family: 'NOFONT';
+    src: url('FAKE.eot?iefix') format('embedded-opentype'), url('FAKE.woff') format('woff'), url('FAKE.ttf') format('truetype'), url('FAKE.svg#NOFONT') format('svg');
+    font-style: normal;
+    font-weight: 400;
+}

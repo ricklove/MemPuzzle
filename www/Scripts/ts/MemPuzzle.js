@@ -137,10 +137,7 @@ var TOLD;
             //        self.createPuzzle();
             //    });
             //}
-            MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleComplete, shouldUseSans) {
-                if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
-                }; }
-                if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
+            MemPuzzle.prototype.getImageCanvas = function () {
                 var self = this;
 
                 var image = self._imageCanvas;
@@ -152,34 +149,112 @@ var TOLD;
                     image.renderOnAddition = false;
                 }
 
-                //image.setWidth(self._canvas.getWidth());
-                //image.setHeight(self._canvas.getHeight());
-                image._objects = [];
+                return image;
+            };
 
-                //image.clear();
-                // Draw Text
-                var textPadding = 10;
+            MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleComplete, shouldUseSans) {
+                if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
+                }; }
+                if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
+                var self = this;
 
-                var textObject = new fabric.Text(text, {
-                    fontFamily: shouldUseSans ? "PuzzleFont" : "Georgia",
-                    fontSize: (self._canvas.getHeight()),
-                    //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
-                    top: -self._canvas.getHeight() * 0.25 + textPadding,
-                    left: textPadding
+                var puzzleFontName = "PuzzleFont";
+                var serifFontName = "DOES NOT EXIST";
+
+                var doWork = function () {
+                    var image = self.getImageCanvas();
+
+                    //image.setWidth(self._canvas.getWidth());
+                    //image.setHeight(self._canvas.getHeight());
+                    //image._objects = [];
+                    //image.clear();
+                    // Draw Text
+                    var textPadding = 10;
+
+                    var textObject = new fabric.Text(text, {
+                        fontFamily: shouldUseSans ? puzzleFontName : serifFontName,
+                        fontSize: (self._canvas.getHeight()),
+                        //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
+                        top: -self._canvas.getHeight() * 0.25 + textPadding,
+                        left: textPadding
+                    });
+                    image.add(textObject);
+
+                    // Set to fit text
+                    image.backgroundColor = "white";
+                    image.setWidth(textObject.width + textPadding * 2);
+                    image.setHeight(textObject.height * 0.8 + textPadding * 2);
+
+                    image.renderAll();
+
+                    //setTimeout(() => {
+                    //    //Re-render
+                    //    image.renderAll();
+                    // Save Data
+                    self._imageData = image.toDataURL("png");
+
+                    self.createPuzzle(onPuzzleComplete);
+                    //}, 100);
+                };
+
+                if (shouldUseSans) {
+                    self.waitForFont(puzzleFontName, doWork, doWork);
+                } else {
+                    doWork();
+                }
+            };
+
+            MemPuzzle.prototype.waitForFont = function (fontName, onLoadedCallback, onTimeoutCallback) {
+                var self = this;
+
+                var text = ".iJk ,@#$1230;',./?";
+
+                var offset = -10000;
+                var fontsize = 300;
+
+                // DEBUG
+                offset = 0;
+                fontsize = 30;
+
+                var noFont = new fabric.Text(text, {
+                    fontFamily: "NOFONT",
+                    fontSize: fontsize,
+                    top: 20 + offset
                 });
-                image.add(textObject);
 
-                // Set to fit text
-                image.backgroundColor = "white";
-                image.setWidth(textObject.width + textPadding * 2);
-                image.setHeight(textObject.height * 0.8 + textPadding * 2);
+                var myFont = new fabric.Text(text, {
+                    fontFamily: fontName,
+                    fontSize: fontsize,
+                    top: 120 + offset
+                });
 
-                image.renderAll();
+                var image = self.getImageCanvas();
+                image.add(noFont);
+                image.add(myFont);
 
-                // Save Data
-                self._imageData = image.toDataURL("png");
+                var hasFailed = false;
+                setTimeout(function () {
+                    hasFailed = true;
+                }, 5000);
 
-                self.createPuzzle(onPuzzleComplete);
+                var doTest = function () {
+                    if (hasFailed) {
+                        onTimeoutCallback();
+                        return;
+                    }
+
+                    image.renderAll();
+
+                    if (noFont.width !== myFont.width) {
+                        onLoadedCallback();
+                        return;
+                    }
+
+                    setTimeout(doTest, 100);
+                };
+
+                doTest();
+                //setTimeout(doTest, 100);
             };
 
             MemPuzzle.prototype.createPuzzle = function (onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces, timeToShowCompletedPuzzle) {

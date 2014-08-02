@@ -151,6 +151,7 @@ Remaining Features
 - Use a custom handwriting font
 
 ### 5:45-5:54
+### 5:54-6:52
 
 - Wait for custom font to load
 
@@ -158,6 +159,5 @@ Remaining Features
 
 # TODO
 
-- Wait for custom font to load for first word
 - Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
