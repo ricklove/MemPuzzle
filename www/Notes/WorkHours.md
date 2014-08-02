@@ -141,11 +141,14 @@ Remaining Features
 
 - Show target picture at beginning of puzzle
 
+### 4:47-4:57
+
+- Reduce number of pieces for simple words
+- Change to monospace
 
 ---
 
 # TODO
 
-- Handle simple puzzles ("I")
 - Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)

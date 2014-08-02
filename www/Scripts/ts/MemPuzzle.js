@@ -161,7 +161,7 @@ var TOLD;
                 var textPadding = 10;
 
                 var textObject = new fabric.Text(text, {
-                    fontFamily: shouldUseSans ? "Arial" : "Georgia",
+                    fontFamily: shouldUseSans ? "Monospace" : "Georgia",
                     fontSize: (self._canvas.getHeight()),
                     //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
                     top: -self._canvas.getHeight() * 0.25 + textPadding,
@@ -285,21 +285,32 @@ var TOLD;
                     var width = mainImage.width;
                     var height = mainImage.height;
 
+                    if (width <= 0 || height <= 0) {
+                        return;
+                    }
+
                     // Create an h*v puzzle
-                    var minSideCount = 3;
+                    var minPieceCount = 6;
+                    var minSideCount = 2;
                     var hSideCount = minSideCount;
                     var vSideCount = minSideCount;
 
-                    var widthHeightRatio = width / height;
+                    var maxRectRatio = 2;
 
-                    if (widthHeightRatio > 1) {
-                        widthHeightRatio = Math.max(1, widthHeightRatio * 0.66);
+                    while ((hSideCount * vSideCount) < minPieceCount) {
+                        var widthHeightRatio = width / height;
 
-                        hSideCount = Math.floor(widthHeightRatio * minSideCount);
-                    } else {
-                        widthHeightRatio = Math.min(1, widthHeightRatio * 1.5);
+                        if (widthHeightRatio > 1) {
+                            widthHeightRatio = Math.max(1, widthHeightRatio / maxRectRatio);
 
-                        vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
+                            hSideCount = Math.floor(widthHeightRatio * minSideCount);
+                        } else {
+                            widthHeightRatio = Math.min(1, widthHeightRatio * maxRectRatio);
+
+                            vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
+                        }
+
+                        minSideCount++;
                     }
 
                     var pWidth = width / hSideCount;
