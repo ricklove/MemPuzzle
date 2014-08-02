@@ -1,4 +1,4 @@
-﻿///<reference path="Scripts/typings/fabricjs/fabricjs.d.ts"/>
+﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
 var TOLD;
 (function (TOLD) {
     (function (_MemPuzzle) {
@@ -52,8 +52,9 @@ var TOLD;
                     }
                 });
             }
-            MemPuzzle.prototype.stackPieces = function (shouldStackAll) {
+            MemPuzzle.prototype.stackPieces = function (shouldStackAll, shouldSpreadOut) {
                 if (typeof shouldStackAll === "undefined") { shouldStackAll = false; }
+                if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = true; }
                 var self = this;
                 var pieces = self._pieces;
                 var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
@@ -61,19 +62,35 @@ var TOLD;
                 var STACK_Y = MemPuzzle.STACK_Y;
                 var scale = self._puzzleScale;
 
+                var piecesNotLocked = [];
+
                 for (var i = 0; i < pieces.length; i++) {
                     var piece = pieces[i];
 
                     var nearness = Math.abs(self._puzzleX - piece.image.left) + Math.abs(self._puzzleY - piece.image.top);
 
                     if (shouldStackAll || nearness > LOCKRADIUS) {
-                        // Move to stack
-                        piece.image.setLeft(STACK_X - piece.x * scale);
-                        piece.image.setTop(STACK_Y - piece.y * scale);
-
-                        //piece.image.bringToFront();
-                        piece.image.scale(scale);
+                        piecesNotLocked.push(piece);
                     }
+                }
+
+                var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
+
+                if (shouldSpreadOut) {
+                    piecesNotLocked = RandomOrder(piecesNotLocked);
+                } else {
+                    gap = 0;
+                }
+
+                for (var i = 0; i < piecesNotLocked.length; i++) {
+                    var piece = piecesNotLocked[i];
+
+                    // Move to stack
+                    piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
+                    piece.image.setTop(STACK_Y - piece.y * scale);
+
+                    //piece.image.bringToFront();
+                    piece.image.scale(scale);
                 }
 
                 self._canvas.renderAll();
@@ -99,7 +116,7 @@ var TOLD;
             //    });
             //}
             MemPuzzle.prototype.createPuzzleFromText = function (text, shouldUseSans) {
-                if (typeof shouldUseSans === "undefined") { shouldUseSans = true; }
+                if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
                 var self = this;
 
                 var image = self._imageCanvas;
@@ -147,16 +164,15 @@ var TOLD;
                 if (typeof shouldRandomizePieces === "undefined") { shouldRandomizePieces = false; }
                 if (typeof shouldStackPieces === "undefined") { shouldStackPieces = true; }
                 var self = this;
+                var PADDING = MemPuzzle.PADDING;
 
                 var canvas = self._canvas;
 
                 var image = self._imageCanvas;
 
                 // Calculate Image Scale
-                var padding = 10;
-
-                var width = self._canvas.getWidth() - padding * 2;
-                var height = self._canvas.getHeight() - padding * 2;
+                var width = self._canvas.getWidth() - PADDING * 2;
+                var height = self._canvas.getHeight() - PADDING * 2;
 
                 var rWidth = width / image.getWidth();
                 var rHeight = height / image.getHeight();
@@ -164,8 +180,8 @@ var TOLD;
                 var tRatio = Math.min(rWidth, rHeight);
                 var sWidth = image.getWidth() * tRatio;
                 var sHeight = image.getHeight() * tRatio;
-                var sx = (width - sWidth) / 2 + padding;
-                var sy = (height - sHeight) / 2 + padding;
+                var sx = (width - sWidth) / 2 + PADDING;
+                var sy = (height - sHeight) / 2 + PADDING;
 
                 self._puzzleScale = tRatio;
 
@@ -212,15 +228,7 @@ var TOLD;
                     }
 
                     // Randomize z index
-                    var remainingPieces = pieces.map(function (p) {
-                        return p;
-                    });
-                    var randomPieces = [];
-
-                    while (remainingPieces.length > 0) {
-                        var r = remainingPieces.splice(Math.floor(Math.random() * remainingPieces.length), 1);
-                        randomPieces.push(r[0]);
-                    }
+                    var randomPieces = RandomOrder(pieces);
 
                     for (var i = 0; i < randomPieces.length; i++) {
                         canvas.add(randomPieces[i].image);
@@ -567,9 +575,24 @@ var TOLD;
             MemPuzzle.STACK_X = 30;
             MemPuzzle.STACK_Y = 30;
             MemPuzzle.LOCKRADIUS = 20;
+            MemPuzzle.PADDING = 100;
             return MemPuzzle;
         })();
         _MemPuzzle.MemPuzzle = MemPuzzle;
+
+        function RandomOrder(items) {
+            var remaining = items.map(function (p) {
+                return p;
+            });
+            var random = [];
+
+            while (remaining.length > 0) {
+                var r = remaining.splice(Math.floor(Math.random() * remaining.length), 1);
+                random.push(r[0]);
+            }
+
+            return random;
+        }
     })(TOLD.MemPuzzle || (TOLD.MemPuzzle = {}));
     var MemPuzzle = TOLD.MemPuzzle;
 })(TOLD || (TOLD = {}));

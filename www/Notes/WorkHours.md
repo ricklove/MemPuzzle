@@ -98,8 +98,37 @@ Tasks
 
 - Draw Outline
 
+### 17:00-17:29
+
+- BEGIN: Spread Out Pieces
+
+## Period 2
+
+### 2014-08-02 3:34-3:36 Plan
+
+Finished Features
+
+* Display a Word as a Puzzle
+* Create puzzle piece shape (instead of straight edges)
+
+Remaining Features
+
+- Load Sight Word List
+- Respond to completion of puzzle
+- Display Score for Puzzle
+	- 3 Stars (2 Seconds / Piece)
+	- 2 Stars (4 Seconds / Piece)
+	- 1 Star (Completion)
+- Display World List
+	- 5 Worlds - 9 Pieces (Divide Sight Words among worlds)
+	- 5 Worlds - 16 Pieces
+	- 5 Worlds - 25 Pieces
+
+
+
 ---
 
 # TODO
 
+- Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)

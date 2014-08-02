@@ -1,4 +1,4 @@
-﻿///<reference path="Scripts/typings/fabricjs/fabricjs.d.ts"/>
+﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
 
 module TOLD.MemPuzzle {
 
@@ -7,6 +7,7 @@ module TOLD.MemPuzzle {
         static STACK_X = 30;
         static STACK_Y = 30;
         static LOCKRADIUS = 20;
+        static PADDING = 100;
 
 
         private _canvas: fabric.ICanvas = null;
@@ -64,7 +65,7 @@ module TOLD.MemPuzzle {
 
         }
 
-        stackPieces(shouldStackAll= false) {
+        stackPieces(shouldStackAll= false, shouldSpreadOut= true) {
             var self = this;
             var pieces = self._pieces;
             var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
@@ -72,6 +73,7 @@ module TOLD.MemPuzzle {
             var STACK_Y = MemPuzzle.STACK_Y;
             var scale = self._puzzleScale;
 
+            var piecesNotLocked = <IPiece[]>[];
 
             for (var i = 0; i < pieces.length; i++) {
 
@@ -80,14 +82,28 @@ module TOLD.MemPuzzle {
                 var nearness = Math.abs(self._puzzleX - piece.image.left) + Math.abs(self._puzzleY - piece.image.top);
 
                 if (shouldStackAll || nearness > LOCKRADIUS) {
-                    // Move to stack
-                    piece.image.setLeft(STACK_X - piece.x * scale);
-                    piece.image.setTop(STACK_Y - piece.y * scale);
-                    //piece.image.bringToFront();
 
-                    piece.image.scale(scale);
+                    piecesNotLocked.push(piece);
                 }
+            }
 
+            var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
+
+            if (shouldSpreadOut) {
+                piecesNotLocked = RandomOrder(piecesNotLocked);
+            } else {
+                gap = 0;
+            }
+
+            for (var i = 0; i < piecesNotLocked.length; i++) {
+                var piece = piecesNotLocked[i];
+
+                // Move to stack
+                piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
+                piece.image.setTop(STACK_Y - piece.y * scale);
+                //piece.image.bringToFront();
+
+                piece.image.scale(scale);
             }
 
             self._canvas.renderAll();
@@ -121,7 +137,7 @@ module TOLD.MemPuzzle {
         //    });
         //}
 
-        createPuzzleFromText(text: string, shouldUseSans= true) {
+        createPuzzleFromText(text: string, shouldUseSans= false) {
             var self = this;
 
             var image = self._imageCanvas;
@@ -165,16 +181,16 @@ module TOLD.MemPuzzle {
 
         private createPuzzle(makeOutsideFlat= true, difficulty= 0, shouldRandomizePieces= false, shouldStackPieces = true) {
             var self = this;
+            var PADDING = MemPuzzle.PADDING;
 
             var canvas = self._canvas;
 
             var image = self._imageCanvas;
 
             // Calculate Image Scale
-            var padding = 10;
 
-            var width = self._canvas.getWidth() - padding * 2;
-            var height = self._canvas.getHeight() - padding * 2;
+            var width = self._canvas.getWidth() - PADDING * 2;
+            var height = self._canvas.getHeight() - PADDING * 2;
 
             var rWidth = width / image.getWidth();
             var rHeight = height / image.getHeight();
@@ -182,8 +198,8 @@ module TOLD.MemPuzzle {
             var tRatio = Math.min(rWidth, rHeight);
             var sWidth = image.getWidth() * tRatio;
             var sHeight = image.getHeight() * tRatio;
-            var sx = (width - sWidth) / 2 + padding;
-            var sy = (height - sHeight) / 2 + padding;
+            var sx = (width - sWidth) / 2 + PADDING;
+            var sy = (height - sHeight) / 2 + PADDING;
 
             self._puzzleScale = tRatio;
 
@@ -235,13 +251,7 @@ module TOLD.MemPuzzle {
                 }
 
                 // Randomize z index
-                var remainingPieces = pieces.map(p=> p);
-                var randomPieces = <IPiece[]>[];
-
-                while (remainingPieces.length > 0) {
-                    var r = remainingPieces.splice(Math.floor(Math.random() * remainingPieces.length), 1);
-                    randomPieces.push(r[0]);
-                }
+                var randomPieces = RandomOrder(pieces);
 
                 for (var i = 0; i < randomPieces.length; i++) {
                     canvas.add(randomPieces[i].image);
@@ -641,6 +651,18 @@ module TOLD.MemPuzzle {
     interface IPoint {
         x: number;
         y: number;
+    }
+
+    function RandomOrder<T>(items: T[]): T[] {
+        var remaining = items.map(p=> p);
+        var random = <T[]>[];
+
+        while (remaining.length > 0) {
+            var r = remaining.splice(Math.floor(Math.random() * remaining.length), 1);
+            random.push(r[0]);
+        }
+
+        return random;
     }
 
     //// FROM: http://www.enkolab.com/code/wrapping-text-for-fabric-js/
