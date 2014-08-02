@@ -4,9 +4,15 @@
     <title>MemPuzzle</title>
     <link rel="stylesheet" href="Styles/css/App.css">
 </head>
-<body>
-    <canvas id="cvsPuzzle" width="600" height="400" style="border: 0px solid red"></canvas>
+<body style="background-color: black">
+    <canvas id="cvsPuzzle" width="600" height="400" style="margin: 20px;"></canvas>
     <!--<button id="btnStack">Stack</button>-->
+
+    <script src="Scripts/js/External/sonic.js"></script>
+    <script src="Scripts/ts/Loading.js"></script>
+    <script>
+        var stopLoading = TOLD.MemPuzzle.showLoading("cvsPuzzle");
+    </script>
 
     <script src="Scripts/js/External/fabric.min.js"></script>
     <script src="Scripts/ts/MemPuzzle.js"></script>
@@ -14,19 +20,23 @@
     <script src="Scripts/ts/Subjects/SightWords.js"></script>
 
     <script>
-        puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
-        //puzzle.createPuzzleFromImage("test.png");
-        //puzzle.createPuzzleFromText("testlTjJ");
-        //puzzle.createPuzzleFromText("Tiger");
-        //puzzle.createPuzzleFromText("Psychology");
-        //puzzle.createPuzzleFromText("whale");
-        //puzzle.createPuzzleFromText("please");
-        //puzzle.createPuzzleFromText("Czechoslovakia ");
-        //puzzle.createPuzzleFromText("conscientious ");
-        //puzzle.drawShapeTest();
+        setTimeout(function () {
+            stopLoading();
 
-        controller = new TOLD.MemPuzzle.Subject.SubjectController(puzzle);
-        controller.loadSubject(new TOLD.MemPuzzle.Subjects.SightWords());
+            puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
+            //puzzle.createPuzzleFromImage("test.png");
+            //puzzle.createPuzzleFromText("testlTjJ");
+            //puzzle.createPuzzleFromText("Tiger");
+            //puzzle.createPuzzleFromText("Psychology");
+            //puzzle.createPuzzleFromText("whale");
+            //puzzle.createPuzzleFromText("please");
+            //puzzle.createPuzzleFromText("Czechoslovakia ");
+            //puzzle.createPuzzleFromText("conscientious ");
+            //puzzle.drawShapeTest();
+
+            controller = new TOLD.MemPuzzle.Subject.SubjectController(puzzle);
+            controller.loadSubject(new TOLD.MemPuzzle.Subjects.SightWords());
+        }, 3000);
     </script>
 </body>
 </html>

@@ -160,12 +160,16 @@ Remaining Features
 - Bring clicked puzzle piece to front
 - Resume index
 
+### 8:36-9:35
+
+- Publish to website
+- Show loading graphic
 
 ---
 
 # TODO
 
-- Publish to website
+
 - Find the visible pixels in the text and resize image for that
 - Spread Out Pieces
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
