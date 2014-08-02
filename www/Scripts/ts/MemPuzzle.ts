@@ -633,14 +633,16 @@ module TOLD.MemPuzzle {
             var self = this;
             var canvas = self._canvas;
 
+            var thickness = 5;
+
             var outline = new fabric.Rect({
-                left: self._puzzleX,
-                top: self._puzzleY,
-                width: self._puzzleWidth,
-                height: self._puzzleHeight,
+                left: self._puzzleX - thickness,
+                top: self._puzzleY - thickness,
+                width: self._puzzleWidth + thickness,
+                height: self._puzzleHeight + thickness,
                 stroke: "blue",
                 opacity: 0.5,
-                strokeWidth: 2,
+                strokeWidth: thickness,
                 fill: "rgba(0,0,0,0)",
                 hasBorders: false,
                 hasControls: false,

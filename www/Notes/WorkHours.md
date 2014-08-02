@@ -165,6 +165,10 @@ Remaining Features
 - Publish to website
 - Show loading graphic
 
+### 9:36-10:07
+
+- Fix Loading
+
 ---
 
 # TODO
