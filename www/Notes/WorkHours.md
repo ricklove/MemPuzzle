@@ -196,6 +196,22 @@ Organize Task list
 
 - Use snapshots
 
+### 4:39-4:49
+
+- Test Performance
+	- iPhone4 = OK
+	- iPhone3S = 
+	- Kindle Fire (2012 - Original 2nd Gen) =
+	- Kindle HD (2012) = Good
+		- BUG: Highlights Canvas while dragging
+		- Snap is too small
+
+
+### 4:50-5:08
+
+- Adjust snap length to piece size
+
+
 ---
 
 # TODO
@@ -205,6 +221,8 @@ Organize Task list
 	* Use snapshot
 	- Find bounding box and clip snapshot
 	- Turn off pixel perfect dragging
+
+- Constrain piece location to inside screen
 
 - Make snap length, borders, outline, etc. based on ratios of screen size
 

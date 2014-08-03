@@ -6,7 +6,7 @@ module TOLD.MemPuzzle {
 
         static STACK_X = 30;
         static STACK_Y = 30;
-        static LOCKRADIUS = 20;
+        static SNAP_PERCENT = 35;
         static PADDING = 100;
         static BACKGROUNDCOLOR = "lightgrey";
         static OUTLINECOLOR = "rgb(100,100,255)";
@@ -30,7 +30,6 @@ module TOLD.MemPuzzle {
 
         constructor(canvasId: string) {
             var self = this;
-            var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
 
             var canvas = self._canvas = new fabric.Canvas(canvasId, {
                 hoverCursor: 'pointer',
@@ -54,8 +53,7 @@ module TOLD.MemPuzzle {
                     target.bringToFront();
 
                     // Snap to target
-                    var nearness = Math.abs(self._puzzleX - target.left) + Math.abs(self._puzzleY - target.top);
-                    if (nearness < LOCKRADIUS) {
+                    if (self.canPieceSnapInPlace(<IPiece> target['_piece'])) {
                         target.setLeft(self._puzzleX);
                         target.setTop(self._puzzleY);
 
@@ -74,6 +72,16 @@ module TOLD.MemPuzzle {
                 }
             });
 
+        }
+
+        private canPieceSnapInPlace(piece: IPiece) {
+            var self = this;
+            var snapPercent = MemPuzzle.SNAP_PERCENT;
+
+            var snapRadius = Math.min(piece.width, piece.height) / 100 * snapPercent;
+
+            var nearness = Math.abs(piece.targetImageLeft - piece.image.left) + Math.abs(piece.targetImageTop - piece.image.top);
+            return nearness < snapRadius;
         }
 
         private checkForComplete() {
@@ -98,7 +106,6 @@ module TOLD.MemPuzzle {
         stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
             var self = this;
             var pieces = self._pieces;
-            var LOCKRADIUS = MemPuzzle.LOCKRADIUS;
             var STACK_X = MemPuzzle.STACK_X;
             var STACK_Y = MemPuzzle.STACK_Y;
             var scale = self._puzzleScale;
@@ -114,9 +121,7 @@ module TOLD.MemPuzzle {
 
                 var piece = pieces[i];
 
-                var nearness = Math.abs(self._puzzleX - piece.image.left) + Math.abs(self._puzzleY - piece.image.top);
-
-                if (shouldStackAll || nearness > LOCKRADIUS) {
+                if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
 
                     piecesNotLocked.push(piece);
                 }
@@ -437,13 +442,19 @@ module TOLD.MemPuzzle {
 
                     fabric.Image.fromURL(data, function (snapshotImage) {
 
-                        snapshots.push({
+                        var snapshot = {
                             x: piece.x * scale,
                             y: piece.y * scale,
                             width: piece.width * scale,
                             height: piece.height * scale,
+                            targetImageLeft: piece.targetImageLeft,
+                            targetImageTop: piece.targetImageTop,
                             image: snapshotImage,
-                        });
+                        };
+
+                        snapshots.push(snapshot);
+
+                        snapshotImage["_piece"] = snapshot;
 
                         if (snapshots.length === pieces.length) {
                             onCreatedPieces(snapshots);
@@ -582,7 +593,12 @@ module TOLD.MemPuzzle {
                                     y: yInner * pHeight,
                                     width: pWidth,
                                     height: pHeight,
+
+                                    targetImageLeft: self._puzzleX,
+                                    targetImageTop: self._puzzleY,
                                 };
+
+                                img["_piece"] = piece;
 
                                 piece.image.set({
                                     clipTo: (ctx: CanvasRenderingContext2D) => {
@@ -904,6 +920,8 @@ module TOLD.MemPuzzle {
         y: number;
         width: number;
         height: number;
+        targetImageLeft: number;
+        targetImageTop: number;
     }
 
     interface IEdge {
