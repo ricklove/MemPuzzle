@@ -192,9 +192,9 @@ Organize Task list
 
 - Create snapshot of puzzle size (with scaling)
 
-### 4:28-
+### 4:28-4:38
 
-- Use snapshot
+- Use snapshots
 
 ---
 

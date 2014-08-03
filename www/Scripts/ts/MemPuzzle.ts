@@ -103,6 +103,11 @@ module TOLD.MemPuzzle {
             var STACK_Y = MemPuzzle.STACK_Y;
             var scale = self._puzzleScale;
 
+            // Use snapshots
+            //pieces = self._snapshots;
+            //scale = 1;
+
+
             var piecesNotLocked = <IPiece[]>[];
 
             for (var i = 0; i < pieces.length; i++) {
@@ -341,7 +346,11 @@ module TOLD.MemPuzzle {
 
                     self._snapshots = snapshots;
 
-                    // TODO: Use Snapshots
+                    // Use Snapshots
+                    pieces = snapshots;
+                    tRatio = 1;
+                    self._pieces = pieces;
+                    self._puzzleScale = 1;
 
                     // Draw pieces
                     for (var i = 0; i < pieces.length; i++) {
@@ -408,12 +417,16 @@ module TOLD.MemPuzzle {
                     var piece = pieces[i];
                     var pImage = piece.image;
 
+                    var w = pImage.width;
+                    var h = pImage.height;
+
                     pImage.scale(scale);
 
 
                     // Draw to canvas
-                    wCanvas.setWidth(piece.width * scale);
-                    wCanvas.setHeight(piece.height * scale);
+                    wCanvas.setWidth(w * scale);
+                    wCanvas.setHeight(h * scale);
+                    wCanvas.backgroundColor = "rgba(0,0,0,0)";
 
                     wCanvas.clear();
                     wCanvas.add(pImage);
