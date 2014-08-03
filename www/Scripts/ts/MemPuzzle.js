@@ -303,7 +303,7 @@ var TOLD;
                 if (typeof timeToShowCompletedPuzzle === "undefined") { timeToShowCompletedPuzzle = 2000; }
                 var _this = this;
                 var self = this;
-                var PADDING = MemPuzzle.PADDING;
+                var PADDING_PERCENT = MemPuzzle.PADDING_PERCENT;
 
                 var canvas = self._canvas;
 
@@ -316,8 +316,10 @@ var TOLD;
                 self._onPuzzleComplete = onPuzzleComplete;
 
                 // Calculate Image Scale
-                var width = self._canvas.getWidth() - PADDING * 2;
-                var height = self._canvas.getHeight() - PADDING * 2;
+                var padding = PADDING_PERCENT / 100 * Math.min(self._canvas.getWidth(), self._canvas.getHeight());
+
+                var width = self._canvas.getWidth() - padding * 2;
+                var height = self._canvas.getHeight() - padding * 2;
 
                 var rWidth = width / image.getWidth();
                 var rHeight = height / image.getHeight();
@@ -325,8 +327,11 @@ var TOLD;
                 var tRatio = Math.min(rWidth, rHeight);
                 var sWidth = image.getWidth() * tRatio;
                 var sHeight = image.getHeight() * tRatio;
-                var sx = (width - sWidth) / 2 + PADDING;
-                var sy = (height - sHeight) / 2 + PADDING;
+                var sx = (width - sWidth) / 2 + padding;
+                var sy = (height - sHeight) / 2 + padding;
+
+                // Move puzzle down
+                sy += padding * 0.5;
 
                 self._puzzleScale = tRatio;
 
@@ -855,7 +860,7 @@ var TOLD;
             MemPuzzle.STACK_X = 30;
             MemPuzzle.STACK_Y = 30;
             MemPuzzle.SNAP_PERCENT = 35;
-            MemPuzzle.PADDING = 100;
+            MemPuzzle.PADDING_PERCENT = 30;
             MemPuzzle.BACKGROUNDCOLOR = "lightgrey";
             MemPuzzle.OUTLINECOLOR = "rgb(100,100,255)";
             return MemPuzzle;

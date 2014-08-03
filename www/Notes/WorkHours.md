@@ -216,6 +216,10 @@ Organize Task list
 
 - Constrain Piece Location to inside screen
 
+### 5:15-5:29
+
+- Adjust puzzle padding to make room for pieces
+
 ---
 
 # TODO
@@ -226,7 +230,7 @@ Organize Task list
 	- Find bounding box and clip snapshot
 	- Turn off pixel perfect dragging
 
-- Constrain piece location to inside screen
+* Constrain piece location to inside screen
 
 - Make snap length, borders, outline, etc. based on ratios of screen size
 

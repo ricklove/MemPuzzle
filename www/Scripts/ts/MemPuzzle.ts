@@ -7,7 +7,7 @@ module TOLD.MemPuzzle {
         static STACK_X = 30;
         static STACK_Y = 30;
         static SNAP_PERCENT = 35;
-        static PADDING = 100;
+        static PADDING_PERCENT = 30;
         static BACKGROUNDCOLOR = "lightgrey";
         static OUTLINECOLOR = "rgb(100,100,255)";
 
@@ -324,7 +324,7 @@ module TOLD.MemPuzzle {
 
         private createPuzzle(onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true, timeToShowCompletedPuzzle= 2000) {
             var self = this;
-            var PADDING = MemPuzzle.PADDING;
+            var PADDING_PERCENT = MemPuzzle.PADDING_PERCENT;
 
             var canvas = self._canvas;
 
@@ -338,9 +338,10 @@ module TOLD.MemPuzzle {
 
 
             // Calculate Image Scale
+            var padding = PADDING_PERCENT / 100 * Math.min(self._canvas.getWidth(), self._canvas.getHeight());
 
-            var width = self._canvas.getWidth() - PADDING * 2;
-            var height = self._canvas.getHeight() - PADDING * 2;
+            var width = self._canvas.getWidth() - padding * 2;
+            var height = self._canvas.getHeight() - padding * 2;
 
             var rWidth = width / image.getWidth();
             var rHeight = height / image.getHeight();
@@ -348,8 +349,11 @@ module TOLD.MemPuzzle {
             var tRatio = Math.min(rWidth, rHeight);
             var sWidth = image.getWidth() * tRatio;
             var sHeight = image.getHeight() * tRatio;
-            var sx = (width - sWidth) / 2 + PADDING;
-            var sy = (height - sHeight) / 2 + PADDING;
+            var sx = (width - sWidth) / 2 + padding;
+            var sy = (height - sHeight) / 2 + padding;
+
+            // Move puzzle down
+            sy += padding * 0.5;
 
             self._puzzleScale = tRatio;
 
