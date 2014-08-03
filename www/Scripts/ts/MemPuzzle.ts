@@ -14,7 +14,7 @@ module TOLD.MemPuzzle {
 
         private _canvas: fabric.ICanvas = null;
         //private _imageCanvasElement: HTMLCanvasElement = null;
-        private _imageCanvas: fabric.ICanvas = null;
+        private _workingCanvas: fabric.ICanvas = null;
         private _imageData: string = null;
         private _puzzleScale: number = null;
 
@@ -24,6 +24,7 @@ module TOLD.MemPuzzle {
         private _puzzleHeight: number = 0;
 
         private _pieces: IPiece[] = null;
+        private _snapshots: IPiece[] = null;
 
         private _onPuzzleComplete = () => { };
 
@@ -166,19 +167,19 @@ module TOLD.MemPuzzle {
         //    });
         //}
 
-        getImageCanvas() {
+        getWorkingCanvas() {
             var self = this;
 
-            var image = self._imageCanvas;
+            var wCanvas = self._workingCanvas;
 
-            if (image === null) {
+            if (wCanvas === null) {
                 var element = document.createElement("canvas");
                 element.setAttribute('id', '_temp_canvas');
-                image = self._imageCanvas = new fabric.Canvas('_temp_canvas');
-                image.renderOnAddition = false;
+                wCanvas = self._workingCanvas = new fabric.Canvas('_temp_canvas');
+                wCanvas.renderOnAddition = false;
             }
 
-            return image;
+            return wCanvas;
         }
 
         createPuzzleFromText(text: string, onPuzzleComplete= () => { }, shouldUseSans= false) {
@@ -188,12 +189,12 @@ module TOLD.MemPuzzle {
             var serifFontName = "DOES NOT EXIST";
 
             var doWork = () => {
-                var image = self.getImageCanvas();
+                var wCanvas = self.getWorkingCanvas();
 
-                image.setWidth(self._canvas.getWidth());
-                image.setHeight(self._canvas.getHeight());
+                wCanvas.setWidth(self._canvas.getWidth());
+                wCanvas.setHeight(self._canvas.getHeight());
                 //image._objects = [];
-                image.clear();
+                wCanvas.clear();
 
                 // Draw Text
                 var textPadding = 10;
@@ -211,14 +212,14 @@ module TOLD.MemPuzzle {
                     top: -self._canvas.getHeight() * cutoffTop + textPadding,
                     left: textPadding,
                 });
-                image.add(textObject);
+                wCanvas.add(textObject);
 
                 // Set to fit text
-                image.backgroundColor = "white";
-                image.setWidth(textObject.width + textPadding * 2);
-                image.setHeight(textObject.height * cutoffHeightKeep + textPadding * 2);
+                wCanvas.backgroundColor = "white";
+                wCanvas.setWidth(textObject.width + textPadding * 2);
+                wCanvas.setHeight(textObject.height * cutoffHeightKeep + textPadding * 2);
 
-                image.renderAll();
+                wCanvas.renderAll();
 
                 //setTimeout(() => {
 
@@ -226,7 +227,7 @@ module TOLD.MemPuzzle {
                 //    image.renderAll();
 
                 // Save Data
-                self._imageData = image.toDataURL("png");
+                self._imageData = wCanvas.toDataURL("png");
 
                 self.createPuzzle(onPuzzleComplete);
 
@@ -264,9 +265,9 @@ module TOLD.MemPuzzle {
                 top: 120 + offset,
             });
 
-            var image = self.getImageCanvas();
-            image.add(noFont);
-            image.add(myFont);
+            var wCanvas = self.getWorkingCanvas();
+            wCanvas.add(noFont);
+            wCanvas.add(myFont);
 
             var hasFailed = false;
             setTimeout(() => { hasFailed = true; }, 5000);
@@ -278,7 +279,7 @@ module TOLD.MemPuzzle {
                     return;
                 }
 
-                image.renderAll();
+                wCanvas.renderAll();
 
                 if (noFont.width !== myFont.width) {
                     onLoadedCallback();
@@ -298,7 +299,7 @@ module TOLD.MemPuzzle {
 
             var canvas = self._canvas;
 
-            var image = self._imageCanvas;
+            var image = self._workingCanvas;
 
             // Clear Puzzle
             canvas.clear();
@@ -335,60 +336,81 @@ module TOLD.MemPuzzle {
 
                 self._pieces = pieces;
 
-                // Draw pieces
-                for (var i = 0; i < pieces.length; i++) {
-                    var piece = pieces[i];
-                    var pImage = piece.image;
+                // Create snapshot (of puzzle size with scaling)
+                this.createPuzzlePieceSnapshots(pieces, tRatio, (snapshots) => {
 
-                    pImage.scale(tRatio);
+                    self._snapshots = snapshots;
 
-                    // BUG: IN FABRICJS - Sometimes some of the pieces are unclickable
-                    pImage.perPixelTargetFind = true;
-                    (<any>pImage).targetFindTolerance = 4;
-                    pImage.hasBorders = false;
-                    pImage.hasControls = false;
+                    // TODO: Use Snapshots
+
+                    // Draw pieces
+                    for (var i = 0; i < pieces.length; i++) {
+                        var piece = pieces[i];
+                        var pImage = piece.image;
+
+                        pImage.scale(tRatio);
+
+                        // BUG: IN FABRICJS - Sometimes some of the pieces are unclickable
+                        pImage.perPixelTargetFind = true;
+                        (<any>pImage).targetFindTolerance = 4;
+                        pImage.hasBorders = false;
+                        pImage.hasControls = false;
 
 
-                    var x = sx;
-                    var y = sy;
+                        var x = sx;
+                        var y = sy;
 
-                    // Randomize
-                    if (shouldRandomizePieces) {
-                        var diff = 200;
-                        x += diff * Math.random() - diff / 2;
-                        y += diff * Math.random() - diff / 2;
+                        // Randomize
+                        if (shouldRandomizePieces) {
+                            var diff = 200;
+                            x += diff * Math.random() - diff / 2;
+                            y += diff * Math.random() - diff / 2;
 
-                        //if (x < 0) { x = 0; }
-                        //if (y < 0) { y = 0; }
-                        //if (x > canvas.getWidth() - piece.width) { x = canvas.getWidth() - piece.width; }
-                        //if (y > canvas.getHeight() - piece.height) { y = canvas.getHeight() - piece.height; }
+                            //if (x < 0) { x = 0; }
+                            //if (y < 0) { y = 0; }
+                            //if (x > canvas.getWidth() - piece.width) { x = canvas.getWidth() - piece.width; }
+                            //if (y > canvas.getHeight() - piece.height) { y = canvas.getHeight() - piece.height; }
+                        }
+
+                        pImage.setLeft(x);
+                        pImage.setTop(y);
+
                     }
 
-                    pImage.setLeft(x);
-                    pImage.setTop(y);
+                    // Add to canvas & Randomize z index
+                    var randomPieces = RandomOrder(pieces);
 
-                    // Add to canvas
-                    //canvas.add(piece);
-                }
+                    for (var i = 0; i < randomPieces.length; i++) {
+                        canvas.add(randomPieces[i].image);
+                    }
 
-                // Randomize z index
-                var randomPieces = RandomOrder(pieces);
+                    canvas.renderAll();
 
-                for (var i = 0; i < randomPieces.length; i++) {
-                    canvas.add(randomPieces[i].image);
-                }
+                    if (shouldStackPieces) {
+                        self.stackPieces(true);
+                    }
 
-                canvas.renderAll();
-
-                if (shouldStackPieces) {
-                    self.stackPieces(true);
-                }
-
+                });
             });
 
         }
 
+        private createPuzzlePieceSnapshots(pieces: IPiece[], scale: number, onCreatedPieces: (pieces: IPiece[]) => void) {
 
+            var self = this;
+            var wCanvas = self.getWorkingCanvas();
+
+            for (var i = 0; i < pieces.length; i++) {
+                var piece = pieces[i];
+                var pImage = piece.image;
+
+                //pImage.scale(tRatio);
+            }
+
+            // TODO: Implement this
+
+            onCreatedPieces(null);
+        }
 
         private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: IPiece[]) => void) {
             var self = this;

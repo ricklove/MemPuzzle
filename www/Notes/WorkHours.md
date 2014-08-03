@@ -183,21 +183,27 @@ Organize Task list
 
 - Make rectangular pieces have same circle size on each edge
 
+### 4:02-4:17
 
+- Cache puzzle pieces as images (to prevent recalculating clip path each render)
+	* Setup code structure
+	- Create snapshot of puzzle size (with scaling)
 
 ---
 
 # TODO
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
-	- Find bounding box
-	- Create snapshot (with scaling)
+	- Create snapshot of puzzle size (with scaling)
 	- Use snapshot
+	- Find bounding box and clip snapshot
 	- Turn off pixel perfect dragging
 
 - Make snap length, borders, outline, etc. based on ratios of screen size
 
-- Find the visible pixels in the text and resize image for that
 
+# TODO Maybe
+
+- Find the visible pixels in the text and resize image for that
 
 - Spread Out Pieces
