@@ -212,6 +212,10 @@ Organize Task list
 - Adjust snap length to piece size
 
 
+### 5:09-5:14
+
+- Constrain Piece Location to inside screen
+
 ---
 
 # TODO

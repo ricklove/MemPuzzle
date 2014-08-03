@@ -40,6 +40,24 @@ var TOLD;
                         target.opacity = 0.5;
                         target.bringToFront();
 
+                        // Constrain piece to inside canvas
+                        // (This will work better with clipping of puzzle pieces)
+                        if (target.left < 0) {
+                            target.left = 0;
+                        }
+
+                        if (target.top < 0) {
+                            target.top = 0;
+                        }
+
+                        if (target.left > canvas.getWidth() - target.width) {
+                            target.left = canvas.getWidth() - target.width;
+                        }
+
+                        if (target.top > canvas.getHeight() - target.height) {
+                            target.top = canvas.getHeight() - target.height;
+                        }
+
                         // Snap to target
                         if (self.canPieceSnapInPlace(target['_piece'])) {
                             target.setLeft(self._puzzleX);
