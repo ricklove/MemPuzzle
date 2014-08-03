@@ -397,6 +397,9 @@ var TOLD;
                         minSideCount++;
                     }
 
+                    // DEBUG: Make rect
+                    //hSideCount = 3;
+                    //vSideCount = 3;
                     var pWidth = width / hSideCount;
                     var pHeight = height / vSideCount;
 
@@ -425,6 +428,8 @@ var TOLD;
                             var hIsOutside = (v === 0) || (v === vSideCount);
                             var vIsOutside = (h === 0) || (h === hSideCount);
 
+                            var minEdgeLength = Math.min(Math.abs(right - left), Math.abs(bottom - top));
+
                             if (!makeOutsideFlat) {
                                 if (hIsOutside) {
                                     hIsOutside = false;
@@ -438,7 +443,7 @@ var TOLD;
                             }
 
                             if (!hIsOutside) {
-                                hEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, hIsInset);
+                                hEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, minEdgeLength, hIsInset);
                             } else {
                                 var s = { x: left, y: top };
                                 var e = { x: right, y: top };
@@ -446,7 +451,7 @@ var TOLD;
                             }
 
                             if (!vIsOutside) {
-                                vEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, vIsInset);
+                                vEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, minEdgeLength, vIsInset);
                             } else {
                                 var s = { x: left, y: top };
                                 var e = { x: left, y: bottom };
@@ -647,10 +652,10 @@ var TOLD;
                 var bottom = 210;
 
                 var edges = [
-                    self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }),
-                    self.createPuzzleEdge({ x: right, y: top }, { x: right, y: bottom }),
-                    self.createPuzzleEdge({ x: right, y: bottom }, { x: left, y: bottom }),
-                    self.createPuzzleEdge({ x: left, y: bottom }, { x: left, y: top })
+                    self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, 200),
+                    self.createPuzzleEdge({ x: right, y: top }, { x: right, y: bottom }, 200),
+                    self.createPuzzleEdge({ x: right, y: bottom }, { x: left, y: bottom }, 200),
+                    self.createPuzzleEdge({ x: left, y: bottom }, { x: left, y: top }, 200)
                 ];
 
                 for (var iEdgeNum = 0; iEdgeNum < edges.length; iEdgeNum++) {
@@ -684,31 +689,40 @@ var TOLD;
                 ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
             };
 
-            MemPuzzle.prototype.createPuzzleEdge = function (start, end, isInset) {
+            MemPuzzle.prototype.createPuzzleEdge = function (start, end, minEdgeLength, isInset) {
                 if (typeof isInset === "undefined") { isInset = true; }
-                // Hard code a basic shape
-                var unitPoints = [
-                    { x: 0, y: 0 },
-                    { x: 0.2, y: 0 },
-                    { x: 0.45, y: 0 },
-                    { x: 0.45, y: 0.05 },
-                    { x: 0.4, y: 0.1 },
-                    { x: 0.4, y: 0.2 },
-                    { x: 0.5, y: 0.25 },
-                    { x: 0.6, y: 0.2 },
-                    { x: 0.6, y: 0.1 },
-                    { x: 0.55, y: 0.05 },
-                    { x: 0.55, y: 0 },
-                    { x: 0.8, y: 0 },
-                    { x: 1, y: 0 }
-                ];
-
-                // Apply to vector and perp-vector
                 var vect = {
                     x: end.x - start.x,
                     y: end.y - start.y
                 };
 
+                var len = Math.sqrt(vect.x * vect.x + vect.y * vect.y);
+                var ratio = minEdgeLength / len;
+
+                // Get unit shape
+                var circleRadius = 0.125 * ratio;
+                var cr = circleRadius;
+                var cr2 = circleRadius * 2;
+                var cr_2 = circleRadius / 2;
+
+                // Hard code a basic shape
+                var unitPoints = [
+                    { x: 0, y: 0 },
+                    { x: (0.5 - cr_2) / 2, y: 0 },
+                    { x: 0.5 - cr_2, y: 0 },
+                    { x: 0.5 - cr_2, y: cr_2 },
+                    { x: 0.5 - cr, y: cr },
+                    { x: 0.5 - cr, y: cr2 },
+                    { x: 0.5, y: cr_2 + cr2 },
+                    { x: 0.5 + cr, y: cr2 },
+                    { x: 0.5 + cr, y: cr },
+                    { x: 0.5 + cr_2, y: cr_2 },
+                    { x: 0.5 + cr_2, y: 0 },
+                    { x: 1 - ((0.5 - cr_2) / 2), y: 0 },
+                    { x: 1, y: 0 }
+                ];
+
+                // Apply to vector and perp-vector
                 var pVect = {
                     x: -vect.y,
                     y: vect.x

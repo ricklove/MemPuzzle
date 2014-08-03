@@ -179,9 +179,9 @@ Organize Task list
 
 - Use fill rectangle for background
 
-### 3:36-
+### 3:36-4:01
 
-- Make rectangular pieces with same circle size on each edge
+- Make rectangular pieces have same circle size on each edge
 
 
 
@@ -194,8 +194,6 @@ Organize Task list
 	- Create snapshot (with scaling)
 	- Use snapshot
 	- Turn off pixel perfect dragging
-
-- Make rectangular pieces with same circle size on each edge
 
 - Make snap length, borders, outline, etc. based on ratios of screen size
 
