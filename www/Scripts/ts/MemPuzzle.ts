@@ -10,6 +10,7 @@ module TOLD.MemPuzzle {
         static PADDING_PERCENT = 30;
         static BACKGROUNDCOLOR = "lightgrey";
         static OUTLINECOLOR = "rgb(100,100,255)";
+        static OUTLINE_THICKNESS_PERCENT = 5;
 
 
         private _canvas: fabric.ICanvas = null;
@@ -744,7 +745,9 @@ module TOLD.MemPuzzle {
             var self = this;
             var canvas = self._canvas;
 
-            var thickness = 10;
+            var T_PERCENT = MemPuzzle.OUTLINE_THICKNESS_PERCENT;
+
+            var thickness = Math.min(self._puzzleWidth, self._puzzleHeight) * T_PERCENT / 100;
 
             var outline = new fabric.Rect({
                 left: self._puzzleX - thickness,

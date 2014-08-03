@@ -220,6 +220,12 @@ Organize Task list
 
 - Adjust puzzle padding to make room for pieces
 
+### 5:30-5:32
+
+- Adjust outline thickness
+
+
+
 ---
 
 # TODO

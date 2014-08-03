@@ -686,7 +686,9 @@ var TOLD;
                 var self = this;
                 var canvas = self._canvas;
 
-                var thickness = 10;
+                var T_PERCENT = MemPuzzle.OUTLINE_THICKNESS_PERCENT;
+
+                var thickness = Math.min(self._puzzleWidth, self._puzzleHeight) * T_PERCENT / 100;
 
                 var outline = new fabric.Rect({
                     left: self._puzzleX - thickness,
@@ -863,6 +865,7 @@ var TOLD;
             MemPuzzle.PADDING_PERCENT = 30;
             MemPuzzle.BACKGROUNDCOLOR = "lightgrey";
             MemPuzzle.OUTLINECOLOR = "rgb(100,100,255)";
+            MemPuzzle.OUTLINE_THICKNESS_PERCENT = 5;
             return MemPuzzle;
         })();
         _MemPuzzle.MemPuzzle = MemPuzzle;
