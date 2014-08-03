@@ -109,9 +109,11 @@ var TOLD;
                 if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = false; }
                 var self = this;
                 var pieces = self._pieces;
-                var STACK_X = MemPuzzle.STACK_X;
-                var STACK_Y = MemPuzzle.STACK_Y;
+                var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
                 var scale = self._puzzleScale;
+
+                var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
+                var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
 
                 // Use snapshots
                 //pieces = self._snapshots;
@@ -138,6 +140,7 @@ var TOLD;
                     var piece = piecesNotLocked[i];
 
                     // Move to stack
+                    // NOTE: This ignores the piece button
                     piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
                     piece.image.setTop(STACK_Y - piece.y * scale);
 
@@ -859,10 +862,9 @@ var TOLD;
 
                 return { points: finalPoints, start: start, end: end };
             };
-            MemPuzzle.STACK_X = 30;
-            MemPuzzle.STACK_Y = 30;
             MemPuzzle.SNAP_PERCENT = 35;
             MemPuzzle.PADDING_PERCENT = 30;
+            MemPuzzle.STACK_PADDING_PERCENT = 5;
             MemPuzzle.BACKGROUNDCOLOR = "lightgrey";
             MemPuzzle.OUTLINECOLOR = "rgb(100,100,255)";
             MemPuzzle.OUTLINE_THICKNESS_PERCENT = 5;

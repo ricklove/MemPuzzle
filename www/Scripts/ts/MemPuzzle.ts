@@ -4,10 +4,9 @@ module TOLD.MemPuzzle {
 
     export class MemPuzzle {
 
-        static STACK_X = 30;
-        static STACK_Y = 30;
         static SNAP_PERCENT = 35;
         static PADDING_PERCENT = 30;
+        static STACK_PADDING_PERCENT = 5;
         static BACKGROUNDCOLOR = "lightgrey";
         static OUTLINECOLOR = "rgb(100,100,255)";
         static OUTLINE_THICKNESS_PERCENT = 5;
@@ -126,9 +125,11 @@ module TOLD.MemPuzzle {
         stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
             var self = this;
             var pieces = self._pieces;
-            var STACK_X = MemPuzzle.STACK_X;
-            var STACK_Y = MemPuzzle.STACK_Y;
+            var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
             var scale = self._puzzleScale;
+
+            var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
+            var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
 
             // Use snapshots
             //pieces = self._snapshots;
@@ -159,6 +160,8 @@ module TOLD.MemPuzzle {
                 var piece = piecesNotLocked[i];
 
                 // Move to stack
+                // NOTE: This ignores the piece button
+
                 piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
                 piece.image.setTop(STACK_Y - piece.y * scale);
                 //piece.image.bringToFront();

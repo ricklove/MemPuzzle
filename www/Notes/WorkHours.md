@@ -224,6 +224,9 @@ Organize Task list
 
 - Adjust outline thickness
 
+### 5:33-5:37
+
+- Adjust stack location
 
 
 ---
