@@ -186,7 +186,7 @@ Organize Task list
 ### 4:02-4:17
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
-	* Setup code structure
+	- Setup code structure
 
 ### 4:18-4:27
 
@@ -201,8 +201,8 @@ Organize Task list
 # TODO
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
-	- Create snapshot of puzzle size (with scaling)
-	- Use snapshot
+	* Create snapshot of puzzle size (with scaling)
+	* Use snapshot
 	- Find bounding box and clip snapshot
 	- Turn off pixel perfect dragging
 
