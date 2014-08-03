@@ -369,14 +369,41 @@ var TOLD;
                 var self = this;
                 var wCanvas = self.getWorkingCanvas();
 
-                for (var i = 0; i < pieces.length; i++) {
-                    var piece = pieces[i];
-                    var pImage = piece.image;
-                    //pImage.scale(tRatio);
-                }
+                var snapshots = [];
 
-                // TODO: Implement this
-                onCreatedPieces(null);
+                for (var i = 0; i < pieces.length; i++) {
+                    (function () {
+                        var piece = pieces[i];
+                        var pImage = piece.image;
+
+                        pImage.scale(scale);
+
+                        // Draw to canvas
+                        wCanvas.setWidth(piece.width * scale);
+                        wCanvas.setHeight(piece.height * scale);
+
+                        wCanvas.clear();
+                        wCanvas.add(pImage);
+                        wCanvas.renderAll();
+
+                        // Save as new snapshot
+                        var data = wCanvas.toDataURL("png");
+
+                        fabric.Image.fromURL(data, function (snapshotImage) {
+                            snapshots.push({
+                                x: piece.x * scale,
+                                y: piece.y * scale,
+                                width: piece.width * scale,
+                                height: piece.height * scale,
+                                image: snapshotImage
+                            });
+
+                            if (snapshots.length === pieces.length) {
+                                onCreatedPieces(snapshots);
+                            }
+                        });
+                    })();
+                }
             };
 
             MemPuzzle.prototype.createPuzzlePieces = function (imageData, difficulty, makeOutsideFlat, onCreatedPieces) {

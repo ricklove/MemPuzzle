@@ -187,7 +187,14 @@ Organize Task list
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
 	* Setup code structure
-	- Create snapshot of puzzle size (with scaling)
+
+### 4:18-4:27
+
+- Create snapshot of puzzle size (with scaling)
+
+### 4:28-
+
+- Use snapshot
 
 ---
 
