@@ -173,7 +173,17 @@ Remaining Features
 
 # TODO
 
+- Cache puzzle pieces as images (to prevent recalculating clip path each render)
+	- Find bounding box
+	- Create snapshot (with scaling)
+	- Use snapshot
+	- Turn off pixel perfect dragging
+
+- Make rectangular pieces with same circle size on each edge
+
+- Make snap length, borders, outline, etc. based on ratios of screen size
 
 - Find the visible pixels in the text and resize image for that
+
+
 - Spread Out Pieces
-- Cache puzzle pieces as images (to prevent recalculating clip path each render)
