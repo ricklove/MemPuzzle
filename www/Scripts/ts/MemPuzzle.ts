@@ -8,6 +8,8 @@ module TOLD.MemPuzzle {
         static STACK_Y = 30;
         static LOCKRADIUS = 20;
         static PADDING = 100;
+        static BACKGROUNDCOLOR = "lightgrey";
+        static OUTLINECOLOR = "rgb(100,100,255)";
 
 
         private _canvas: fabric.ICanvas = null;
@@ -34,7 +36,7 @@ module TOLD.MemPuzzle {
                 selection: false
             });
 
-            canvas.backgroundColor = "lightgrey";
+            canvas.backgroundColor = MemPuzzle.BACKGROUNDCOLOR;
             canvas.setWidth(document.body.clientWidth - 20);
             canvas.setHeight(window.innerHeight - 30);
 
@@ -638,11 +640,9 @@ module TOLD.MemPuzzle {
             var outline = new fabric.Rect({
                 left: self._puzzleX - thickness,
                 top: self._puzzleY - thickness,
-                width: self._puzzleWidth + thickness,
-                height: self._puzzleHeight + thickness,
-                stroke: "rgb(100,100,255)",
-                strokeWidth: thickness,
-                fill: "rgba(0,0,0,0)",
+                width: self._puzzleWidth + thickness * 2,
+                height: self._puzzleHeight + thickness * 2,
+                fill: MemPuzzle.OUTLINECOLOR,
                 hasBorders: false,
                 hasControls: false,
                 lockMovementX: true,
@@ -651,6 +651,23 @@ module TOLD.MemPuzzle {
             });
 
             canvas.add(outline);
+
+            thickness = 0;
+
+            var inline = new fabric.Rect({
+                left: self._puzzleX - thickness,
+                top: self._puzzleY - thickness,
+                width: self._puzzleWidth + thickness * 2,
+                height: self._puzzleHeight + thickness * 2,
+                fill: MemPuzzle.BACKGROUNDCOLOR,
+                hasBorders: false,
+                hasControls: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                selectable: false,
+            });
+
+            canvas.add(inline);
         }
 
         private drawEdges(edges: IEdge[][]) {

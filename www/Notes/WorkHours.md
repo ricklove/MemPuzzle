@@ -169,6 +169,22 @@ Remaining Features
 
 - Fix Loading
 
+## Period 3
+
+### 2014-08-03 3:25-3:29 Plan
+
+Organize Task list
+
+### 3:30-3:35
+
+- Use fill rectangle for background
+
+### 3:36-
+
+- Make rectangular pieces with same circle size on each edge
+
+
+
 ---
 
 # TODO

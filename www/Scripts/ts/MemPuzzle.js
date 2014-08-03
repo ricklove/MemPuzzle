@@ -24,7 +24,7 @@ var TOLD;
                     selection: false
                 });
 
-                canvas.backgroundColor = "lightgrey";
+                canvas.backgroundColor = MemPuzzle.BACKGROUNDCOLOR;
                 canvas.setWidth(document.body.clientWidth - 20);
                 canvas.setHeight(window.innerHeight - 30);
 
@@ -589,11 +589,9 @@ var TOLD;
                 var outline = new fabric.Rect({
                     left: self._puzzleX - thickness,
                     top: self._puzzleY - thickness,
-                    width: self._puzzleWidth + thickness,
-                    height: self._puzzleHeight + thickness,
-                    stroke: "rgb(100,100,255)",
-                    strokeWidth: thickness,
-                    fill: "rgba(0,0,0,0)",
+                    width: self._puzzleWidth + thickness * 2,
+                    height: self._puzzleHeight + thickness * 2,
+                    fill: MemPuzzle.OUTLINECOLOR,
                     hasBorders: false,
                     hasControls: false,
                     lockMovementX: true,
@@ -602,6 +600,23 @@ var TOLD;
                 });
 
                 canvas.add(outline);
+
+                thickness = 0;
+
+                var inline = new fabric.Rect({
+                    left: self._puzzleX - thickness,
+                    top: self._puzzleY - thickness,
+                    width: self._puzzleWidth + thickness * 2,
+                    height: self._puzzleHeight + thickness * 2,
+                    fill: MemPuzzle.BACKGROUNDCOLOR,
+                    hasBorders: false,
+                    hasControls: false,
+                    lockMovementX: true,
+                    lockMovementY: true,
+                    selectable: false
+                });
+
+                canvas.add(inline);
             };
 
             MemPuzzle.prototype.drawEdges = function (edges) {
@@ -735,6 +750,8 @@ var TOLD;
             MemPuzzle.STACK_Y = 30;
             MemPuzzle.LOCKRADIUS = 20;
             MemPuzzle.PADDING = 100;
+            MemPuzzle.BACKGROUNDCOLOR = "lightgrey";
+            MemPuzzle.OUTLINECOLOR = "rgb(100,100,255)";
             return MemPuzzle;
         })();
         _MemPuzzle.MemPuzzle = MemPuzzle;
