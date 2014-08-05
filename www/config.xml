@@ -14,6 +14,16 @@
     Rick Love - Told
   </author>
 
+  <!--
+      If you do not want any permissions to be added to your app, add the
+      following tag to your config.xml; you will still have the INTERNET
+      permission on your app, which PhoneGap requires.
+    -->
+  <preference name="permissions" value="none"/>
+
+  <!-- Plugins -->
+  <gap:plugin name="com.adobe.plugins.fastcanvas" version="1.0.1" />
+
   <icon src="icon.png" />
 
 </widget>

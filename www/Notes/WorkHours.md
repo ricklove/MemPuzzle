@@ -303,7 +303,12 @@ Organize Task list
 
 - Disable Highlight on Kindle
 
-### 6:41-6:44
+### 6:45-
+
+- Removed permissions in config.xml
+- Use PhoneGap Fast Canvas plugin
+- Publish
+- Test
 
 
 ---
