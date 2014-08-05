@@ -24,6 +24,6 @@ var TOLD;
             Subjects.SightWords = SightWords;
         })(MemPuzzle.Subjects || (MemPuzzle.Subjects = {}));
         var Subjects = MemPuzzle.Subjects;
-    })(TOLD.MemPuzzle || (TOLD.MemPuzzle = {}));
-    var MemPuzzle = TOLD.MemPuzzle;
+    })(Told.MemPuzzle || (Told.MemPuzzle = {}));
+    var MemPuzzle = Told.MemPuzzle;
 })(TOLD || (TOLD = {}));

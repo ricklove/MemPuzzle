@@ -1,6 +1,6 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
 
-module TOLD.MemPuzzle {
+module Told.MemPuzzle {
 
     export class MemPuzzle {
 

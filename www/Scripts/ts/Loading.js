@@ -1,5 +1,5 @@
-﻿var TOLD;
-(function (TOLD) {
+﻿var Told;
+(function (Told) {
     (function (MemPuzzle) {
         function showLoading(canvasId) {
             var canvas = document.getElementById(canvasId);
@@ -75,6 +75,6 @@
             };
         }
         MemPuzzle.showLoading = showLoading;
-    })(TOLD.MemPuzzle || (TOLD.MemPuzzle = {}));
-    var MemPuzzle = TOLD.MemPuzzle;
-})(TOLD || (TOLD = {}));
+    })(Told.MemPuzzle || (Told.MemPuzzle = {}));
+    var MemPuzzle = Told.MemPuzzle;
+})(Told || (Told = {}));

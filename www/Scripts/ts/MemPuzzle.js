@@ -1,6 +1,6 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
-var TOLD;
-(function (TOLD) {
+var Told;
+(function (Told) {
     (function (_MemPuzzle) {
         var MemPuzzle = (function () {
             function MemPuzzle(canvasId) {
@@ -885,6 +885,6 @@ var TOLD;
 
             return random;
         }
-    })(TOLD.MemPuzzle || (TOLD.MemPuzzle = {}));
-    var MemPuzzle = TOLD.MemPuzzle;
-})(TOLD || (TOLD = {}));
+    })(Told.MemPuzzle || (Told.MemPuzzle = {}));
+    var MemPuzzle = Told.MemPuzzle;
+})(Told || (Told = {}));

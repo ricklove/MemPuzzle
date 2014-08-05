@@ -11,7 +11,7 @@
     <script src="Scripts/js/External/sonic.js"></script>
     <script src="Scripts/ts/Loading.js"></script>
     <script>
-        var stopLoading = TOLD.MemPuzzle.showLoading("cvsPuzzle");
+        var stopLoading = Told.MemPuzzle.showLoading("cvsPuzzle");
     </script>
 
     <!--    <script src="Scripts/js/External/fabric.min.js" defer="defer"></script>
@@ -40,28 +40,44 @@
 
             var doWhenLoaded = function () {
 
-                if (!window.TOLD
+                if (!window.Told
 
                     || !Told.AppSettings
                     || !Told.Analytics
                     || !Told.Debug
 
-                    || !TOLD.MemPuzzle
-                    || !TOLD.MemPuzzle.MemPuzzle
-                    || !TOLD.MemPuzzle.Subject
-                    || !TOLD.MemPuzzle.Subjects
-
-                    || !window.fabric) {
+                    ) {
 
                     setTimeout(doWhenLoaded, 500);
                     return;
                 }
 
-                TOLD.Log();
+                Told.log("Loader", "Loaded Logging System", true);
+
+                if (!window.Told
+
+                    || !Told.AppSettings
+                    || !Told.Analytics
+                    || !Told.Debug
+
+                    || !Told.MemPuzzle
+                    || !Told.MemPuzzle.MemPuzzle
+                    || !Told.MemPuzzle.Subject
+                    || !Told.MemPuzzle.Subjects
+
+                    || !window.fabric
+
+                    ) {
+
+                    setTimeout(doWhenLoaded, 500);
+                    return;
+                }
+
+                Told.log("Loader", "Loaded Scripts", true);
 
                 stopLoading();
 
-                puzzle = new TOLD.MemPuzzle.MemPuzzle("cvsPuzzle");
+                puzzle = new Told.MemPuzzle.MemPuzzle("cvsPuzzle");
                 //puzzle.createPuzzleFromImage("test.png");
                 //puzzle.createPuzzleFromText("testlTjJ");
                 //puzzle.createPuzzleFromText("Tiger");
@@ -72,8 +88,8 @@
                 //puzzle.createPuzzleFromText("conscientious ");
                 //puzzle.drawShapeTest();
 
-                controller = new TOLD.MemPuzzle.Subject.SubjectController(puzzle);
-                controller.loadSubject(new TOLD.MemPuzzle.Subjects.SightWords());
+                controller = new Told.MemPuzzle.Subject.SubjectController(puzzle);
+                controller.loadSubject(new Told.MemPuzzle.Subjects.SightWords());
             };
 
             doWhenLoaded();

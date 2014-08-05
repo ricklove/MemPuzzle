@@ -1,6 +1,6 @@
 ﻿/// <reference path="MemPuzzle.ts"/>
-var TOLD;
-(function (TOLD) {
+var Told;
+(function (Told) {
     (function (MemPuzzle) {
         (function (Subject) {
             var SubjectController = (function () {
@@ -64,6 +64,6 @@ var TOLD;
             Subject.SubjectController = SubjectController;
         })(MemPuzzle.Subject || (MemPuzzle.Subject = {}));
         var Subject = MemPuzzle.Subject;
-    })(TOLD.MemPuzzle || (TOLD.MemPuzzle = {}));
-    var MemPuzzle = TOLD.MemPuzzle;
-})(TOLD || (TOLD = {}));
+    })(Told.MemPuzzle || (Told.MemPuzzle = {}));
+    var MemPuzzle = Told.MemPuzzle;
+})(Told || (Told = {}));

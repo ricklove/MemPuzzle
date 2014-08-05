@@ -1,6 +1,6 @@
 ﻿/// <reference path="MemPuzzle.ts"/>
 
-module TOLD.MemPuzzle.Subject {
+module Told.MemPuzzle.Subject {
 
     export interface ISubjectProvider {
         getSubject(): ISubject;

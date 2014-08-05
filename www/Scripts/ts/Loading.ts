@@ -1,7 +1,7 @@
 ﻿
 declare var Sonic;
 
-module TOLD.MemPuzzle {
+module Told.MemPuzzle {
 
     export function showLoading(canvasId: string): () => void {
 
