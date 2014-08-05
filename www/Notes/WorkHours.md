@@ -260,7 +260,7 @@ Organize Task list
 - Create Google Analytics Account
 - Add tracking id to app
 
-### 4:21-
+### 4:21-4:47
 
 - Test google analytics 
 	- localhost: OK
@@ -269,7 +269,17 @@ Organize Task list
 - Update logging
 - Manually change file length from TOLD to Told rename to cause website to update
 
-- Test on Kindle Fire
+### 4:48-
+
+- Improved Logging
+- Publish
+- Update PhoneGap
+	- Build with app key
+
+- Test on Kindle Fire Browser
+	- Stuck at creating pieces
+
+- Improve Logging for Create Pieces
 
 
 ---

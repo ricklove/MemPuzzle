@@ -96,20 +96,25 @@ var Told;
                 var puzzleX = self._puzzleX;
                 var puzzleY = self._puzzleY;
 
+                var correctCount = 0;
+
                 for (var i = 0; i < pieces.length; i++) {
                     var piece = pieces[i];
 
                     if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
-                        Told.log("CheckForComplete", "Correct Pieces ~ " + i, true);
-
-                        return;
+                        // return;
+                    } else {
+                        correctCount++;
                     }
                 }
 
-                // Complete
-                Told.log("CheckForComplete", "Puzzle Complete", true);
-
-                self._onPuzzleComplete();
+                if (correctCount !== pieces.length) {
+                    Told.log("CheckForComplete", "Correct Pieces = " + correctCount, true);
+                } else {
+                    // Complete
+                    Told.log("CheckForComplete", "Puzzle Complete", true);
+                    self._onPuzzleComplete();
+                }
             };
 
             MemPuzzle.prototype.stackPieces = function (shouldStackAll, shouldSpreadOut) {
@@ -477,11 +482,15 @@ var Told;
             };
 
             MemPuzzle.prototype.createPuzzlePieces = function (imageData, difficulty, makeOutsideFlat, onCreatedPieces) {
+                Told.log("MemPuzzle_createPuzzlePieces", "01 - BEGIN", true);
+
                 var self = this;
 
                 var pieces = [];
 
                 fabric.Image.fromURL(imageData, function (mainImage) {
+                    Told.log("MemPuzzle_createPuzzlePieces", "02 - Load Main Image", true);
+
                     var width = mainImage.width;
                     var height = mainImage.height;
 
@@ -519,6 +528,7 @@ var Told;
                     var pWidth = width / hSideCount;
                     var pHeight = height / vSideCount;
 
+                    // Create edges
                     var hEdges = [];
                     var vEdges = [];
 
@@ -579,6 +589,9 @@ var Told;
                     // DEBUG
                     //self.drawEdges(hEdges);
                     //self.drawEdges(vEdges);
+                    Told.log("MemPuzzle_createPuzzlePieces", "03 - Created Edges", true);
+
+                    var targetCount = hSideCount * vSideCount;
                     var pieces = [];
 
                     for (var h = 0; h < hSideCount; h++) {
@@ -664,7 +677,9 @@ var Told;
 
                                     pieces.push(piece);
 
-                                    if (pieces.length === hSideCount * vSideCount) {
+                                    if (pieces.length === targetCount) {
+                                        Told.log("MemPuzzle_createPuzzlePieces", "05 - END - Created Pieces", true);
+
                                         setTimeout(function () {
                                             onCreatedPieces(pieces);
                                         }, 10);
@@ -673,6 +688,16 @@ var Told;
                             })();
                         }
                     }
+
+                    var doLogCreation = function () {
+                        Told.log("MemPuzzle_createPuzzlePieces", "04 - Creating Pieces Report: TargetCount=" + targetCount + " ActualCount=" + pieces.length, true);
+
+                        if (targetCount !== pieces.length) {
+                            setTimeout(doLogCreation, 500);
+                        }
+                    };
+
+                    doLogCreation();
                 });
             };
 

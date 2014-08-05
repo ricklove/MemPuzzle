@@ -114,22 +114,28 @@ module Told.MemPuzzle {
             var puzzleX = self._puzzleX;
             var puzzleY = self._puzzleY;
 
+            var correctCount = 0;
 
             for (var i = 0; i < pieces.length; i++) {
                 var piece = pieces[i];
 
                 if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
-
-                    Told.log("CheckForComplete", "Correct Pieces ~ " + i, true);
-
-                    return;
+                    // return;
+                } else {
+                    correctCount++;
                 }
             }
 
-            // Complete
-            Told.log("CheckForComplete", "Puzzle Complete", true);
+            if (correctCount !== pieces.length) {
 
-            self._onPuzzleComplete();
+                Told.log("CheckForComplete", "Correct Pieces = " + correctCount, true);
+
+            } else {
+
+                // Complete
+                Told.log("CheckForComplete", "Puzzle Complete", true);
+                self._onPuzzleComplete();
+            }
         }
 
         stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
@@ -518,11 +524,17 @@ module Told.MemPuzzle {
         }
 
         private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: IPiece[]) => void) {
+            Told.log("MemPuzzle_createPuzzlePieces", "01 - BEGIN", true);
+
+
             var self = this;
 
             var pieces = <fabric.IImage[]>[];
 
             fabric.Image.fromURL(imageData, function (mainImage) {
+
+                Told.log("MemPuzzle_createPuzzlePieces", "02 - Load Main Image", true);
+
 
                 var width = mainImage.width;
                 var height = mainImage.height;
@@ -564,6 +576,7 @@ module Told.MemPuzzle {
                 var pHeight = height / vSideCount;
 
 
+                // Create edges
                 var hEdges = <IEdge[][]>[];
                 var vEdges = <IEdge[][]>[];
 
@@ -627,7 +640,11 @@ module Told.MemPuzzle {
                 //self.drawEdges(hEdges);
                 //self.drawEdges(vEdges);
 
+                Told.log("MemPuzzle_createPuzzlePieces", "03 - Created Edges", true);
+
+                var targetCount = hSideCount * vSideCount;
                 var pieces = <IPiece[]>[];
+
 
                 for (var h = 0; h < hSideCount; h++) {
                     for (var v = 0; v < vSideCount; v++) {
@@ -721,7 +738,9 @@ module Told.MemPuzzle {
 
                                 pieces.push(piece);
 
-                                if (pieces.length === hSideCount * vSideCount) {
+                                if (pieces.length === targetCount) {
+
+                                    Told.log("MemPuzzle_createPuzzlePieces", "05 - END - Created Pieces", true);
 
                                     setTimeout(() => {
                                         onCreatedPieces(pieces);
@@ -732,6 +751,16 @@ module Told.MemPuzzle {
 
                     }
                 }
+
+                var doLogCreation = () => {
+                    Told.log("MemPuzzle_createPuzzlePieces", "04 - Creating Pieces Report: TargetCount=" + targetCount + " ActualCount=" + pieces.length, true);
+
+                    if (targetCount !== pieces.length) {
+                        setTimeout(doLogCreation, 500);
+                    }
+                };
+
+                doLogCreation();
 
             });
         }
