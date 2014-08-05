@@ -169,6 +169,7 @@ Remaining Features
 
 - Fix Loading
 
+
 ## Period 3
 
 ### 2014-08-03 3:25-3:29 Plan
@@ -228,6 +229,24 @@ Organize Task list
 
 - Adjust stack location
 
+### 5:38-5:50
+
+- Publish
+- Test
+
+
+## Period 4
+
+### 3:37-3:39 Plan
+
+- Test as App
+- Add Logging & Analytics
+
+### 3:40-
+
+- Create PhoneGapBuild project
+- Test on Kindle Fire
+
 
 ---
 
@@ -241,7 +260,11 @@ Organize Task list
 
 * Constrain piece location to inside screen
 
-- Make snap length, borders, outline, etc. based on ratios of screen size
+* Make snap length, borders, outline, etc. based on ratios of screen size
+
+- Handle screen size change
+
+- Provide sense of progress and accomplishment
 
 
 # TODO Maybe

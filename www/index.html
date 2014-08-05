@@ -28,7 +28,12 @@
         }
 
         function runOnLoad() {
+            addScript("Scripts/ts/System/AppSettings.js");
+            addScript("Scripts/ts/System/Analytics.js");
+            addScript("Scripts/ts/System/Debug.js");
+
             addScript("Scripts/js/External/fabric.min.js");
+
             addScript("Scripts/ts/MemPuzzle.js");
             addScript("Scripts/ts/Subject.js");
             addScript("Scripts/ts/Subjects/SightWords.js");
@@ -36,15 +41,23 @@
             var doWhenLoaded = function () {
 
                 if (!window.TOLD
+
+                    || !Told.AppSettings
+                    || !Told.Analytics
+                    || !Told.Debug
+
                     || !TOLD.MemPuzzle
                     || !TOLD.MemPuzzle.MemPuzzle
                     || !TOLD.MemPuzzle.Subject
                     || !TOLD.MemPuzzle.Subjects
+
                     || !window.fabric) {
 
                     setTimeout(doWhenLoaded, 500);
                     return;
                 }
+
+                TOLD.Log();
 
                 stopLoading();
 
