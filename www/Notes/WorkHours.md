@@ -334,7 +334,10 @@ Organize Task list
 
 - Publish
 - Test
-	- Still not right
+	- iPhone4 - BUG: canvas is using strict resolution and ignoring device dpi
+
+- Multiply canvas size by device pixel ratio
+
 
 ---
 

@@ -29,8 +29,14 @@ var Told;
                 });
 
                 canvas.backgroundColor = MemPuzzle.BACKGROUNDCOLOR;
-                canvas.setWidth(document.body.clientWidth - 20);
-                canvas.setHeight(window.innerHeight - 30);
+
+                // Multiply resolution by device pixel ratio
+                var dpr = 1;
+                if (window.devicePixelRatio !== undefined)
+                    dpr = window.devicePixelRatio;
+
+                canvas.setWidth(document.body.clientWidth * dpr - 20);
+                canvas.setHeight(window.innerHeight * dpr - 30);
 
                 Told.log("MemPuzzle_Constructor", "02 - Canvas Size Set - width=" + canvas.getWidth() + " height= " + canvas.getHeight(), true);
 
