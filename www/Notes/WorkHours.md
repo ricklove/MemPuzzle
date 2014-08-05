@@ -269,7 +269,8 @@ Organize Task list
 - Update logging
 - Manually change file length from TOLD to Told rename to cause website to update
 
-### 4:48-
+### 4:48-5:15
+### 5:20-5:42
 
 - Improved Logging
 - Publish
@@ -278,8 +279,13 @@ Organize Task list
 
 - Test on Kindle Fire Browser
 	- Stuck at creating pieces
-
-- Improve Logging for Create Pieces
+	- Improve Logging for Create Pieces
+	- Deploy to website 
+	- Retest
+	- Add Error Logging
+	- Deploy to website 
+	- Retest
+	- 
 
 
 ---

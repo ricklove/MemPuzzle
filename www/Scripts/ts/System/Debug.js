@@ -135,4 +135,12 @@ var Told;
         Told.Debug.loggerInstance.setElement(elemendId);
     }
     Told.enableLogging = enableLogging;
+
+    function enableErrorLogging() {
+        // From: http://stackoverflow.com/questions/20500190/window-onerror-in-ts-0-9-5-is-impossible
+        window.onerror = function (eventOrMessage, source, fileno, colnumber) {
+            Told.log("ERROR", "URL:" + source + " line:" + fileno + " Message: " + eventOrMessage, true);
+        };
+    }
+    Told.enableErrorLogging = enableErrorLogging;
 })(Told || (Told = {}));

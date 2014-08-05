@@ -69,7 +69,7 @@ module Told.Debug {
                             }
                         }
 
-                        element.textContent = fps + "\r\n" + element["badFPS"] +"\r\n" + element["textContentCopy"];
+                        element.textContent = fps + "\r\n" + element["badFPS"] + "\r\n" + element["textContentCopy"];
                     }
 
                     setTimeout(showFPS, 250);
@@ -140,5 +140,12 @@ module Told {
 
     export function enableLogging(elemendId: string) {
         Debug.loggerInstance.setElement(elemendId);
+    }
+
+    export function enableErrorLogging() {
+        // From: http://stackoverflow.com/questions/20500190/window-onerror-in-ts-0-9-5-is-impossible
+        window.onerror = function (eventOrMessage: any, source: string, fileno: number, colnumber?: number): any {
+            Told.log("ERROR", "URL:" + source + " line:" + fileno + " Message: " + eventOrMessage, true);
+        };
     }
 }

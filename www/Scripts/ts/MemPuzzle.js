@@ -489,7 +489,7 @@ var Told;
                 var pieces = [];
 
                 fabric.Image.fromURL(imageData, function (mainImage) {
-                    Told.log("MemPuzzle_createPuzzlePieces", "02 - Load Main Image", true);
+                    Told.log("MemPuzzle_createPuzzlePieces", "02 - Loaded Main Image", true);
 
                     var width = mainImage.width;
                     var height = mainImage.height;
