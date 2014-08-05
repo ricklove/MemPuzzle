@@ -38,6 +38,10 @@
             addScript("Scripts/ts/Subject.js");
             addScript("Scripts/ts/Subjects/SightWords.js");
 
+            var wasLoaded_LoggingSystem = false;
+            var wasLoaded_External = false;
+            var wasLoaded_App = false;
+
             var doWhenLoaded = function () {
 
                 if (!window.Told
@@ -52,25 +56,40 @@
                     return;
                 }
 
-                Told.log("Loader", "Loaded Logging System", true);
+                if (!wasLoaded_LoggingSystem) {
+                    Told.log("Loader", "Loaded Logging System", true);
+                    wasLoaded_LoggingSystem = true;
+                }
+
+                if (!window.fabric
+
+                    ) {
+
+                    setTimeout(doWhenLoaded, 500);
+                    return;
+                }
+
+                if (!wasLoaded_External) {
+                    Told.log("Loader", "Loaded External", true);
+                    wasLoaded_External = true;
+                }
 
                 if (!window.Told
-
-                    || !Told.AppSettings
-                    || !Told.Analytics
-                    || !Told.Debug
 
                     || !Told.MemPuzzle
                     || !Told.MemPuzzle.MemPuzzle
                     || !Told.MemPuzzle.Subject
                     || !Told.MemPuzzle.Subjects
 
-                    || !window.fabric
-
                     ) {
 
                     setTimeout(doWhenLoaded, 500);
                     return;
+                }
+
+                if (!wasLoaded_App) {
+                    Told.log("Loader", "Loaded App", true);
+                    wasLoaded_App = true;
                 }
 
                 Told.log("Loader", "Loaded Scripts", true);
