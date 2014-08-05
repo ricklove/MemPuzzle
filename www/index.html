@@ -44,7 +44,12 @@
             var wasLoaded_External = false;
             var wasLoaded_App = false;
 
+            // Show loading screen for min time
             var doWhenLoaded = function () {
+                setTimeout(doLoadScripts, 3000);
+            }
+
+            var doLoadScripts = function () {
 
                 if (!window.Told
 
@@ -54,7 +59,7 @@
 
                     ) {
 
-                    setTimeout(doWhenLoaded, 500);
+                    setTimeout(doLoadScripts, 500);
                     return;
                 }
 
@@ -67,7 +72,7 @@
 
                     ) {
 
-                    setTimeout(doWhenLoaded, 500);
+                    setTimeout(doLoadScripts, 500);
                     return;
                 }
 
@@ -85,7 +90,7 @@
 
                     ) {
 
-                    setTimeout(doWhenLoaded, 500);
+                    setTimeout(doLoadScripts, 500);
                     return;
                 }
 
@@ -96,6 +101,7 @@
 
                 Told.log("Loader", "Loaded Scripts", true);
                 Told.enableErrorLogging();
+                Told.Analytics.trackPageView();
 
                 stopLoading();
 

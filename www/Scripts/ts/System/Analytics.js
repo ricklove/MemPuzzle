@@ -176,7 +176,9 @@ var Told;
         })();
 
         // Track page view as soon as this is loaded
-        GoogleAnalyticsMeasurementProtocol.trackPageView();
+        Analytics.trackPageView = function () {
+            GoogleAnalyticsMeasurementProtocol.trackPageView();
+        };
     })(Told.Analytics || (Told.Analytics = {}));
     var Analytics = Told.Analytics;
 })(Told || (Told = {}));

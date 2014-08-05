@@ -345,6 +345,12 @@ Organize Task list
 - Test Kindle createPuzzleCompleted
 	- BUG: No imageData being saved in createPuzzleFromText
 
+
+### 8:30-8:41
+
+- Fix Google Analytics auto tracking page view before app settings loaded
+- Show loading screen for set time
+
 ---
 
 # TODO

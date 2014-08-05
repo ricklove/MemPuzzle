@@ -195,7 +195,8 @@ module Told.Analytics {
 
 
     // Track page view as soon as this is loaded
-    GoogleAnalyticsMeasurementProtocol.trackPageView();
-
+    export var trackPageView = function () {
+        GoogleAnalyticsMeasurementProtocol.trackPageView();
+    }
 
 }
