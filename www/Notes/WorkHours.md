@@ -242,9 +242,21 @@ Organize Task list
 - Test as App
 - Add Logging & Analytics
 
-### 3:40-
+### 3:40-3:59
+
+- Add logging System
+
+### 4:00-4:03
 
 - Create PhoneGapBuild project
+	- Add config.xml
+
+
+- Create Google Analytics Account
+
+
+### 
+
 - Test on Kindle Fire
 
 
