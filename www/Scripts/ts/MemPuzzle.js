@@ -360,8 +360,9 @@ var Told;
                 self._puzzleWidth = sWidth;
                 self._puzzleHeight = sHeight;
 
-                this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
                 this.createPuzzleOutline();
+
+                this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
 
                 Told.log("MemPuzzle_createPuzzle", "02 - created puzzle outline", true);
 
@@ -702,6 +703,8 @@ var Told;
             };
 
             MemPuzzle.prototype.createPuzzleCompleted = function (imageData, timeToShow) {
+                Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40), true);
+
                 var self = this;
                 var canvas = self._canvas;
 
@@ -710,6 +713,8 @@ var Told;
                 var y = self._puzzleY;
 
                 fabric.Image.fromURL(imageData, function (mainImage) {
+                    Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created", true);
+
                     mainImage.set({
                         scaleX: scale,
                         scaleY: scale,
@@ -725,6 +730,8 @@ var Told;
                     canvas.add(mainImage);
 
                     setTimeout(function () {
+                        Told.log("MemPuzzle_createPuzzleCompleted", "03 - END - Image Removed", true);
+
                         mainImage.remove();
                     }, timeToShow);
                 });
