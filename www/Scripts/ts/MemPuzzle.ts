@@ -32,7 +32,7 @@ module Told.MemPuzzle {
 
         constructor(canvasId: string) {
 
-            Told.log("MemPuzzle", "Constructor", true);
+            Told.log("MemPuzzle_Constructor", "01 - BEGIN", true);
 
             var self = this;
 
@@ -44,6 +44,8 @@ module Told.MemPuzzle {
             canvas.backgroundColor = MemPuzzle.BACKGROUNDCOLOR;
             canvas.setWidth(document.body.clientWidth - 20);
             canvas.setHeight(window.innerHeight - 30);
+
+            Told.log("MemPuzzle_Constructor", "02 - Canvas Size Set - width=" + canvas.getWidth() + " height= " + canvas.getHeight(), true);
 
             canvas.on({
                 //'mouse:down': function (e: any) {
@@ -224,7 +226,7 @@ module Told.MemPuzzle {
             if (wCanvas === null) {
                 var element = document.createElement("canvas");
                 element.setAttribute('id', '_temp_canvas');
-                wCanvas = self._workingCanvas = new fabric.Canvas('_temp_canvas');
+                wCanvas = self._workingCanvas = new fabric.StaticCanvas('_temp_canvas');
                 wCanvas.renderOnAddition = false;
             }
 
@@ -778,7 +780,7 @@ module Told.MemPuzzle {
 
             fabric.Image.fromURL(imageData, function (mainImage) {
 
-                Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created", true);
+                Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created - width=" + mainImage.width + " height= " + mainImage.height, true);
 
                 mainImage.set({
                     scaleX: scale,

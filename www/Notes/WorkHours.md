@@ -327,7 +327,14 @@ Organize Task list
 - Adjust scale for iPhone4
 - Publish
 - Test
+	- Still not right
 
+- Add Logging to createPuzzleCompleted for Kindle Testing
+- Add Logging to track screen size
+
+- Publish
+- Test
+	- Still not right
 
 ---
 
