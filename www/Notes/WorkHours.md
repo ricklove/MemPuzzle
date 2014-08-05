@@ -307,6 +307,9 @@ Organize Task list
 
 - Removed permissions in config.xml
 - Use PhoneGap Fast Canvas plugin
+- Add no scale meta tag
+
+
 - Publish
 - Test
 
