@@ -45,7 +45,8 @@ module Told.MemPuzzle {
 
             // Multiply resolution by device pixel ratio
             var dpr = 1;
-            if (window.devicePixelRatio !== undefined) dpr = window.devicePixelRatio;
+            // This does not work
+            //if (window.devicePixelRatio !== undefined) dpr = window.devicePixelRatio;
 
             canvas.setWidth(document.body.clientWidth * dpr - 20);
             canvas.setHeight(window.innerHeight * dpr - 30);
