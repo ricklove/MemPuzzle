@@ -303,7 +303,7 @@ Organize Task list
 
 - Disable Highlight on Kindle
 
-### 6:45-
+### 6:45-7:04
 
 - Removed permissions in config.xml
 - Use PhoneGap Fast Canvas plugin
@@ -321,7 +321,12 @@ Organize Task list
 
 - Test on Kingle HD PhoneGap
 	- PhoneGap FastCanvas plugin - unsupported!
-	- 
+
+### 7:05-
+
+- Adjust scale for iPhone4
+- Publish
+- Test
 
 
 ---
