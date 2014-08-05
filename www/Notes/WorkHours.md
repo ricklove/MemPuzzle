@@ -270,7 +270,7 @@ Organize Task list
 - Manually change file length from TOLD to Told rename to cause website to update
 
 ### 4:48-5:15
-### 5:20-5:42
+### 5:20-5:47
 
 - Improved Logging
 - Publish
@@ -284,8 +284,26 @@ Organize Task list
 	- Retest
 	- Add Error Logging
 	- Deploy to website 
-	- Retest
-	- 
+	- Retest (Still no pieces and no error - fabric.Image.loadUrl (dataURL...) is failing
+
+- Test on iPhone Browser
+	- !First piece is blank (Font not loaded)
+
+### 5:48-5:58
+### 6:30-6:40
+
+- Test on Kindle Fire HD
+	- Download apk
+	- Google Analytics: OK
+	- Font: OK
+	- Performance: Poor when dragging
+	- BUG: Highlighting canvas
+
+### 6:41-6:44
+
+- Disable Highlight on Kindle
+
+### 6:41-6:44
 
 
 ---
