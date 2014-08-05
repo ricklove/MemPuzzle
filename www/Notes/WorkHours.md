@@ -311,7 +311,17 @@ Organize Task list
 
 
 - Publish
-- Test
+- Test on Kindle HD Browser
+	- Performance: Good
+	- FIX: Not highlighting now
+
+- Test on iPhone 4 Browser
+	- BUG: Scaling is using small default resolution
+	- Performance: Great (Maybe due to using small resolution)
+
+- Test on Kingle HD PhoneGap
+	- PhoneGap FastCanvas plugin - unsupported!
+	- 
 
 
 ---
