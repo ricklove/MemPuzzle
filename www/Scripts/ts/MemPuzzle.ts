@@ -240,7 +240,7 @@ module Told.MemPuzzle {
 
         createPuzzleFromText(text: string, onPuzzleComplete= () => { }, shouldUseSans= false) {
 
-            Told.log("MemPuzzle_createPuzzleFromText", "text:" + text, true);
+            Told.log("MemPuzzle_createPuzzleFromText", "BEGIN - text:" + text, true);
 
             var self = this;
 
@@ -287,6 +287,7 @@ module Told.MemPuzzle {
 
                 // Save Data
                 self._imageData = wCanvas.toDataURL("png");
+                Told.log("MemPuzzle_createPuzzleFromText", "END - imageData:" + self._imageData.substr(0,40) + " ...", true);
 
                 self.createPuzzle(onPuzzleComplete);
 
@@ -774,7 +775,7 @@ module Told.MemPuzzle {
         }
 
         private createPuzzleCompleted(imageData: string, timeToShow: number) {
-            Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40), true);
+            Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40) + " ...", true);
 
             var self = this;
             var canvas = self._canvas;

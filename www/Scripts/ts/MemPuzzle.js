@@ -210,7 +210,7 @@ var Told;
                 if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
                 }; }
                 if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
-                Told.log("MemPuzzle_createPuzzleFromText", "text:" + text, true);
+                Told.log("MemPuzzle_createPuzzleFromText", "BEGIN - text:" + text, true);
 
                 var self = this;
 
@@ -254,6 +254,7 @@ var Told;
                     //    image.renderAll();
                     // Save Data
                     self._imageData = wCanvas.toDataURL("png");
+                    Told.log("MemPuzzle_createPuzzleFromText", "END - imageData:" + self._imageData.substr(0, 40) + " ...", true);
 
                     self.createPuzzle(onPuzzleComplete);
                     //}, 100);
@@ -711,7 +712,7 @@ var Told;
             };
 
             MemPuzzle.prototype.createPuzzleCompleted = function (imageData, timeToShow) {
-                Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40), true);
+                Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40) + " ...", true);
 
                 var self = this;
                 var canvas = self._canvas;

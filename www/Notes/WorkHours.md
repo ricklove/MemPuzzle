@@ -322,7 +322,7 @@ Organize Task list
 - Test on Kingle HD PhoneGap
 	- PhoneGap FastCanvas plugin - unsupported!
 
-### 7:05-
+### 7:05-7:41
 
 - Adjust scale for iPhone4
 - Publish
@@ -333,11 +333,17 @@ Organize Task list
 - Add Logging to track screen size
 
 - Publish
-- Test
-	- iPhone4 - BUG: canvas is using strict resolution and ignoring device dpi
+- Test iPhone4 
+	- BUG: canvas is using strict resolution and ignoring device dpi
 
 - Multiply canvas size by device pixel ratio
 
+- Publish
+- Test iPhone4 
+	- BUG: Now canvas is off screen
+
+- Test Kindle createPuzzleCompleted
+	- BUG: No imageData being saved in createPuzzleFromText
 
 ---
 
