@@ -100,11 +100,15 @@ var Told;
                     var piece = pieces[i];
 
                     if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
+                        Told.log("CheckForComplete", "Correct Pieces ~ " + i, true);
+
                         return;
                     }
                 }
 
                 // Complete
+                Told.log("CheckForComplete", "Puzzle Complete", true);
+
                 self._onPuzzleComplete();
             };
 

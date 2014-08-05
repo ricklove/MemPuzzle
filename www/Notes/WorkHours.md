@@ -267,6 +267,7 @@ Organize Task list
 	- website: OK - but logging is broken
 
 - Update logging
+- Manually change file length from TOLD to Told rename to cause website to update
 
 - Test on Kindle Fire
 
