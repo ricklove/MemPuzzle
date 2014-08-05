@@ -253,8 +253,12 @@ Organize Task list
 
 ### 4:04-4:14
 
-- Create Google Analytics Account
 - Add more logging
+
+### 4:15-4:20
+
+- Create Google Analytics Account
+- Add tracking id to app
 
 ### 
 
