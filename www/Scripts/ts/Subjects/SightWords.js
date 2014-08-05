@@ -1,7 +1,8 @@
 ﻿/// <reference path="../Subject.ts"/>
-var TOLD;
-(function (TOLD) {
+var Told;
+(function (Told) {
     (function (MemPuzzle) {
+        // Subjects
         (function (Subjects) {
             var SightWords = (function () {
                 function SightWords() {
@@ -26,4 +27,4 @@ var TOLD;
         var Subjects = MemPuzzle.Subjects;
     })(Told.MemPuzzle || (Told.MemPuzzle = {}));
     var MemPuzzle = Told.MemPuzzle;
-})(TOLD || (TOLD = {}));
+})(Told || (Told = {}));

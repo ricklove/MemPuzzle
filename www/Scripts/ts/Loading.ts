@@ -1,6 +1,7 @@
 ﻿
 declare var Sonic;
 
+// LOADING
 module Told.MemPuzzle {
 
     export function showLoading(canvasId: string): () => void {

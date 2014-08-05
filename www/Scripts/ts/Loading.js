@@ -1,5 +1,6 @@
 ﻿var Told;
 (function (Told) {
+    // LOADING
     (function (MemPuzzle) {
         function showLoading(canvasId) {
             var canvas = document.getElementById(canvasId);

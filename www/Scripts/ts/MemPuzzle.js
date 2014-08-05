@@ -2,6 +2,7 @@
 ///<reference path="System/Debug.ts"/>
 var Told;
 (function (Told) {
+    // MemPuzzle
     (function (_MemPuzzle) {
         var MemPuzzle = (function () {
             function MemPuzzle(canvasId) {

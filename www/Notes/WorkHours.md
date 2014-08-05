@@ -260,7 +260,13 @@ Organize Task list
 - Create Google Analytics Account
 - Add tracking id to app
 
-### 
+### 4:21-
+
+- Test google analytics 
+	- localhost: OK
+	- website: OK - but logging is broken
+
+- Update logging
 
 - Test on Kindle Fire
 

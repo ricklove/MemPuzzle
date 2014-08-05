@@ -1,5 +1,6 @@
 ﻿/// <reference path="../Subject.ts"/>
 
+// Subjects
 module Told.MemPuzzle.Subjects {
 
     export class SightWords implements Subject.ISubjectProvider {

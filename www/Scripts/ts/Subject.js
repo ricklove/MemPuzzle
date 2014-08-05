@@ -2,6 +2,7 @@
 var Told;
 (function (Told) {
     (function (MemPuzzle) {
+        // Subject
         (function (Subject) {
             var SubjectController = (function () {
                 function SubjectController(puzzle) {
