@@ -1,4 +1,5 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
+///<reference path="System/Debug.ts"/>
 
 module Told.MemPuzzle {
 
@@ -29,6 +30,9 @@ module Told.MemPuzzle {
         private _onPuzzleComplete = () => { };
 
         constructor(canvasId: string) {
+
+            Told.log("MemPuzzle", "Constructor", true);
+
             var self = this;
 
             var canvas = self._canvas = new fabric.Canvas(canvasId, {
@@ -216,6 +220,9 @@ module Told.MemPuzzle {
         }
 
         createPuzzleFromText(text: string, onPuzzleComplete= () => { }, shouldUseSans= false) {
+
+            Told.log("MemPuzzle_createPuzzleFromText", "text:" + text, true);
+
             var self = this;
 
             var puzzleFontName = "PuzzleFont";
@@ -327,6 +334,9 @@ module Told.MemPuzzle {
         }
 
         private createPuzzle(onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true, timeToShowCompletedPuzzle= 2000) {
+
+            Told.log("MemPuzzle_createPuzzle", "01 - Begin", true);
+
             var self = this;
             var PADDING_PERCENT = MemPuzzle.PADDING_PERCENT;
 
@@ -369,12 +379,18 @@ module Told.MemPuzzle {
             this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
             this.createPuzzleOutline();
 
+            Told.log("MemPuzzle_createPuzzle", "02 - created puzzle outline", true);
+
             this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, (pieces) => {
+
+                Told.log("MemPuzzle_createPuzzle", "03 - created puzzle pieces", true);
 
                 self._pieces = pieces;
 
                 // Create snapshot (of puzzle size with scaling)
                 this.createPuzzlePieceSnapshots(pieces, tRatio, (snapshots) => {
+
+                    Told.log("MemPuzzle_createPuzzle", "04 - created puzzle snapshots", true);
 
                     self._snapshots = snapshots;
 
@@ -430,6 +446,8 @@ module Told.MemPuzzle {
                     if (shouldStackPieces) {
                         self.stackPieces(true);
                     }
+
+                    Told.log("MemPuzzle_createPuzzle", "05 - End - Added snapshot pieces to canvas", true);
 
                 });
             });

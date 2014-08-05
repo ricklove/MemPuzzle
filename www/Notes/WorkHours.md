@@ -251,9 +251,10 @@ Organize Task list
 - Create PhoneGapBuild project
 	- Add config.xml
 
+### 4:04-4:14
 
 - Create Google Analytics Account
-
+- Add more logging
 
 ### 
 
