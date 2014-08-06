@@ -348,12 +348,38 @@ Organize Task list
 
 ### 8:30-8:41
 
+- Remove bad scaling
 - Fix Google Analytics auto tracking page view before app settings loaded
 - Show loading screen for set time
+
+
+## Period 5
+
+### 2014-08-06 4:00-5:11
+
+- Load and Test CocoonJS app
+	- From: http://support.ludei.com/hc/en-us/articles/200767258-Creating-an-installable-Android-APK
+	- Download debug.apk and unsigned.apk (for release)
+
+
+- Created SOP for signing apk file
+	- At ~\Dropbox\Programming\SOP_StandardOperatingProcedures\SigningAndroidApkFileForPublishing.md
+
+
+### 2014-08-06 5:12-
+
+- Copy debug.apk to kindle and test
+
+
+
 
 ---
 
 # TODO
+
+- Deploy with ConcoonJS Canvas+
+
+- Remove toDataUrl and use DrawImage directly with multiple canvases
 
 - Cache puzzle pieces as images (to prevent recalculating clip path each render)
 	* Create snapshot of puzzle size (with scaling)
