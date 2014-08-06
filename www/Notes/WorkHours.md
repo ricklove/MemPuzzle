@@ -366,7 +366,7 @@ Organize Task list
 	- At ~\Dropbox\Programming\SOP_StandardOperatingProcedures\SigningAndroidApkFileForPublishing.md
 
 
-### 2014-08-06 5:12-
+### 5:12-5:28
 
 - Copy debug.apk to kindle and test
 - Test
@@ -385,6 +385,22 @@ Organize Task list
 	- To Resolve:
 		- Add more logging to detect exact time of failure
 
+### 5:29-5:32
+
+- Create a CocoonJS launcher (from project on CocoonJS website)
+
+### 6:30-6:45
+
+- Test on iPhone4 CocoonJS launcher
+	- Performance: OK
+	- BUG: Transparency of pieces was broken, so they had a black background
+
+- Custom CocoonJS launcher is not needed
+- Install Generic CocoonJS launcher on Kindle Fire HD
+
+### 6:45-7:10
+
+- Tweak Told Loading Logo Animation
 
 
 ---

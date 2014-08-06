@@ -23,21 +23,25 @@
                 this._.fill();
             }
 
-            var x = 50;
-            var y = 50;
-            var m = 10;
+            var x = 25;
+            var y = 25;
+            var m = 5;
 
             var sonic = new Sonic({
                 //width: window.innerWidth - 60,
                 //height: window.innerHeight - 60,
-                width: 300,
-                height: 300,
+                width: 150,
+                height: 90,
                 canvas: canvas,
-                stepsPerFrame: 4,
-                trailLength: 0.8,
-                pointDistance: 0.01,
-                fps: 20,
-                backgroundColor: '#1B0918',
+                stepsPerFrame: 8,
+                trailLength: 1.0,
+                pointDistance: 0.04,
+                fps: 10,
+                //stepsPerFrame: 4,
+                //trailLength: 0.8,
+                //pointDistance: 0.01,
+                //fps: 20,
+                backgroundColor: '#000000',
                 path: [
                     [
                         'line',
@@ -59,7 +63,7 @@
                         20 * m + x, 10 * m + y]
                 ],
                 step: function (point, index, frame) {
-                    var sizeMultiplier = 10;
+                    var sizeMultiplier = 5;
                     var radius = sizeMultiplier * (index > 0.5 ? 1 - index : index);
 
                     drawFlame.call(this, '#FF6C08', point.x * index, point.y, radius);
