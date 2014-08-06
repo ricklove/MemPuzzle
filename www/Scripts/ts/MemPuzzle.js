@@ -19,7 +19,7 @@ var Told;
                 this._snapshots = null;
                 this._onPuzzleComplete = function () {
                 };
-                Told.log("MemPuzzle_Constructor", "01 - BEGIN", true);
+                Told.log("MemPuzzle_Constructor", "01 - BEGIN - Will Create fabric Canvas", true);
 
                 var self = this;
 
@@ -28,7 +28,11 @@ var Told;
                     selection: false
                 });
 
+                Told.log("MemPuzzle_Constructor", "01_A - Will Change Background Color", true);
+
                 canvas.backgroundColor = MemPuzzle.BACKGROUNDCOLOR;
+
+                Told.log("MemPuzzle_Constructor", "01_A - Will Change Canvas Size", true);
 
                 // Multiply resolution by device pixel ratio
                 var dpr = 1;

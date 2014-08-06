@@ -369,7 +369,21 @@ Organize Task list
 ### 2014-08-06 5:12-
 
 - Copy debug.apk to kindle and test
-
+- Test
+	- Not working:
+		- Loading screen displayed
+		- App exits after a few seconds
+	- Google Analytics: CocoonJS converts spaces to %20
+	- Loading of scripts - OK
+	- MemPuzzle constructor called
+	- LAST EVENT: MemPuzzle_Construct -> 01 - BEGIN
+	- Possible Problems:
+		- Changing the size of the main canvas:
+			- With Canvas+ the screen is scalled to the main canvas, it may not be allowed to change it's size after creation
+		- Creating a fabric.Canvas:
+			- fabricJS may do something incompatible with CocoonJS
+	- To Resolve:
+		- Add more logging to detect exact time of failure
 
 
 
