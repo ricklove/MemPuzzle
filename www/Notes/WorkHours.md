@@ -397,33 +397,53 @@ Organize Task list
 
 - Custom CocoonJS launcher is not needed
 - Install Generic CocoonJS launcher on Kindle Fire HD
+	- Forget this... Just download the custom launcher
 
 ### 6:45-7:10
 
 - Tweak Told Loading Logo Animation
 
 
+
+## Period 6
+
+### 15:30-15:40
+
+A refactor is required to solve performance issues:
+
+- REFACTOR:
+	- Move CreateImageSource and CreatePiece to own files
+	- Remove fabricjs from everything but the last canvas (and possibly image creation canvas)
+		- Remove toDataUrl and use DrawImage directly with multiple canvases
+	- Provide only one moving piece
+		- Create puzzle static canvas for everything but moving pieces
+		- Create fabricjs canvas with only static canvas image and one moving piece
+		- Find bounding box and clip snapshot
+		- Turn off pixel perfect dragging
+		- Allow click to place (if in correct location)
+
+
+
 ---
 
 # TODO
 
-- Deploy with ConcoonJS Canvas+
-
-- Remove toDataUrl and use DrawImage directly with multiple canvases
-
-- Cache puzzle pieces as images (to prevent recalculating clip path each render)
-	* Create snapshot of puzzle size (with scaling)
-	* Use snapshot
-	- Find bounding box and clip snapshot
-	- Turn off pixel perfect dragging
-
-* Constrain piece location to inside screen
-
-* Make snap length, borders, outline, etc. based on ratios of screen size
+- REFACTOR:
+	- Move CreateImageSource and CreatePiece to own files
+	- Remove fabricjs from everything but the last canvas (and possibly image creation canvas)
+		- Remove toDataUrl and use DrawImage directly with multiple canvases
+	- Provide only one moving piece
+		- Create puzzle static canvas for everything but moving pieces
+		- Create fabricjs canvas with only static canvas image and one moving piece
+		- Find bounding box and clip snapshot
+		- Turn off pixel perfect dragging
+		- Allow click to place (if in correct location)
 
 - Handle screen size change
 
 - Provide sense of progress and accomplishment
+
+- BUG: Still font is not being loaded on first puzzle sometimes
 
 
 # TODO Maybe

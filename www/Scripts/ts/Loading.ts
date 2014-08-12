@@ -21,6 +21,8 @@ module Told.MemPuzzle {
         //context.fill();
         //context.stroke();
 
+        // Based on: http://padolsey.github.io/sonic-creator/#flame
+
         function drawFlame(color, px, py, radius) {
             this._.fillStyle = color;
             this._.beginPath();
