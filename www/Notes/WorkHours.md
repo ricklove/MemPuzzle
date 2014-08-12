@@ -433,6 +433,9 @@ A refactor is required to solve performance issues:
 - Move CreatePuzzleFromText to ImageSource
 - Show Completed Puzzle image from canvas
 
+### 5:23-5:36
+
+- Prepare to refactor CreatePuzzlePieces
 
 ---
 
