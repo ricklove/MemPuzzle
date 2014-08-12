@@ -1,5 +1,6 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
 ///<reference path="System/Debug.ts"/>
+///<reference path="ImageSource.ts"/>
 
 // MemPuzzle
 module Told.MemPuzzle {
@@ -16,8 +17,8 @@ module Told.MemPuzzle {
 
         private _canvas: fabric.ICanvas = null;
         //private _imageCanvasElement: HTMLCanvasElement = null;
-        private _workingCanvas: fabric.ICanvas = null;
-        private _imageData: string = null;
+        //private _workingCanvas: fabric.ICanvas = null;
+        //private _imageData: string = null;
         private _puzzleScale: number = null;
 
         private _puzzleX: number = 0;
@@ -201,164 +202,20 @@ module Told.MemPuzzle {
             //setTimeout(self._canvas.renderAll, 10);
         }
 
-        //createPuzzleFromImage(imgUrl: string) {
-        //    var self = this;
 
-        //    fabric.Image.fromURL(imgUrl, function (img) {
-
-        //        var image = self._imageCanvasElement;
-
-        //        if (image === null) {
-        //            image = self._imageCanvasElement = document.createElement("canvas");
-        //        }
-
-        //        image.width = img.width;
-        //        image.height = img.height;
-
-        //        var context = image.getContext('2d');
-        //        context.clearRect(0, 0, image.width, image.height);
-
-        //        // Draw Image
-        //        context.drawImage(img.getElement(), 0, 0, image.width, image.height);
-
-        //        // Save Data
-        //        self._imageData = image.toDataURL();
-
-        //        self.createPuzzle();
-        //    });
-        //}
-
-        getWorkingCanvas() {
-            var self = this;
-
-            var wCanvas = self._workingCanvas;
-
-            if (wCanvas === null) {
-                var element = document.createElement("canvas");
-                element.setAttribute('id', '_temp_canvas');
-                wCanvas = self._workingCanvas = new fabric.StaticCanvas('_temp_canvas');
-                wCanvas.renderOnAddition = false;
-            }
-
-            return wCanvas;
-        }
-
-        createPuzzleFromText(text: string, onPuzzleComplete= () => { }, shouldUseSans= false) {
-
-            Told.log("MemPuzzle_createPuzzleFromText", "BEGIN - text:" + text, true);
+        public createPuzzleFromText(text: string, onPuzzleCreated = () => { }, shouldUseSans = true) {
 
             var self = this;
 
-            var puzzleFontName = "PuzzleFont";
-            var serifFontName = "DOES NOT EXIST";
+            Told.MemPuzzle.ImageSource.createImageSourceFromText(text, self._canvas.getWidth(), self._canvas.getHeight(), (imageSource) => {
 
-            var doWork = () => {
-                var wCanvas = self.getWorkingCanvas();
+                self.createPuzzle(imageSource, onPuzzleCreated);
 
-                wCanvas.setWidth(self._canvas.getWidth());
-                wCanvas.setHeight(self._canvas.getHeight());
-                //image._objects = [];
-                wCanvas.clear();
-
-                // Draw Text
-                var textPadding = 10;
-                var cutoffTop = 0.25;
-                var cutoffHeightKeep = 0.8;
-
-                //cutoffTop = 0.25;
-                //cutoffHeightKeep = 0.9;
-
-
-                var textObject = new fabric.Text(text, <fabric.ITextOptions> {
-                    fontFamily: shouldUseSans ? puzzleFontName : serifFontName,
-                    fontSize: (self._canvas.getHeight()),
-                    //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
-                    top: -self._canvas.getHeight() * cutoffTop + textPadding,
-                    left: textPadding,
-                });
-                wCanvas.add(textObject);
-
-                // Set to fit text
-                wCanvas.backgroundColor = "white";
-                wCanvas.setWidth(textObject.width + textPadding * 2);
-                wCanvas.setHeight(textObject.height * cutoffHeightKeep + textPadding * 2);
-
-                wCanvas.renderAll();
-
-                //setTimeout(() => {
-
-                //    //Re-render
-                //    image.renderAll();
-
-                // Save Data
-                self._imageData = wCanvas.toDataURL("png");
-                Told.log("MemPuzzle_createPuzzleFromText", "END - imageData:" + self._imageData.substr(0,40) + " ...", true);
-
-                self.createPuzzle(onPuzzleComplete);
-
-                //}, 100);
-            };
-
-            if (shouldUseSans) {
-                self.waitForFont(puzzleFontName, doWork, doWork);
-            } else {
-                doWork();
-            }
+            }, shouldUseSans);
         }
 
-        private waitForFont(fontName: string, onLoadedCallback: () => void, onTimeoutCallback: () => void) {
-            var self = this;
 
-            var text = ".iJk ,@#$1230;',./?";
-
-            var offset = -10000;
-            var fontsize = 300;
-
-            // DEBUG
-            offset = 0;
-            fontsize = 30;
-
-            var noFont = new fabric.Text(text, <fabric.ITextOptions> {
-                fontFamily: "NOFONT",
-                fontSize: fontsize,
-                top: 20 + offset,
-            });
-
-            var myFont = new fabric.Text(text, <fabric.ITextOptions> {
-                fontFamily: fontName,
-                fontSize: fontsize,
-                top: 120 + offset,
-            });
-
-            var wCanvas = self.getWorkingCanvas();
-            wCanvas.add(noFont);
-            wCanvas.add(myFont);
-
-            var hasFailed = false;
-            setTimeout(() => { hasFailed = true; }, 5000);
-
-            var doTest = () => {
-
-                if (hasFailed) {
-                    onTimeoutCallback();
-                    return;
-                }
-
-                wCanvas.renderAll();
-
-                if (noFont.width !== myFont.width) {
-                    onLoadedCallback();
-                    return;
-                }
-
-                setTimeout(doTest, 100);
-            };
-
-            doTest();
-            //setTimeout(doTest, 100);
-        }
-
-        private createPuzzle(onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true, timeToShowCompletedPuzzle= 2000) {
+        private createPuzzle(imageSource: ImageSource, onPuzzleComplete= () => { }, makeOutsideFlat = true, difficulty = 0, shouldRandomizePieces = false, shouldStackPieces = true, timeToShowCompletedPuzzle= 2000) {
 
             Told.log("MemPuzzle_createPuzzle", "01 - Begin", true);
 
@@ -367,7 +224,7 @@ module Told.MemPuzzle {
 
             var canvas = self._canvas;
 
-            var image = self._workingCanvas;
+            //var image = self._workingCanvas;
 
             // Clear Puzzle
             canvas.clear();
@@ -382,12 +239,12 @@ module Told.MemPuzzle {
             var width = self._canvas.getWidth() - padding * 2;
             var height = self._canvas.getHeight() - padding * 2;
 
-            var rWidth = width / image.getWidth();
-            var rHeight = height / image.getHeight();
+            var rWidth = width / imageSource.width;
+            var rHeight = height / imageSource.height;
 
             var tRatio = Math.min(rWidth, rHeight);
-            var sWidth = image.getWidth() * tRatio;
-            var sHeight = image.getHeight() * tRatio;
+            var sWidth = imageSource.width * tRatio;
+            var sHeight = imageSource.height * tRatio;
             var sx = (width - sWidth) / 2 + padding;
             var sy = (height - sHeight) / 2 + padding;
 
@@ -403,11 +260,14 @@ module Told.MemPuzzle {
 
             this.createPuzzleOutline();
 
-            this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
+            this.createPuzzleCompleted(imageSource, timeToShowCompletedPuzzle);
 
             Told.log("MemPuzzle_createPuzzle", "02 - created puzzle outline", true);
 
-            this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, (pieces) => {
+            // DEBUG
+            return;
+
+            this.createPuzzlePieces(imageSource, difficulty, makeOutsideFlat, (pieces) => {
 
                 Told.log("MemPuzzle_createPuzzle", "03 - created puzzle pieces", true);
 
@@ -537,7 +397,7 @@ module Told.MemPuzzle {
 
         }
 
-        private createPuzzlePieces(imageData: string, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: IPiece[]) => void) {
+        private createPuzzlePieces(imageSource: ImageSource, difficulty: number, makeOutsideFlat: boolean, onCreatedPieces: (pieces: IPiece[]) => void) {
             Told.log("MemPuzzle_createPuzzlePieces", "01 - BEGIN", true);
 
 
@@ -545,7 +405,9 @@ module Told.MemPuzzle {
 
             var pieces = <fabric.IImage[]>[];
 
-            fabric.Image.fromURL(imageData, function (mainImage) {
+            var mainImage = new fabric.Image(imageSource, {});
+
+            //fabric.Image.fromURL(imageData, function (mainImage) {
 
                 Told.log("MemPuzzle_createPuzzlePieces", "02 - Loaded Main Image", true);
 
@@ -776,11 +638,11 @@ module Told.MemPuzzle {
 
                 doLogCreation();
 
-            });
+            //});
         }
 
-        private createPuzzleCompleted(imageData: string, timeToShow: number) {
-            Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40) + " ...", true);
+        private createPuzzleCompleted(imageSource: ImageSource, timeToShow: number) {
+            Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN", true);
 
             var self = this;
             var canvas = self._canvas;
@@ -789,33 +651,35 @@ module Told.MemPuzzle {
             var x = self._puzzleX;
             var y = self._puzzleY;
 
-            fabric.Image.fromURL(imageData, function (mainImage) {
+            var mainImage = new fabric.Image(imageSource.imageOrCanvas, {});
+            //var mainImage = new CanvasImage(imageSource.imageOrCanvas, {});
+            //fabric.Image.fromURL(imageData, function (mainImage) {
 
-                Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created - width=" + mainImage.width + " height= " + mainImage.height, true);
+            Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created - width=" + mainImage.width + " height= " + mainImage.height, true);
 
-                mainImage.set({
-                    scaleX: scale,
-                    scaleY: scale,
+            mainImage.set({
+                scaleX: scale,
+                scaleY: scale,
 
-                    left: x,
-                    top: y,
+                left: x,
+                top: y,
 
-                    hasBorders: false,
-                    hasControls: false,
-                    lockMovementX: true,
-                    lockMovementY: true,
-                    selectable: false,
-                });
-
-                canvas.add(mainImage);
-
-                setTimeout(() => {
-
-                    Told.log("MemPuzzle_createPuzzleCompleted", "03 - END - Image Removed", true);
-
-                    mainImage.remove();
-                }, timeToShow);
+                hasBorders: false,
+                hasControls: false,
+                lockMovementX: true,
+                lockMovementY: true,
+                selectable: false,
             });
+
+            canvas.add(mainImage);
+
+            setTimeout(() => {
+
+                Told.log("MemPuzzle_createPuzzleCompleted", "03 - END - Image Removed", true);
+
+                mainImage.remove();
+            }, timeToShow);
+            //});
         }
 
         private createPuzzleOutline() {
@@ -1016,6 +880,29 @@ module Told.MemPuzzle {
         }
 
     }
+
+    //var CanvasImage = fabric.util.createClass(fabric.Image, {
+    //    type: 'canvasImage',
+
+    //    initialize: function ( canvas, options) {
+    //        options || (options = {});
+
+    //        this.callSuper('initialize', canvas, options);
+    //        //this.set('label', options.label || '');
+    //    },
+
+    //    _render: function (ctx: CanvasRenderingContext2D) {
+
+    //        var self = this;
+    //        ctx.drawImage(self._element, self.left, self.top, self.width, self.height);
+
+    //        //this.callSuper('_render', ctx);
+
+    //        //ctx.font = '20px Helvetica';
+    //        //ctx.fillStyle = '#333';
+    //        //ctx.fillText(this.label, -this.width / 2, -this.height / 2 + 20);
+    //    }
+    //});
 
     interface IPiece {
         image: fabric.IImage;

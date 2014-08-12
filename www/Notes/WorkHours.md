@@ -422,6 +422,16 @@ A refactor is required to solve performance issues:
 		- Turn off pixel perfect dragging
 		- Allow click to place (if in correct location)
 
+### 2014-08-12 4:01-4:03
+
+- Review Notes
+- Begin REFACTOR
+
+### 4:04-5:22
+
+- Create ImageSource file
+- Move CreatePuzzleFromText to ImageSource
+- Show Completed Puzzle image from canvas
 
 
 ---

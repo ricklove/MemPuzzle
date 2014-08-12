@@ -1,5 +1,6 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
 ///<reference path="System/Debug.ts"/>
+///<reference path="ImageSource.ts"/>
 var Told;
 (function (Told) {
     // MemPuzzle
@@ -8,8 +9,8 @@ var Told;
             function MemPuzzle(canvasId) {
                 this._canvas = null;
                 //private _imageCanvasElement: HTMLCanvasElement = null;
-                this._workingCanvas = null;
-                this._imageData = null;
+                //private _workingCanvas: fabric.ICanvas = null;
+                //private _imageData: string = null;
                 this._puzzleScale = null;
                 this._puzzleX = 0;
                 this._puzzleY = 0;
@@ -177,154 +178,18 @@ var Told;
                 //setTimeout(self._canvas.renderAll, 10);
             };
 
-            //createPuzzleFromImage(imgUrl: string) {
-            //    var self = this;
-            //    fabric.Image.fromURL(imgUrl, function (img) {
-            //        var image = self._imageCanvasElement;
-            //        if (image === null) {
-            //            image = self._imageCanvasElement = document.createElement("canvas");
-            //        }
-            //        image.width = img.width;
-            //        image.height = img.height;
-            //        var context = image.getContext('2d');
-            //        context.clearRect(0, 0, image.width, image.height);
-            //        // Draw Image
-            //        context.drawImage(img.getElement(), 0, 0, image.width, image.height);
-            //        // Save Data
-            //        self._imageData = image.toDataURL();
-            //        self.createPuzzle();
-            //    });
-            //}
-            MemPuzzle.prototype.getWorkingCanvas = function () {
-                var self = this;
-
-                var wCanvas = self._workingCanvas;
-
-                if (wCanvas === null) {
-                    var element = document.createElement("canvas");
-                    element.setAttribute('id', '_temp_canvas');
-                    wCanvas = self._workingCanvas = new fabric.StaticCanvas('_temp_canvas');
-                    wCanvas.renderOnAddition = false;
-                }
-
-                return wCanvas;
-            };
-
-            MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleComplete, shouldUseSans) {
-                if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
+            MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleCreated, shouldUseSans) {
+                if (typeof onPuzzleCreated === "undefined") { onPuzzleCreated = function () {
                 }; }
-                if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
-                Told.log("MemPuzzle_createPuzzleFromText", "BEGIN - text:" + text, true);
-
+                if (typeof shouldUseSans === "undefined") { shouldUseSans = true; }
                 var self = this;
 
-                var puzzleFontName = "PuzzleFont";
-                var serifFontName = "DOES NOT EXIST";
-
-                var doWork = function () {
-                    var wCanvas = self.getWorkingCanvas();
-
-                    wCanvas.setWidth(self._canvas.getWidth());
-                    wCanvas.setHeight(self._canvas.getHeight());
-
-                    //image._objects = [];
-                    wCanvas.clear();
-
-                    // Draw Text
-                    var textPadding = 10;
-                    var cutoffTop = 0.25;
-                    var cutoffHeightKeep = 0.8;
-
-                    //cutoffTop = 0.25;
-                    //cutoffHeightKeep = 0.9;
-                    var textObject = new fabric.Text(text, {
-                        fontFamily: shouldUseSans ? puzzleFontName : serifFontName,
-                        fontSize: (self._canvas.getHeight()),
-                        //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
-                        top: -self._canvas.getHeight() * cutoffTop + textPadding,
-                        left: textPadding
-                    });
-                    wCanvas.add(textObject);
-
-                    // Set to fit text
-                    wCanvas.backgroundColor = "white";
-                    wCanvas.setWidth(textObject.width + textPadding * 2);
-                    wCanvas.setHeight(textObject.height * cutoffHeightKeep + textPadding * 2);
-
-                    wCanvas.renderAll();
-
-                    //setTimeout(() => {
-                    //    //Re-render
-                    //    image.renderAll();
-                    // Save Data
-                    self._imageData = wCanvas.toDataURL("png");
-                    Told.log("MemPuzzle_createPuzzleFromText", "END - imageData:" + self._imageData.substr(0, 40) + " ...", true);
-
-                    self.createPuzzle(onPuzzleComplete);
-                    //}, 100);
-                };
-
-                if (shouldUseSans) {
-                    self.waitForFont(puzzleFontName, doWork, doWork);
-                } else {
-                    doWork();
-                }
+                Told.MemPuzzle.ImageSource.createImageSourceFromText(text, self._canvas.getWidth(), self._canvas.getHeight(), function (imageSource) {
+                    self.createPuzzle(imageSource, onPuzzleCreated);
+                }, shouldUseSans);
             };
 
-            MemPuzzle.prototype.waitForFont = function (fontName, onLoadedCallback, onTimeoutCallback) {
-                var self = this;
-
-                var text = ".iJk ,@#$1230;',./?";
-
-                var offset = -10000;
-                var fontsize = 300;
-
-                // DEBUG
-                offset = 0;
-                fontsize = 30;
-
-                var noFont = new fabric.Text(text, {
-                    fontFamily: "NOFONT",
-                    fontSize: fontsize,
-                    top: 20 + offset
-                });
-
-                var myFont = new fabric.Text(text, {
-                    fontFamily: fontName,
-                    fontSize: fontsize,
-                    top: 120 + offset
-                });
-
-                var wCanvas = self.getWorkingCanvas();
-                wCanvas.add(noFont);
-                wCanvas.add(myFont);
-
-                var hasFailed = false;
-                setTimeout(function () {
-                    hasFailed = true;
-                }, 5000);
-
-                var doTest = function () {
-                    if (hasFailed) {
-                        onTimeoutCallback();
-                        return;
-                    }
-
-                    wCanvas.renderAll();
-
-                    if (noFont.width !== myFont.width) {
-                        onLoadedCallback();
-                        return;
-                    }
-
-                    setTimeout(doTest, 100);
-                };
-
-                doTest();
-                //setTimeout(doTest, 100);
-            };
-
-            MemPuzzle.prototype.createPuzzle = function (onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces, timeToShowCompletedPuzzle) {
+            MemPuzzle.prototype.createPuzzle = function (imageSource, onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces, timeToShowCompletedPuzzle) {
                 if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
                 }; }
                 if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
@@ -340,8 +205,7 @@ var Told;
 
                 var canvas = self._canvas;
 
-                var image = self._workingCanvas;
-
+                //var image = self._workingCanvas;
                 // Clear Puzzle
                 canvas.clear();
 
@@ -354,12 +218,12 @@ var Told;
                 var width = self._canvas.getWidth() - padding * 2;
                 var height = self._canvas.getHeight() - padding * 2;
 
-                var rWidth = width / image.getWidth();
-                var rHeight = height / image.getHeight();
+                var rWidth = width / imageSource.width;
+                var rHeight = height / imageSource.height;
 
                 var tRatio = Math.min(rWidth, rHeight);
-                var sWidth = image.getWidth() * tRatio;
-                var sHeight = image.getHeight() * tRatio;
+                var sWidth = imageSource.width * tRatio;
+                var sHeight = imageSource.height * tRatio;
                 var sx = (width - sWidth) / 2 + padding;
                 var sy = (height - sHeight) / 2 + padding;
 
@@ -375,11 +239,14 @@ var Told;
 
                 this.createPuzzleOutline();
 
-                this.createPuzzleCompleted(self._imageData, timeToShowCompletedPuzzle);
+                this.createPuzzleCompleted(imageSource, timeToShowCompletedPuzzle);
 
                 Told.log("MemPuzzle_createPuzzle", "02 - created puzzle outline", true);
 
-                this.createPuzzlePieces(self._imageData, difficulty, makeOutsideFlat, function (pieces) {
+                // DEBUG
+                return;
+
+                this.createPuzzlePieces(imageSource, difficulty, makeOutsideFlat, function (pieces) {
                     Told.log("MemPuzzle_createPuzzle", "03 - created puzzle pieces", true);
 
                     self._pieces = pieces;
@@ -495,228 +362,230 @@ var Told;
                 }
             };
 
-            MemPuzzle.prototype.createPuzzlePieces = function (imageData, difficulty, makeOutsideFlat, onCreatedPieces) {
+            MemPuzzle.prototype.createPuzzlePieces = function (imageSource, difficulty, makeOutsideFlat, onCreatedPieces) {
                 Told.log("MemPuzzle_createPuzzlePieces", "01 - BEGIN", true);
 
                 var self = this;
 
                 var pieces = [];
 
-                fabric.Image.fromURL(imageData, function (mainImage) {
-                    Told.log("MemPuzzle_createPuzzlePieces", "02 - Loaded Main Image", true);
+                var mainImage = new fabric.Image(imageSource, {});
 
-                    var width = mainImage.width;
-                    var height = mainImage.height;
+                //fabric.Image.fromURL(imageData, function (mainImage) {
+                Told.log("MemPuzzle_createPuzzlePieces", "02 - Loaded Main Image", true);
 
-                    if (width <= 0 || height <= 0) {
-                        return;
+                var width = mainImage.width;
+                var height = mainImage.height;
+
+                if (width <= 0 || height <= 0) {
+                    return;
+                }
+
+                // Create an h*v puzzle
+                var minPieceCount = 6;
+                var minSideCount = 2;
+                var hSideCount = minSideCount;
+                var vSideCount = minSideCount;
+
+                var maxRectRatio = 2;
+
+                while ((hSideCount * vSideCount) < minPieceCount) {
+                    var widthHeightRatio = width / height;
+
+                    if (widthHeightRatio > 1) {
+                        widthHeightRatio = Math.max(1, widthHeightRatio / maxRectRatio);
+
+                        hSideCount = Math.floor(widthHeightRatio * minSideCount);
+                    } else {
+                        widthHeightRatio = Math.min(1, widthHeightRatio * maxRectRatio);
+
+                        vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
                     }
 
-                    // Create an h*v puzzle
-                    var minPieceCount = 6;
-                    var minSideCount = 2;
-                    var hSideCount = minSideCount;
-                    var vSideCount = minSideCount;
+                    minSideCount++;
+                }
 
-                    var maxRectRatio = 2;
+                // DEBUG: Make rect
+                //hSideCount = 3;
+                //vSideCount = 3;
+                var pWidth = width / hSideCount;
+                var pHeight = height / vSideCount;
 
-                    while ((hSideCount * vSideCount) < minPieceCount) {
-                        var widthHeightRatio = width / height;
+                // Create edges
+                var hEdges = [];
+                var vEdges = [];
 
-                        if (widthHeightRatio > 1) {
-                            widthHeightRatio = Math.max(1, widthHeightRatio / maxRectRatio);
+                for (var h = 0; h < hSideCount + 1; h++) {
+                    hEdges.push([]);
+                    vEdges.push([]);
 
-                            hSideCount = Math.floor(widthHeightRatio * minSideCount);
+                    for (var v = 0; v < vSideCount + 1; v++) {
+                        var clipLeft = h * pWidth;
+                        var clipTop = v * pHeight;
+                        var clipWidth = pWidth;
+                        var clipHeight = pHeight;
+
+                        // Clip origin is at center of image
+                        var left = clipLeft - width / 2;
+                        var top = clipTop - height / 2;
+                        var right = left + clipWidth;
+                        var bottom = top + clipHeight;
+
+                        var hIsInset = Math.random() > 0.5;
+                        var vIsInset = Math.random() > 0.5;
+
+                        var hIsOutside = (v === 0) || (v === vSideCount);
+                        var vIsOutside = (h === 0) || (h === hSideCount);
+
+                        var minEdgeLength = Math.min(Math.abs(right - left), Math.abs(bottom - top));
+
+                        if (!makeOutsideFlat) {
+                            if (hIsOutside) {
+                                hIsOutside = false;
+                                hIsInset = (v === 0);
+                            }
+
+                            if (vIsOutside) {
+                                vIsOutside = false;
+                                vIsInset = (h !== 0);
+                            }
+                        }
+
+                        if (!hIsOutside) {
+                            hEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, minEdgeLength, hIsInset);
                         } else {
-                            widthHeightRatio = Math.min(1, widthHeightRatio * maxRectRatio);
-
-                            vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
+                            var s = { x: left, y: top };
+                            var e = { x: right, y: top };
+                            hEdges[h][v] = { start: s, end: e, points: [s, e] };
                         }
 
-                        minSideCount++;
-                    }
-
-                    // DEBUG: Make rect
-                    //hSideCount = 3;
-                    //vSideCount = 3;
-                    var pWidth = width / hSideCount;
-                    var pHeight = height / vSideCount;
-
-                    // Create edges
-                    var hEdges = [];
-                    var vEdges = [];
-
-                    for (var h = 0; h < hSideCount + 1; h++) {
-                        hEdges.push([]);
-                        vEdges.push([]);
-
-                        for (var v = 0; v < vSideCount + 1; v++) {
-                            var clipLeft = h * pWidth;
-                            var clipTop = v * pHeight;
-                            var clipWidth = pWidth;
-                            var clipHeight = pHeight;
-
-                            // Clip origin is at center of image
-                            var left = clipLeft - width / 2;
-                            var top = clipTop - height / 2;
-                            var right = left + clipWidth;
-                            var bottom = top + clipHeight;
-
-                            var hIsInset = Math.random() > 0.5;
-                            var vIsInset = Math.random() > 0.5;
-
-                            var hIsOutside = (v === 0) || (v === vSideCount);
-                            var vIsOutside = (h === 0) || (h === hSideCount);
-
-                            var minEdgeLength = Math.min(Math.abs(right - left), Math.abs(bottom - top));
-
-                            if (!makeOutsideFlat) {
-                                if (hIsOutside) {
-                                    hIsOutside = false;
-                                    hIsInset = (v === 0);
-                                }
-
-                                if (vIsOutside) {
-                                    vIsOutside = false;
-                                    vIsInset = (h !== 0);
-                                }
-                            }
-
-                            if (!hIsOutside) {
-                                hEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }, minEdgeLength, hIsInset);
-                            } else {
-                                var s = { x: left, y: top };
-                                var e = { x: right, y: top };
-                                hEdges[h][v] = { start: s, end: e, points: [s, e] };
-                            }
-
-                            if (!vIsOutside) {
-                                vEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, minEdgeLength, vIsInset);
-                            } else {
-                                var s = { x: left, y: top };
-                                var e = { x: left, y: bottom };
-                                vEdges[h][v] = { start: s, end: e, points: [s, e] };
-                            }
+                        if (!vIsOutside) {
+                            vEdges[h][v] = self.createPuzzleEdge({ x: left, y: top }, { x: left, y: bottom }, minEdgeLength, vIsInset);
+                        } else {
+                            var s = { x: left, y: top };
+                            var e = { x: left, y: bottom };
+                            vEdges[h][v] = { start: s, end: e, points: [s, e] };
                         }
                     }
+                }
 
-                    // DEBUG
-                    //self.drawEdges(hEdges);
-                    //self.drawEdges(vEdges);
-                    Told.log("MemPuzzle_createPuzzlePieces", "03 - Created Edges", true);
+                // DEBUG
+                //self.drawEdges(hEdges);
+                //self.drawEdges(vEdges);
+                Told.log("MemPuzzle_createPuzzlePieces", "03 - Created Edges", true);
 
-                    var targetCount = hSideCount * vSideCount;
-                    var pieces = [];
+                var targetCount = hSideCount * vSideCount;
+                var pieces = [];
 
-                    for (var h = 0; h < hSideCount; h++) {
-                        for (var v = 0; v < vSideCount; v++) {
-                            (function () {
-                                var xInner = h;
-                                var yInner = v;
+                for (var h = 0; h < hSideCount; h++) {
+                    for (var v = 0; v < vSideCount; v++) {
+                        (function () {
+                            var xInner = h;
+                            var yInner = v;
 
-                                fabric.Image.fromURL(imageData, function (img) {
-                                    var piece = {
-                                        image: img,
-                                        x: xInner * pWidth,
-                                        y: yInner * pHeight,
-                                        width: pWidth,
-                                        height: pHeight,
-                                        targetImageLeft: self._puzzleX,
-                                        targetImageTop: self._puzzleY
-                                    };
+                            fabric.Image.fromURL(imageData, function (img) {
+                                var piece = {
+                                    image: img,
+                                    x: xInner * pWidth,
+                                    y: yInner * pHeight,
+                                    width: pWidth,
+                                    height: pHeight,
+                                    targetImageLeft: self._puzzleX,
+                                    targetImageTop: self._puzzleY
+                                };
 
-                                    img["_piece"] = piece;
+                                img["_piece"] = piece;
 
-                                    piece.image.set({
-                                        clipTo: function (ctx) {
-                                            //// Clip origin is at center of image
-                                            ////var left = pAny._clipLeft - width / 2;
-                                            ////var top = pAny._clipTop - height / 2;
-                                            ////var right = left + pAny._clipWidth;
-                                            ////var bottom = top + pAny._clipHeight;
-                                            ////var edges = [
-                                            ////    self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }),
-                                            ////    self.createPuzzleEdge({ x: right, y: top }, { x: right, y: bottom }),
-                                            ////    self.createPuzzleEdge({ x: right, y: bottom }, { x: left, y: bottom }),
-                                            ////    self.createPuzzleEdge({ x: left, y: bottom }, { x: left, y: top }),
-                                            ////];
-                                            var topEdge = hEdges[xInner][yInner];
-                                            var rightEdge = vEdges[xInner + 1][yInner];
-                                            var bottomEdge = hEdges[xInner][yInner + 1];
-                                            var leftEdge = vEdges[xInner][yInner];
+                                piece.image.set({
+                                    clipTo: function (ctx) {
+                                        //// Clip origin is at center of image
+                                        ////var left = pAny._clipLeft - width / 2;
+                                        ////var top = pAny._clipTop - height / 2;
+                                        ////var right = left + pAny._clipWidth;
+                                        ////var bottom = top + pAny._clipHeight;
+                                        ////var edges = [
+                                        ////    self.createPuzzleEdge({ x: left, y: top }, { x: right, y: top }),
+                                        ////    self.createPuzzleEdge({ x: right, y: top }, { x: right, y: bottom }),
+                                        ////    self.createPuzzleEdge({ x: right, y: bottom }, { x: left, y: bottom }),
+                                        ////    self.createPuzzleEdge({ x: left, y: bottom }, { x: left, y: top }),
+                                        ////];
+                                        var topEdge = hEdges[xInner][yInner];
+                                        var rightEdge = vEdges[xInner + 1][yInner];
+                                        var bottomEdge = hEdges[xInner][yInner + 1];
+                                        var leftEdge = vEdges[xInner][yInner];
 
-                                            var bEdgePoints = bottomEdge.points.map(function (p) {
-                                                return { x: p.x, y: p.y - 2 };
-                                                //return { x: p.x, y: p.y + 1 }
-                                            }).reverse();
+                                        var bEdgePoints = bottomEdge.points.map(function (p) {
+                                            return { x: p.x, y: p.y - 2 };
+                                            //return { x: p.x, y: p.y + 1 }
+                                        }).reverse();
 
-                                            bottomEdge = {
-                                                points: bEdgePoints,
-                                                start: bEdgePoints[0],
-                                                end: bEdgePoints[bEdgePoints.length - 1]
-                                            };
+                                        bottomEdge = {
+                                            points: bEdgePoints,
+                                            start: bEdgePoints[0],
+                                            end: bEdgePoints[bEdgePoints.length - 1]
+                                        };
 
-                                            var lEdgePoints = leftEdge.points.map(function (p) {
-                                                return { x: p.x + 2, y: p.y };
-                                                //return { x: p.x - 1, y: p.y }
-                                            }).reverse();
+                                        var lEdgePoints = leftEdge.points.map(function (p) {
+                                            return { x: p.x + 2, y: p.y };
+                                            //return { x: p.x - 1, y: p.y }
+                                        }).reverse();
 
-                                            leftEdge = {
-                                                points: lEdgePoints,
-                                                start: lEdgePoints[0],
-                                                end: lEdgePoints[lEdgePoints.length - 1]
-                                            };
+                                        leftEdge = {
+                                            points: lEdgePoints,
+                                            start: lEdgePoints[0],
+                                            end: lEdgePoints[lEdgePoints.length - 1]
+                                        };
 
-                                            var edges = [
-                                                topEdge,
-                                                rightEdge,
-                                                bottomEdge,
-                                                leftEdge
-                                            ];
+                                        var edges = [
+                                            topEdge,
+                                            rightEdge,
+                                            bottomEdge,
+                                            leftEdge
+                                        ];
 
-                                            ctx.beginPath();
-                                            ctx.moveTo(edges[0].start.x, edges[0].start.y);
+                                        ctx.beginPath();
+                                        ctx.moveTo(edges[0].start.x, edges[0].start.y);
 
-                                            for (var iSideNum = 0; iSideNum < edges.length; iSideNum++) {
-                                                var edge = edges[iSideNum];
+                                        for (var iSideNum = 0; iSideNum < edges.length; iSideNum++) {
+                                            var edge = edges[iSideNum];
 
-                                                MemPuzzle.curveThroughPoints(ctx, edge.points);
-                                                // DEBUG
-                                                //ctx.lineTo(edge.end.x, edge.end.y);
-                                            }
-
-                                            ctx.closePath();
+                                            MemPuzzle.curveThroughPoints(ctx, edge.points);
+                                            // DEBUG
+                                            //ctx.lineTo(edge.end.x, edge.end.y);
                                         }
-                                    });
 
-                                    pieces.push(piece);
-
-                                    if (pieces.length === targetCount) {
-                                        Told.log("MemPuzzle_createPuzzlePieces", "05 - END - Created Pieces", true);
-
-                                        setTimeout(function () {
-                                            onCreatedPieces(pieces);
-                                        }, 10);
+                                        ctx.closePath();
                                     }
                                 });
-                            })();
-                        }
+
+                                pieces.push(piece);
+
+                                if (pieces.length === targetCount) {
+                                    Told.log("MemPuzzle_createPuzzlePieces", "05 - END - Created Pieces", true);
+
+                                    setTimeout(function () {
+                                        onCreatedPieces(pieces);
+                                    }, 10);
+                                }
+                            });
+                        })();
                     }
+                }
 
-                    var doLogCreation = function () {
-                        Told.log("MemPuzzle_createPuzzlePieces", "04 - Creating Pieces Report: TargetCount=" + targetCount + " ActualCount=" + pieces.length, true);
+                var doLogCreation = function () {
+                    Told.log("MemPuzzle_createPuzzlePieces", "04 - Creating Pieces Report: TargetCount=" + targetCount + " ActualCount=" + pieces.length, true);
 
-                        if (targetCount !== pieces.length) {
-                            setTimeout(doLogCreation, 500);
-                        }
-                    };
+                    if (targetCount !== pieces.length) {
+                        setTimeout(doLogCreation, 500);
+                    }
+                };
 
-                    doLogCreation();
-                });
+                doLogCreation();
+                //});
             };
 
-            MemPuzzle.prototype.createPuzzleCompleted = function (imageData, timeToShow) {
-                Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN imageData=" + imageData.substr(0, 40) + " ...", true);
+            MemPuzzle.prototype.createPuzzleCompleted = function (imageSource, timeToShow) {
+                Told.log("MemPuzzle_createPuzzleCompleted", "01 - BEGIN", true);
 
                 var self = this;
                 var canvas = self._canvas;
@@ -725,29 +594,32 @@ var Told;
                 var x = self._puzzleX;
                 var y = self._puzzleY;
 
-                fabric.Image.fromURL(imageData, function (mainImage) {
-                    Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created - width=" + mainImage.width + " height= " + mainImage.height, true);
+                var mainImage = new fabric.Image(imageSource.imageOrCanvas, {});
 
-                    mainImage.set({
-                        scaleX: scale,
-                        scaleY: scale,
-                        left: x,
-                        top: y,
-                        hasBorders: false,
-                        hasControls: false,
-                        lockMovementX: true,
-                        lockMovementY: true,
-                        selectable: false
-                    });
+                //var mainImage = new CanvasImage(imageSource.imageOrCanvas, {});
+                //fabric.Image.fromURL(imageData, function (mainImage) {
+                Told.log("MemPuzzle_createPuzzleCompleted", "02 - Image Created - width=" + mainImage.width + " height= " + mainImage.height, true);
 
-                    canvas.add(mainImage);
-
-                    setTimeout(function () {
-                        Told.log("MemPuzzle_createPuzzleCompleted", "03 - END - Image Removed", true);
-
-                        mainImage.remove();
-                    }, timeToShow);
+                mainImage.set({
+                    scaleX: scale,
+                    scaleY: scale,
+                    left: x,
+                    top: y,
+                    hasBorders: false,
+                    hasControls: false,
+                    lockMovementX: true,
+                    lockMovementY: true,
+                    selectable: false
                 });
+
+                canvas.add(mainImage);
+
+                setTimeout(function () {
+                    Told.log("MemPuzzle_createPuzzleCompleted", "03 - END - Image Removed", true);
+
+                    mainImage.remove();
+                }, timeToShow);
+                //});
             };
 
             MemPuzzle.prototype.createPuzzleOutline = function () {
@@ -936,6 +808,8 @@ var Told;
             return MemPuzzle;
         })();
         _MemPuzzle.MemPuzzle = MemPuzzle;
+
+        
 
         function RandomOrder(items) {
             var remaining = items.map(function (p) {
