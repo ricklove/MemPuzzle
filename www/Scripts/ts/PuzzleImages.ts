@@ -3,7 +3,7 @@
 module Told.MemPuzzle {
 
     export interface IPieceImage {
-        imageOrCanvas: any;
+        canvas: WorkingCanvas;
         width: number;
         height: number;
         targetX: number;
@@ -31,14 +31,38 @@ module Told.MemPuzzle {
     }
 
     export class PuzzleImages {
-        private _imageSource: ImageSource;
 
         public whole: IPieceImage;
         //       public active: IPieceImage;
         public pieces: IPieceImage[];
 
-        static createPieces(columns: number, rows: number): IPieceImage[] {
+        constructor(columns: number, rows: number) {
 
+            var self = this;
+
+            self.whole = {
+                canvas: Told.MemPuzzle.WorkingCanvas.getWorkingCanvas(),
+                width: null,
+                height: null,
+                targetX: 0,
+                targetY: 0,
+
+                pRatioLeft: 0,
+                pRatioTop: 0,
+                pRatioRight: 1,
+                pRatioBottom: 1,
+
+                topEdge: null,
+                rightEdge: null,
+                bottomEdge: null,
+                leftEdge: null,
+            };
+
+            self.pieces = PuzzleImages.createPieces(columns, rows);
+        }
+
+        static createPieces(columns: number, rows: number): IPieceImage[] {
+            throw new Error("Not Implemented");
             // Create pieces
 
             // Create piece canvases
@@ -46,16 +70,29 @@ module Told.MemPuzzle {
             // Create piece positions
 
             // Create edges
-
         }
 
-        static drawWhole(imageSource: ImageSource, targetWidth: number, targetHeight: number): IPieceImage {
+        public draw(imageSource: ImageSource, targetWidth: number, targetHeight: number) {
+            var self = this;
+
             // Draw whole puzzle from scaled image source
+            PuzzleImages.drawWhole(self.whole, imageSource, targetWidth, targetHeight);
+
+            // Draw pieces
+            PuzzleImages.drawPieces(self.pieces, self.whole);
         }
 
-        static drawPieces(whole: IPieceImage) : IPieceImage[] {
+        private static drawWhole(whole: IPieceImage, imageSource: ImageSource, targetWidth: number, targetHeight: number) {
+            // Clear canvas
+            //whole.canvas.canvasElement
+            // Set canvas size
+            // Draw image source to canvas as scaled image
+        }
+
+        private static drawPieces(pieces: IPieceImage[], whole: IPieceImage) {
 
             // Get working canvas
+            // Set canvas size
 
             // For each piece (including whole)
 

@@ -313,7 +313,7 @@ var Told;
             MemPuzzle.prototype.createPuzzlePieceSnapshots = function (pieces, scale, onCreatedPieces) {
                 var self = this;
                 var workingCanvas = Told.MemPuzzle.WorkingCanvas.getWorkingCanvas();
-                var wCanvas = workingCanvas.fabricCanvas;
+                var wCanvas = workingCanvas.getFabricCanvas();
 
                 var snapshots = [];
 
@@ -339,7 +339,7 @@ var Told;
                         //// Save as new snapshot
                         //var data = wCanvas.toDataURL("png");
                         //fabric.Image.fromURL(data, function (snapshotImage) {
-                        var snapshotImage = new fabric.Image(wCanvas, {});
+                        var snapshotImage = new fabric.Image(workingCanvas.canvasElement, {});
 
                         var snapshot = {
                             x: piece.x * scale,

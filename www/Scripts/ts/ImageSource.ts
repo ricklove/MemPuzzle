@@ -1,4 +1,6 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
+///<reference path="System/Debug.ts"/>
+
 
 module Told.MemPuzzle {
 
@@ -30,16 +32,31 @@ module Told.MemPuzzle {
                 wCanvas = new WorkingCanvas();
                 wCanvas.canvasElement = element;
                 wCanvas.isFree = false;
-
-                wCanvas.fabricCanvas = new fabric.StaticCanvas(element.id);
             }
 
             return wCanvas;
         }
 
-        public canvasElement = null;
+        public canvasElement: HTMLCanvasElement = null;
         public isFree = false;
-        public fabricCanvas = null;
+        private _fabricCanvas: fabric.IStaticCanvas = null;
+        private _context: CanvasRenderingContext2D = null;
+
+        public getFabricCanvas() {
+            if (this._fabricCanvas === null) {
+                this._fabricCanvas = new fabric.StaticCanvas(this.canvasElement.id);
+            }
+
+            return this._fabricCanvas;
+        }
+
+        public getContext() {
+            if (this._context === null) {
+                this._context = this.canvasElement.getContext("2d");
+            }
+
+            return this._context;
+        }
 
         public release() {
             this.isFree = true;
@@ -88,7 +105,7 @@ module Told.MemPuzzle {
 
             var doWork = () => {
                 var wCanvas = WorkingCanvas.getWorkingCanvas();
-                var fCanvas = wCanvas.fabricCanvas;
+                var fCanvas = wCanvas.getFabricCanvas();
 
                 fCanvas.setWidth(targetWidth);
                 fCanvas.setHeight(targetHeight);
@@ -121,8 +138,8 @@ module Told.MemPuzzle {
 
                 var imageSource = new ImageSource();
                 imageSource.imageOrCanvas = wCanvas.canvasElement;
-                imageSource.width = fCanvas.width;
-                imageSource.height = fCanvas.height;
+                imageSource.width = fCanvas.getWidth();
+                imageSource.height = fCanvas.getHeight();
 
                 onCreated(imageSource);
             };

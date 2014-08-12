@@ -1,4 +1,5 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
+///<reference path="System/Debug.ts"/>
 var Told;
 (function (Told) {
     (function (MemPuzzle) {
@@ -6,7 +7,8 @@ var Told;
             function WorkingCanvas() {
                 this.canvasElement = null;
                 this.isFree = false;
-                this.fabricCanvas = null;
+                this._fabricCanvas = null;
+                this._context = null;
             }
             WorkingCanvas.getWorkingCanvas = function () {
                 var self = this;
@@ -30,11 +32,25 @@ var Told;
                     wCanvas = new WorkingCanvas();
                     wCanvas.canvasElement = element;
                     wCanvas.isFree = false;
-
-                    wCanvas.fabricCanvas = new fabric.StaticCanvas(element.id);
                 }
 
                 return wCanvas;
+            };
+
+            WorkingCanvas.prototype.getFabricCanvas = function () {
+                if (this._fabricCanvas === null) {
+                    this._fabricCanvas = new fabric.StaticCanvas(this.canvasElement.id);
+                }
+
+                return this._fabricCanvas;
+            };
+
+            WorkingCanvas.prototype.getContext = function () {
+                if (this._context === null) {
+                    this._context = this.canvasElement.getContext("2d");
+                }
+
+                return this._context;
             };
 
             WorkingCanvas.prototype.release = function () {
@@ -77,7 +93,7 @@ var Told;
 
                 var doWork = function () {
                     var wCanvas = WorkingCanvas.getWorkingCanvas();
-                    var fCanvas = wCanvas.fabricCanvas;
+                    var fCanvas = wCanvas.getFabricCanvas();
 
                     fCanvas.setWidth(targetWidth);
                     fCanvas.setHeight(targetHeight);
@@ -110,8 +126,8 @@ var Told;
 
                     var imageSource = new ImageSource();
                     imageSource.imageOrCanvas = wCanvas.canvasElement;
-                    imageSource.width = fCanvas.width;
-                    imageSource.height = fCanvas.height;
+                    imageSource.width = fCanvas.getWidth();
+                    imageSource.height = fCanvas.getHeight();
 
                     onCreated(imageSource);
                 };
