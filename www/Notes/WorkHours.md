@@ -464,6 +464,11 @@ A refactor is required to solve performance issues:
 	- Draw Whole
 	- Draw Pieces
 
+### 6:05-6:10
+
+- Round clipping to pixels
+
+
 ### NEXT
 
 - Use real edges as clip

@@ -120,6 +120,11 @@ var Told;
                         var top = piece.pRatioTop * height;
                         var bottom = piece.pRatioBottom * height;
 
+                        left = Math.ceil(left);
+                        right = Math.ceil(right);
+                        top = Math.ceil(top);
+                        bottom = Math.ceil(bottom);
+
                         // Clear canvas
                         ctx.clearRect(0, 0, width, height);
 
@@ -186,17 +191,17 @@ var Told;
                         piece.targetY = bTop;
                     };
 
-                    var doWorkInner = function () {
+                    var doWorkInner = (function () {
                         var i2 = i;
                         return function () {
                             doWork(i2);
                         };
-                    };
+                    })();
 
                     if (DEBUG) {
-                        setTimeout(doWorkInner(), 1000 * i);
+                        setTimeout(doWorkInner, 1000 * i);
                     } else {
-                        doWorkInner()();
+                        doWorkInner();
                     }
                 }
 
