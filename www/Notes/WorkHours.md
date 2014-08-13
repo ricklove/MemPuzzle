@@ -458,10 +458,15 @@ A refactor is required to solve performance issues:
 - CONTINUE: Implement Puzzle Images
 	- Finish Create Pieces
 
-### 5:04-
+### 5:04-6:05
 
-- CONTINUE: Implement Puzzle Images
-	- BEGIN: Implement Draw Pieces
+- Implement Draw Pieces
+	- Draw Whole
+	- Draw Pieces
+
+### NEXT
+
+- Use real edges as clip
 
 ---
 

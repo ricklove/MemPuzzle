@@ -32,6 +32,8 @@ var Told;
                     wCanvas = new WorkingCanvas();
                     wCanvas.canvasElement = element;
                     wCanvas.isFree = false;
+
+                    cList.push(wCanvas);
                 }
 
                 return wCanvas;

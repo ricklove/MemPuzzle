@@ -7,6 +7,7 @@ var Told;
                 var self = this;
 
                 self.whole = {
+                    id: "whole",
                     canvas: Told.MemPuzzle.WorkingCanvas.getWorkingCanvas(),
                     width: null,
                     height: null,
@@ -22,6 +23,8 @@ var Told;
                     bottomEdge: null
                 };
 
+                self.whole.canvas.canvasElement.setAttribute("id", self.whole.id);
+
                 self.pieces = PuzzleImages.createPieces(columns, rows, widthOverHeightRatio);
             }
             PuzzleImages.createPieces = function (columns, rows, widthOverHeightRatio) {
@@ -35,8 +38,9 @@ var Told;
                 var pRatioHeight = 1.0 / rows;
 
                 for (var iCol = 0; iCol < columns; iCol++) {
-                    for (var iRow = 0; iRow < columns; iRow++) {
+                    for (var iRow = 0; iRow < rows; iRow++) {
                         var p = {
+                            id: "piece_" + iCol + "_" + iRow,
                             // Create piece canvases
                             canvas: Told.MemPuzzle.WorkingCanvas.getWorkingCanvas(),
                             width: null,
@@ -54,6 +58,8 @@ var Told;
                             rightEdge: edges.verticalEdges[iCol + 1][iRow],
                             bottomEdge: edges.horizontalEdges[iCol][iRow + 1]
                         };
+
+                        p.canvas.canvasElement.setAttribute("id", p.id);
 
                         pieces.push(p);
                     }
@@ -73,24 +79,128 @@ var Told;
             };
 
             PuzzleImages.drawWhole = function (whole, imageSource, targetWidth, targetHeight) {
-                // Clear canvas
-                //whole.canvas.canvasElement
+                var canvas = whole.canvas.canvasElement;
+                var ctx = whole.canvas.getContext();
+
                 // Set canvas size
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+
+                // Clear canvas
+                ctx.clearRect(0, 0, targetWidth, targetHeight);
+
                 // Draw image source to canvas as scaled image
+                ctx.drawImage(imageSource.imageOrCanvas, 0, 0, targetWidth, targetHeight);
+
+                // Copy properties
+                whole.width = targetWidth;
+                whole.height = targetHeight;
+                whole.targetX = 0;
+                whole.targetY = 0;
             };
 
             PuzzleImages.drawPieces = function (pieces, whole) {
+                var DEBUG = false;
+
                 // Get working canvas
+                var wCanvas = Told.MemPuzzle.WorkingCanvas.getWorkingCanvas();
+                var ctx = wCanvas.getContext();
+
                 // Set canvas size
-                // For each piece (including whole)
-                // Clear canvas
-                // Set clip
-                // Draw whole puzzle (in clip)
-                // Calculate bounds
-                // Set piece canvas size
-                // Clear pieces canvas
-                // Draw working canvas to pieces canvas
-                // Record bounds as size and target coordinates
+                var width = wCanvas.canvasElement.width = whole.width;
+                var height = wCanvas.canvasElement.height = whole.height;
+
+                for (var i = 0; i < pieces.length; i++) {
+                    // DEBUG
+                    var doWork = function (iInner) {
+                        var piece = pieces[iInner];
+
+                        var left = piece.pRatioLeft * width;
+                        var right = piece.pRatioRight * width;
+                        var top = piece.pRatioTop * height;
+                        var bottom = piece.pRatioBottom * height;
+
+                        // Clear canvas
+                        ctx.clearRect(0, 0, width, height);
+
+                        // DEBUG
+                        if (DEBUG) {
+                            ctx.fillStyle = "blue";
+                            ctx.fillRect(0, 0, width, height);
+                            ctx.strokeStyle = "red";
+                            ctx.strokeRect(0, 0, width, height);
+                        }
+
+                        // TODO: Use edges as clip
+                        // Set clip
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.moveTo(left, top);
+                        ctx.lineTo(right, top);
+                        ctx.lineTo(right, bottom);
+                        ctx.lineTo(left, bottom);
+
+                        //ctx.lineTo(left, top);
+                        ctx.closePath();
+                        ctx.clip();
+
+                        // Draw whole puzzle (in clip)
+                        ctx.drawImage(whole.canvas.canvasElement, 0, 0, width, height);
+                        ctx.restore();
+
+                        // TODO: Use edges to calculate bounds
+                        // Calculate bounds
+                        var bLeft = left;
+                        var bTop = top;
+                        var bRight = right;
+                        var bBottom = bottom;
+
+                        var bWidth = bRight - bLeft;
+                        var bHeight = bBottom - bTop;
+
+                        // Set piece canvas size
+                        var pCanvas = piece.canvas.canvasElement;
+                        var pCtx = piece.canvas.getContext();
+
+                        pCanvas.width = bWidth;
+                        pCanvas.height = bHeight;
+
+                        // Clear pieces canvas
+                        pCtx.clearRect(0, 0, bWidth, bHeight);
+
+                        // DEBUG
+                        if (DEBUG) {
+                            pCtx.fillStyle = "lime";
+                            pCtx.fillRect(0, 0, bWidth, bHeight);
+                            pCtx.strokeStyle = "red";
+                            pCtx.strokeRect(0, 0, bWidth, bHeight);
+                        }
+
+                        // Draw working canvas to pieces canvas
+                        pCtx.drawImage(wCanvas.canvasElement, -bLeft, -bTop, width, height);
+
+                        // Record bounds as size and target coordinates
+                        piece.width = bWidth;
+                        piece.height = bHeight;
+                        piece.targetX = bLeft;
+                        piece.targetY = bTop;
+                    };
+
+                    var doWorkInner = function () {
+                        var i2 = i;
+                        return function () {
+                            doWork(i2);
+                        };
+                    };
+
+                    if (DEBUG) {
+                        setTimeout(doWorkInner(), 1000 * i);
+                    } else {
+                        doWorkInner()();
+                    }
+                }
+
+                wCanvas.release();
             };
 
             PuzzleImages.createEdges = function (columns, rows, widthOverHeightRatio, makeOutsideFlat) {

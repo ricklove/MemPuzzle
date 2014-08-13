@@ -3,6 +3,8 @@
 module Told.MemPuzzle {
 
     export interface IPieceImage {
+        id: string;
+
         canvas: WorkingCanvas;
         width: number;
         height: number;
@@ -41,6 +43,8 @@ module Told.MemPuzzle {
             var self = this;
 
             self.whole = {
+                id: "whole",
+
                 canvas: Told.MemPuzzle.WorkingCanvas.getWorkingCanvas(),
                 width: null,
                 height: null,
@@ -58,6 +62,8 @@ module Told.MemPuzzle {
                 bottomEdge: null,
             };
 
+            self.whole.canvas.canvasElement.setAttribute("id", self.whole.id);
+
             self.pieces = PuzzleImages.createPieces(columns, rows, widthOverHeightRatio);
         }
 
@@ -72,8 +78,10 @@ module Told.MemPuzzle {
             var pRatioHeight = 1.0 / rows;
 
             for (var iCol = 0; iCol < columns; iCol++) {
-                for (var iRow = 0; iRow < columns; iRow++) {
+                for (var iRow = 0; iRow < rows; iRow++) {
                     var p = <IPieceImage>{
+
+                        id: "piece_" + iCol + "_" + iRow,
 
                         // Create piece canvases
                         canvas: Told.MemPuzzle.WorkingCanvas.getWorkingCanvas(),
@@ -95,6 +103,8 @@ module Told.MemPuzzle {
                         bottomEdge: edges.horizontalEdges[iCol][iRow + 1],
                     };
 
+                    p.canvas.canvasElement.setAttribute("id", p.id);
+
                     pieces.push(p);
                 }
             }
@@ -113,29 +123,128 @@ module Told.MemPuzzle {
         }
 
         private static drawWhole(whole: IPieceImage, imageSource: ImageSource, targetWidth: number, targetHeight: number) {
-            // Clear canvas
-            //whole.canvas.canvasElement
+
+            var canvas = whole.canvas.canvasElement;
+            var ctx = whole.canvas.getContext();
+
             // Set canvas size
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, targetWidth, targetHeight);
+
             // Draw image source to canvas as scaled image
+            ctx.drawImage(imageSource.imageOrCanvas, 0, 0, targetWidth, targetHeight);
+
+            // Copy properties
+            whole.width = targetWidth;
+            whole.height = targetHeight;
+            whole.targetX = 0;
+            whole.targetY = 0;
         }
 
         private static drawPieces(pieces: IPieceImage[], whole: IPieceImage) {
 
+            var DEBUG = false;
+
             // Get working canvas
+            var wCanvas = WorkingCanvas.getWorkingCanvas();
+            var ctx = wCanvas.getContext();
+
             // Set canvas size
+            var width = wCanvas.canvasElement.width = whole.width;
+            var height = wCanvas.canvasElement.height = whole.height;
 
             // For each piece (including whole)
+            for (var i = 0; i < pieces.length; i++) {
 
-            // Clear canvas
-            // Set clip
-            // Draw whole puzzle (in clip)
 
-            // Calculate bounds
-            // Set piece canvas size
-            // Clear pieces canvas
-            // Draw working canvas to pieces canvas
+                // DEBUG
+                var doWork = (iInner: number) => {
+                    var piece = pieces[iInner];
 
-            // Record bounds as size and target coordinates
+                    var left = piece.pRatioLeft * width;
+                    var right = piece.pRatioRight * width;
+                    var top = piece.pRatioTop * height;
+                    var bottom = piece.pRatioBottom * height;
+
+
+                    // Clear canvas
+                    ctx.clearRect(0, 0, width, height);
+                    // DEBUG
+                    if (DEBUG) {
+                        ctx.fillStyle = "blue";
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.strokeStyle = "red";
+                        ctx.strokeRect(0, 0, width, height);
+                    }
+
+                    // TODO: Use edges as clip
+                    // Set clip
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(left, top);
+                    ctx.lineTo(right, top);
+                    ctx.lineTo(right, bottom);
+                    ctx.lineTo(left, bottom);
+                    //ctx.lineTo(left, top);
+                    ctx.closePath();
+                    ctx.clip();
+
+
+                    // Draw whole puzzle (in clip)
+                    ctx.drawImage(whole.canvas.canvasElement, 0, 0, width, height);
+                    ctx.restore();
+
+                    // TODO: Use edges to calculate bounds
+                    // Calculate bounds
+                    var bLeft = left;
+                    var bTop = top;
+                    var bRight = right;
+                    var bBottom = bottom;
+
+                    var bWidth = bRight - bLeft;
+                    var bHeight = bBottom - bTop;
+
+                    // Set piece canvas size
+                    var pCanvas = piece.canvas.canvasElement;
+                    var pCtx = piece.canvas.getContext();
+
+                    pCanvas.width = bWidth;
+                    pCanvas.height = bHeight;
+
+                    // Clear pieces canvas
+                    pCtx.clearRect(0, 0, bWidth, bHeight);
+
+                    // DEBUG
+                    if (DEBUG) {
+                        pCtx.fillStyle = "lime";
+                        pCtx.fillRect(0, 0, bWidth, bHeight);
+                        pCtx.strokeStyle = "red";
+                        pCtx.strokeRect(0, 0, bWidth, bHeight);
+                    }
+
+                    // Draw working canvas to pieces canvas
+                    pCtx.drawImage(wCanvas.canvasElement, -bLeft, -bTop, width, height);
+
+                    // Record bounds as size and target coordinates
+                    piece.width = bWidth;
+                    piece.height = bHeight;
+                    piece.targetX = bLeft;
+                    piece.targetY = bTop;
+                };
+
+                var doWorkInner = () => { var i2 = i; return () => { doWork(i2); } };
+
+                if (DEBUG) {
+                    setTimeout(doWorkInner(), 1000 * i);
+                } else {
+                    doWorkInner()();
+                }
+            }
+
+            wCanvas.release();
         }
 
 
