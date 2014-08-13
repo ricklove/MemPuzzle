@@ -451,7 +451,17 @@ A refactor is required to solve performance issues:
 ### 3:33-4:59
 
 - CONTINUE: Implement Puzzle Images
-- Rewrite Create Edges
+	- Rewrite Create Edges
+
+### 5:00-5:03
+
+- CONTINUE: Implement Puzzle Images
+	- Finish Create Pieces
+
+### 5:04-
+
+- CONTINUE: Implement Puzzle Images
+	- BEGIN: Implement Draw Pieces
 
 ---
 

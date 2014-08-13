@@ -14,10 +14,10 @@ module Told.MemPuzzle {
         pRatioRight: number;
         pRatioBottom: number;
 
+        leftEdge: IEdge;
         topEdge: IEdge;
         rightEdge: IEdge;
         bottomEdge: IEdge;
-        leftEdge: IEdge;
     }
 
     export interface IEdge {
@@ -52,18 +52,16 @@ module Told.MemPuzzle {
                 pRatioRight: 1,
                 pRatioBottom: 1,
 
+                leftEdge: null,
                 topEdge: null,
                 rightEdge: null,
                 bottomEdge: null,
-                leftEdge: null,
             };
 
             self.pieces = PuzzleImages.createPieces(columns, rows, widthOverHeightRatio);
         }
 
         static createPieces(columns: number, rows: number, widthOverHeightRatio: number): IPieceImage[] {
-            throw new Error("Not Implemented");
-
             var pieces = <IPieceImage[]>[];
 
             // Create edges
@@ -90,16 +88,18 @@ module Told.MemPuzzle {
                         pRatioRight: (iCol + 1) * pRatioWidth,
                         pRatioBottom: (iRow + 1) * pRatioHeight,
 
-                        topEdge: null,
-                        rightEdge: null,
-                        bottomEdge: null,
-                        leftEdge: null,
+                        // Select edges
+                        leftEdge: edges.verticalEdges[iCol][iRow],
+                        topEdge: edges.horizontalEdges[iCol][iRow],
+                        rightEdge: edges.verticalEdges[iCol + 1][iRow],
+                        bottomEdge: edges.horizontalEdges[iCol][iRow + 1],
                     };
 
                     pieces.push(p);
                 }
             }
 
+            return pieces;
         }
 
         public draw(imageSource: ImageSource, targetWidth: number, targetHeight: number) {

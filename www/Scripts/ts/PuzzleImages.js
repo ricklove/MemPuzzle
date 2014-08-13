@@ -16,17 +16,15 @@ var Told;
                     pRatioTop: 0,
                     pRatioRight: 1,
                     pRatioBottom: 1,
+                    leftEdge: null,
                     topEdge: null,
                     rightEdge: null,
-                    bottomEdge: null,
-                    leftEdge: null
+                    bottomEdge: null
                 };
 
                 self.pieces = PuzzleImages.createPieces(columns, rows, widthOverHeightRatio);
             }
             PuzzleImages.createPieces = function (columns, rows, widthOverHeightRatio) {
-                throw new Error("Not Implemented");
-
                 var pieces = [];
 
                 // Create edges
@@ -50,15 +48,18 @@ var Told;
                             pRatioTop: iRow * pRatioHeight,
                             pRatioRight: (iCol + 1) * pRatioWidth,
                             pRatioBottom: (iRow + 1) * pRatioHeight,
-                            topEdge: null,
-                            rightEdge: null,
-                            bottomEdge: null,
-                            leftEdge: null
+                            // Select edges
+                            leftEdge: edges.verticalEdges[iCol][iRow],
+                            topEdge: edges.horizontalEdges[iCol][iRow],
+                            rightEdge: edges.verticalEdges[iCol + 1][iRow],
+                            bottomEdge: edges.horizontalEdges[iCol][iRow + 1]
                         };
 
                         pieces.push(p);
                     }
                 }
+
+                return pieces;
             };
 
             PuzzleImages.prototype.draw = function (imageSource, targetWidth, targetHeight) {
