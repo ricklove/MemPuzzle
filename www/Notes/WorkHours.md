@@ -445,6 +445,14 @@ A refactor is required to solve performance issues:
 
 - BEGIN Implement Puzzle Images
 
+
+## Period 7
+
+### 3:33-4:59
+
+- CONTINUE: Implement Puzzle Images
+- Rewrite Create Edges
+
 ---
 
 # TODO

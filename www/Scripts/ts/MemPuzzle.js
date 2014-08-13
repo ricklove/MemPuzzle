@@ -1,6 +1,7 @@
 ﻿///<reference path="../typings/fabricjs/fabricjs.d.ts"/>
 ///<reference path="System/Debug.ts"/>
 ///<reference path="ImageSource.ts"/>
+///<reference path="PuzzleImages.ts"/>
 var Told;
 (function (Told) {
     // MemPuzzle
@@ -189,6 +190,62 @@ var Told;
                 }, shouldUseSans);
             };
 
+            MemPuzzle.CalculatePuzzlePosition = function (clientWidth, clientHeight, imageSource) {
+                var PADDING_PERCENT = MemPuzzle.PADDING_PERCENT;
+
+                // Calculate Image Scale
+                var padding = PADDING_PERCENT / 100 * Math.min(clientWidth, clientHeight);
+
+                var width = clientWidth - padding * 2;
+                var height = clientHeight - padding * 2;
+
+                var rWidth = width / imageSource.width;
+                var rHeight = height / imageSource.height;
+
+                var tRatio = Math.min(rWidth, rHeight);
+                var sWidth = imageSource.width * tRatio;
+                var sHeight = imageSource.height * tRatio;
+                var sx = (width - sWidth) / 2 + padding;
+                var sy = (height - sHeight) / 2 + padding;
+
+                // Move puzzle down
+                sy += padding * 0.5;
+
+                return { scale: tRatio, x: sx, y: sy, width: sWidth, height: sHeight };
+            };
+
+            MemPuzzle.CalculateColumnsAndRows = function (width, height) {
+                if (width <= 0 || height <= 0) {
+                    return;
+                }
+
+                // Create an h*v puzzle
+                var minPieceCount = 6;
+                var minSideCount = 2;
+                var hSideCount = minSideCount;
+                var vSideCount = minSideCount;
+
+                var maxRectRatio = 2;
+
+                while ((hSideCount * vSideCount) < minPieceCount) {
+                    var widthHeightRatio = width / height;
+
+                    if (widthHeightRatio > 1) {
+                        widthHeightRatio = Math.max(1, widthHeightRatio / maxRectRatio);
+
+                        hSideCount = Math.floor(widthHeightRatio * minSideCount);
+                    } else {
+                        widthHeightRatio = Math.min(1, widthHeightRatio * maxRectRatio);
+
+                        vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
+                    }
+
+                    minSideCount++;
+                }
+
+                return { columns: hSideCount, rows: vSideCount };
+            };
+
             MemPuzzle.prototype.createPuzzle = function (imageSource, onPuzzleComplete, makeOutsideFlat, difficulty, shouldRandomizePieces, shouldStackPieces, timeToShowCompletedPuzzle) {
                 if (typeof onPuzzleComplete === "undefined") { onPuzzleComplete = function () {
                 }; }
@@ -213,38 +270,35 @@ var Told;
                 self._onPuzzleComplete = onPuzzleComplete;
 
                 // Calculate Image Scale
-                var padding = PADDING_PERCENT / 100 * Math.min(self._canvas.getWidth(), self._canvas.getHeight());
+                var pPos = MemPuzzle.CalculatePuzzlePosition(self._canvas.getWidth(), self._canvas.getHeight(), imageSource);
+                var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(pPos.width, pPos.height);
 
-                var width = self._canvas.getWidth() - padding * 2;
-                var height = self._canvas.getHeight() - padding * 2;
+                this.showPuzzleOutline(pPos);
 
-                var rWidth = width / imageSource.width;
-                var rHeight = height / imageSource.height;
+                // NEW
+                var pImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
+                pImages.draw(imageSource, pPos.width, pPos.height);
 
-                var tRatio = Math.min(rWidth, rHeight);
-                var sWidth = imageSource.width * tRatio;
-                var sHeight = imageSource.height * tRatio;
-                var sx = (width - sWidth) / 2 + padding;
-                var sy = (height - sHeight) / 2 + padding;
+                // TODO: Show images
+                // DEBUG
+                return;
 
-                // Move puzzle down
-                sy += padding * 0.5;
+                // -------------
+                // OLD
+                var tRatio = self._puzzleScale = pPos.scale;
 
-                self._puzzleScale = tRatio;
+                var sx = self._puzzleX = pPos.x;
+                var sy = self._puzzleY = pPos.y;
+                self._puzzleWidth = pPos.width;
+                self._puzzleHeight = pPos.height;
 
-                self._puzzleX = sx;
-                self._puzzleY = sy;
-                self._puzzleWidth = sWidth;
-                self._puzzleHeight = sHeight;
-
-                this.showPuzzleOutline();
+                //this.showPuzzleOutline(pPos);
                 this.showPuzzleTargetImage(imageSource, timeToShowCompletedPuzzle);
 
                 Told.log("MemPuzzle_createPuzzle", "02 - show puzzle outline and target", true);
 
-                // DEBUG
-                return;
-
+                //// DEBUG
+                //return;
                 this.createPuzzlePieces(imageSource, difficulty, makeOutsideFlat, function (pieces) {
                     Told.log("MemPuzzle_createPuzzle", "03 - created puzzle pieces", true);
 
@@ -380,29 +434,9 @@ var Told;
                     return;
                 }
 
-                // Create an h*v puzzle
-                var minPieceCount = 6;
-                var minSideCount = 2;
-                var hSideCount = minSideCount;
-                var vSideCount = minSideCount;
-
-                var maxRectRatio = 2;
-
-                while ((hSideCount * vSideCount) < minPieceCount) {
-                    var widthHeightRatio = width / height;
-
-                    if (widthHeightRatio > 1) {
-                        widthHeightRatio = Math.max(1, widthHeightRatio / maxRectRatio);
-
-                        hSideCount = Math.floor(widthHeightRatio * minSideCount);
-                    } else {
-                        widthHeightRatio = Math.min(1, widthHeightRatio * maxRectRatio);
-
-                        vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
-                    }
-
-                    minSideCount++;
-                }
+                var columnsRows = MemPuzzle.CalculateColumnsAndRows(width, height);
+                var hSideCount = columnsRows.columns;
+                var vSideCount = columnsRows.rows;
 
                 // DEBUG: Make rect
                 //hSideCount = 3;
@@ -623,19 +657,19 @@ var Told;
                 //});
             };
 
-            MemPuzzle.prototype.showPuzzleOutline = function () {
-                var self = this;
-                var canvas = self._canvas;
+            MemPuzzle.prototype.showPuzzleOutline = function (pPos) {
+                var self2 = this;
+                var canvas = self2._canvas;
 
                 var T_PERCENT = MemPuzzle.OUTLINE_THICKNESS_PERCENT;
 
-                var thickness = Math.min(self._puzzleWidth, self._puzzleHeight) * T_PERCENT / 100;
+                var thickness = Math.min(pPos.width, pPos.height) * T_PERCENT / 100;
 
                 var outline = new fabric.Rect({
-                    left: self._puzzleX - thickness,
-                    top: self._puzzleY - thickness,
-                    width: self._puzzleWidth + thickness * 2,
-                    height: self._puzzleHeight + thickness * 2,
+                    left: pPos.x - thickness,
+                    top: pPos.y - thickness,
+                    width: pPos.width + thickness * 2,
+                    height: pPos.height + thickness * 2,
                     fill: MemPuzzle.OUTLINECOLOR,
                     hasBorders: false,
                     hasControls: false,
@@ -649,10 +683,10 @@ var Told;
                 thickness = 0;
 
                 var inline = new fabric.Rect({
-                    left: self._puzzleX - thickness,
-                    top: self._puzzleY - thickness,
-                    width: self._puzzleWidth + thickness * 2,
-                    height: self._puzzleHeight + thickness * 2,
+                    left: pPos.x - thickness,
+                    top: pPos.y - thickness,
+                    width: pPos.width + thickness * 2,
+                    height: pPos.height + thickness * 2,
                     fill: MemPuzzle.BACKGROUNDCOLOR,
                     hasBorders: false,
                     hasControls: false,
