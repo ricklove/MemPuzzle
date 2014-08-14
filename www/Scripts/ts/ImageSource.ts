@@ -300,7 +300,7 @@ module Told.MemPuzzle {
                     var hashNoFont = FontTester.createSimpleImageHash(wCanvas);
 
                     var testPuzzleFont = () => {
-                        Told.log("ImageSource_preloadFont_testPuzzleFont", "TESTING", true);
+                        Told.log("ImageSource_preloadFont_testPuzzleFont", "TESTING attempt=" + FontTester._attempts, true);
 
                         var puzzleFont = new fabric.Text(text, <fabric.ITextOptions> {
                             fontFamily: fontName,
