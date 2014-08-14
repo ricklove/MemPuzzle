@@ -546,18 +546,69 @@ A refactor is required to solve performance issues:
 - Fix akward puzzle button size
 - Don't show flat outside edges
 
+### 11:10-11:12
+
+- Lock correct pieces
+
+
 ---
 
 # TODO
 
 - BUG: Font is not being loaded on first puzzle sometimes
-- Lock pieces once in place
-- Provide sense of progress and accomplishment
-- Delay resize a bit (instead of resizing live)
 
+- Calculate rows and columns based on text
+	- 2 rows per line
+	- 1 column per max line length
+
+- Provide sense of progress and accomplishment
+	- Trophy Pictures (With Progress Indication)
+
+- Delay resize a bit (instead of resizing live)
 
 # TODO Maybe
 
 - Size initial ImageSource better to prevent scaling of font image
 - Allow click to place (if in correct location)
 - Create puzzle static canvas for everything but moving pieces
+
+
+# IDEAS
+
+- Canvas Level Menu:
+	- Display levels (3xn)
+	- Canvas (sized to width, scroll to needed height)
+	- Level
+		- Name
+		- Image (Optional)
+		- SubLevels
+		- Stars (Calculated if has sublevels)
+		- MaxStars (Calculated if has sublevels)
+	- COOL IDEA: Use Growing Tree Simulation nodes as level navigation
+		- End Levels have star/flowers (budded, not budded)
+		- Locked levels are unbudded branches
+		- Tree drags on canvas
+		- Click on parent level to zoom in to that part of tree
+
+
+- Monetization: Told Reward Ads Network
+	- Serve: 
+		- Image
+		- SendToEmail (fill in own email address to receive prize)
+		- Link (Open in browser to get deal online without using email)
+	- Advertise:
+		- Discount Premium Upgrade (Half price upgrade to remove ads)
+		- All Told Games
+		- Ad Network for Companies 
+			- HTML5 ads run anywhere 
+			- pay per click through only
+		- Purchased Ads
+	- Ad Viewer: Mini Games
+		- As Puzzle
+		- As Tetris Puzzle
+		- Upon completion, fill in own email address to claim prize
+		- Skip Ad: Shows reminder to purchase Premium version of the game (In-app or separate app)
+
+			
+		
+

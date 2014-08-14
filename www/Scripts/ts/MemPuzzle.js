@@ -18,6 +18,7 @@ var Told;
                 Told.log("MemPuzzle_Constructor", "01 - BEGIN - Will Create fabric Canvas", true);
 
                 var self = this;
+                var LOCK_ON_SNAP = MemPuzzle.LOCK_ON_SNAP;
 
                 var canvas = self._canvas = new fabric.Canvas(canvasId, {
                     hoverCursor: 'pointer',
@@ -74,9 +75,13 @@ var Told;
                             var aTarget = self.getActualTarget(target['_piece']);
                             target.setLeft(aTarget.x);
                             target.setTop(aTarget.y);
+
                             // Lock when correct
-                            //target.lockMovementX = true;
-                            //target.lockMovementY = true;
+                            if (LOCK_ON_SNAP) {
+                                target.lockMovementX = true;
+                                target.lockMovementY = true;
+                                target.selectable = false;
+                            }
                         }
                     },
                     'object:modified': function (e) {
@@ -520,6 +525,8 @@ var Told;
                 return piece;
             };
             MemPuzzle.SNAP_PERCENT = 35;
+            MemPuzzle.LOCK_ON_SNAP = true;
+
             MemPuzzle.PADDING_PERCENT = 30;
             MemPuzzle.STACK_PADDING_PERCENT = 5;
             MemPuzzle.BACKGROUNDCOLOR = "lightgrey";
