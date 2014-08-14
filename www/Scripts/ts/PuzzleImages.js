@@ -265,7 +265,7 @@ var Told;
             };
 
             PuzzleImages.createEdges = function (columns, rows, widthOverHeightRatio, makeOutsideFlat) {
-                if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
+                if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = false; }
                 var hSideCount = columns;
                 var vSideCount = rows;
 
@@ -280,8 +280,8 @@ var Told;
                         var hCircleReductionRatio = 1 / widthOverHeightRatio;
                         var vCircleReductionRatio = widthOverHeightRatio;
 
-                        hCircleReductionRatio = Math.max(1, hCircleReductionRatio);
-                        vCircleReductionRatio = Math.max(1, vCircleReductionRatio);
+                        hCircleReductionRatio = Math.min(1, hCircleReductionRatio);
+                        vCircleReductionRatio = Math.min(1, vCircleReductionRatio);
 
                         var hIsInset = Math.random() > 0.5;
                         var vIsInset = Math.random() > 0.5;
@@ -320,9 +320,9 @@ var Told;
 
                 if (!isStraight) {
                     // Get unit shape
-                    //var BASE_RADIUS = 0.125;
-                    var BASE_RADIUS = 0.1;
+                    var BASE_RADIUS = 0.125;
 
+                    //var BASE_RADIUS = 0.1;
                     var circleRadius = BASE_RADIUS * circleReductionRatio;
                     var cr = circleRadius;
                     var cr2 = circleRadius * 2;

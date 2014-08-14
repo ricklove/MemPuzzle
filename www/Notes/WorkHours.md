@@ -540,17 +540,20 @@ A refactor is required to solve performance issues:
 	- Perfomance: GREAT
 	- Size Change: GREAT
 
+
+### 8:35-8:38
+
+- Fix akward puzzle button size
+- Don't show flat outside edges
+
 ---
 
 # TODO
 
-- Delay resize a bit (instead of resizing live)
-
-- Fix akward puzzle button size
-
-- Provide sense of progress and accomplishment
-
 - BUG: Font is not being loaded on first puzzle sometimes
+- Lock pieces once in place
+- Provide sense of progress and accomplishment
+- Delay resize a bit (instead of resizing live)
 
 
 # TODO Maybe

@@ -303,7 +303,7 @@ module Told.MemPuzzle {
         }
 
 
-        private static createEdges(columns: number, rows: number, widthOverHeightRatio: number, makeOutsideFlat = true) {
+        private static createEdges(columns: number, rows: number, widthOverHeightRatio: number, makeOutsideFlat = false) {
 
             var hSideCount = columns;
             var vSideCount = rows;
@@ -320,8 +320,8 @@ module Told.MemPuzzle {
                     var hCircleReductionRatio = 1 / widthOverHeightRatio;
                     var vCircleReductionRatio = widthOverHeightRatio;
 
-                    hCircleReductionRatio = Math.max(1, hCircleReductionRatio);
-                    vCircleReductionRatio = Math.max(1, vCircleReductionRatio);
+                    hCircleReductionRatio = Math.min(1, hCircleReductionRatio);
+                    vCircleReductionRatio = Math.min(1, vCircleReductionRatio);
 
 
                     var hIsInset = Math.random() > 0.5;
@@ -357,8 +357,8 @@ module Told.MemPuzzle {
 
             if (!isStraight) {
                 // Get unit shape
-                //var BASE_RADIUS = 0.125;
-                var BASE_RADIUS = 0.1;
+                var BASE_RADIUS = 0.125;
+                //var BASE_RADIUS = 0.1;
 
                 var circleRadius = BASE_RADIUS * circleReductionRatio;
                 var cr = circleRadius;
