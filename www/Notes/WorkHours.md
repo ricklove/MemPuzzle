@@ -564,23 +564,30 @@ A refactor is required to solve performance issues:
 
 ### 11:50-12:05
 
-- Resize ImageSource to prevent scaling
+- Resize ImageSource to reduce scaling
+
+### 12:20-12:45
+
+- Prevent blank text
 
 ---
 
 # TODO
 
 - TEST: BUG: Font is not being loaded on first puzzle sometimes
-- Size initial ImageSource better to prevent scaling of font image
+	- If needed, do a pixel based evaluation
 
+- Publish
+	- Google Play
+	- Amazon App Store
 
 # TODO Maybe
 
 - Provide sense of progress and accomplishment
 	- Trophy Pictures (With Progress Indication)
 - Delay resize a bit (instead of resizing live)
-- Allow click to place (if in correct location)
-- Create puzzle static canvas for everything but moving pieces
+- Allow click to place piece (if in correct location)
+- PERFORMANCE: Create puzzle static canvas for everything but moving pieces
 
 
 # IDEAS

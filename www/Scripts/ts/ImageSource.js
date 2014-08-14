@@ -202,20 +202,39 @@ var Told;
                         Told.log("ImageSource_preloadFont", "BEGIN", true);
 
                         var fontName = ImageSource.PUZZLE_FONT;
-                        var text = "test";
+                        var text = "O";
                         var fontSize = 20;
 
                         var myFont = new fabric.Text(text, {
                             fontFamily: fontName,
                             fontSize: fontSize,
-                            top: 10
+                            top: 0,
+                            left: 0
                         });
 
+                        myFont.setColor("rgb(100,100,100)");
+
                         var wCanvas = WorkingCanvas.getWorkingCanvas();
-                        wCanvas.getFabricCanvas().add(myFont);
+                        var fCanvas = wCanvas.getFabricCanvas();
+                        fCanvas.add(myFont);
+                        fCanvas.setDimensions({ width: fontSize / 2, height: fontSize });
+                        fCanvas.backgroundColor = "white";
+                        fCanvas.renderAll();
+
+                        // Evaluate
+                        var isNonWhite = ImageSource.evaluateIfAnyPixelHasColor(wCanvas);
+
                         wCanvas.release();
 
-                        ImageSource._isPreloaded = true;
+                        if (isNonWhite) {
+                            ImageSource._isPreloaded = isNonWhite;
+                        } else {
+                            ImageSource._attempts++;
+
+                            if (ImageSource._attempts < 10) {
+                                setTimeout(doWork, 1000);
+                            }
+                        }
                     } else {
                         setTimeout(doWork, 100);
                     }
@@ -223,10 +242,31 @@ var Told;
 
                 doWork();
             };
+
+            ImageSource.evaluateIfAnyPixelHasColor = function (workingCanvas) {
+                var ctx = workingCanvas.getContext();
+                var imageData = ctx.getImageData(0, 0, workingCanvas.canvasElement.width, workingCanvas.canvasElement.height);
+                var data = imageData.data;
+
+                // Go through image diagonally looking for non-white pixel
+                var i = 1;
+                var skipSize = 17;
+
+                while (i < data.length) {
+                    i += skipSize;
+
+                    if (data[i] !== 255 && data[0] !== 0) {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
             ImageSource.PUZZLE_FONT = "PuzzleFont";
 
             ImageSource._hasStartedPreloading = false;
             ImageSource._isPreloaded = false;
+            ImageSource._attempts = 0;
             return ImageSource;
         })();
         MemPuzzle.ImageSource = ImageSource;
