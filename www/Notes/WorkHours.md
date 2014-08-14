@@ -476,6 +476,9 @@ A refactor is required to solve performance issues:
 - Use real edges as clip
 - Calculate actual bounds
 
+### 4:04-
+
+- Create pieces from PieceImages
 
 ---
 

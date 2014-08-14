@@ -100,7 +100,7 @@ var Told;
             };
 
             PuzzleImages.drawPieces = function (pieces, whole) {
-                var DEBUG = true;
+                var DEBUG = false;
                 var useStraightEdges = false;
 
                 // Get working canvas

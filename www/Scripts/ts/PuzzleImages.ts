@@ -146,7 +146,7 @@ module Told.MemPuzzle {
 
         private static drawPieces(pieces: IPieceImage[], whole: IPieceImage) {
 
-            var DEBUG = true;
+            var DEBUG = false;
             var useStraightEdges = false;
 
             // Get working canvas
