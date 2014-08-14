@@ -122,7 +122,6 @@ module Told.MemPuzzle {
             Told.log("ImageSource_createImageSourceFromText", "BEGIN - text:" + text, true);
 
             var puzzleFontName = ImageSource.PUZZLE_FONT;
-            var serifFontName = "DOES NOT EXIST";
 
             var doWork = () => {
                 var wCanvas = WorkingCanvas.getWorkingCanvas();
@@ -139,13 +138,19 @@ module Told.MemPuzzle {
                 //cutoffTop = 0.25;
                 //cutoffHeightKeep = 0.9;
 
-                var textObject = new fabric.Text(text, <fabric.ITextOptions> {
-                    fontFamily: shouldUseSans ? puzzleFontName : serifFontName,
+                var options = <fabric.ITextOptions> {
                     fontSize: (targetHeight),
                     //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
                     top: -targetHeight * cutoffTop + textPadding,
                     left: textPadding,
-                });
+                }
+
+                if (shouldUseSans) {
+                    options.fontFamily = puzzleFontName;
+                }
+
+                var textObject = new fabric.Text(text, options);
+
                 fCanvas.add(textObject);
 
                 // Set to fit text
@@ -171,27 +176,52 @@ module Told.MemPuzzle {
                 onCreated(imageSource);
             };
 
-            doWork();
-
-            //if (shouldUseSans) {
-            //    self.waitForFont(puzzleFontName, doWork, doWork);
-            //} else {
-            //    doWork();
-            //}
+            if (shouldUseSans) {
+                ImageSource.waitForFont(doWork, () => {
+                    shouldUseSans = false;
+                    doWork();
+                });
+            } else {
+                doWork();
+            }
         }
 
+        private static waitForFont(onLoaded: () => void, onTimeout: () => void) {
+            var hasFailed = false;
+            setTimeout(() => { hasFailed = true; }, 5000);
+
+            var doTest = () => {
+
+                if (hasFailed) {
+                    onTimeout();
+                    return;
+                }
+
+                ImageSource.preloadFont();
+
+                if (ImageSource._isPreloaded) {
+                    onLoaded();
+                    return;
+                }
+
+                setTimeout(doTest, 100);
+            };
+
+            doTest();
+        }
+
+        private static _hasStartedPreloading = false;
         private static _isPreloaded = false;
         static preloadFont() {
 
-            if (ImageSource._isPreloaded) {
+            if (ImageSource._hasStartedPreloading) {
                 return;
             }
 
-            ImageSource._isPreloaded = true;
+            ImageSource._hasStartedPreloading = true;
 
             var doWork = () => {
-                if (
-                    Told.AppSettings
+                if (Told.AppSettings
                     && Told.Analytics
                     && Told.Debug
                     && window["fabric"]
@@ -212,6 +242,8 @@ module Told.MemPuzzle {
                     var wCanvas = WorkingCanvas.getWorkingCanvas();
                     wCanvas.getFabricCanvas().add(myFont);
                     wCanvas.release();
+
+                    ImageSource._isPreloaded = true;
 
                 } else {
                     setTimeout(doWork, 100);

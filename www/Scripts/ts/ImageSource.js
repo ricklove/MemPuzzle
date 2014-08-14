@@ -101,7 +101,6 @@ var Told;
                 Told.log("ImageSource_createImageSourceFromText", "BEGIN - text:" + text, true);
 
                 var puzzleFontName = ImageSource.PUZZLE_FONT;
-                var serifFontName = "DOES NOT EXIST";
 
                 var doWork = function () {
                     var wCanvas = WorkingCanvas.getWorkingCanvas();
@@ -118,13 +117,19 @@ var Told;
 
                     //cutoffTop = 0.25;
                     //cutoffHeightKeep = 0.9;
-                    var textObject = new fabric.Text(text, {
-                        fontFamily: shouldUseSans ? puzzleFontName : serifFontName,
+                    var options = {
                         fontSize: (targetHeight),
                         //lineHeight: (self._canvas.getHeight() * 0.8), // BUG
                         top: -targetHeight * cutoffTop + textPadding,
                         left: textPadding
-                    });
+                    };
+
+                    if (shouldUseSans) {
+                        options.fontFamily = puzzleFontName;
+                    }
+
+                    var textObject = new fabric.Text(text, options);
+
                     fCanvas.add(textObject);
 
                     // Set to fit text
@@ -150,20 +155,47 @@ var Told;
                     onCreated(imageSource);
                 };
 
-                doWork();
-                //if (shouldUseSans) {
-                //    self.waitForFont(puzzleFontName, doWork, doWork);
-                //} else {
-                //    doWork();
-                //}
+                if (shouldUseSans) {
+                    ImageSource.waitForFont(doWork, function () {
+                        shouldUseSans = false;
+                        doWork();
+                    });
+                } else {
+                    doWork();
+                }
+            };
+
+            ImageSource.waitForFont = function (onLoaded, onTimeout) {
+                var hasFailed = false;
+                setTimeout(function () {
+                    hasFailed = true;
+                }, 5000);
+
+                var doTest = function () {
+                    if (hasFailed) {
+                        onTimeout();
+                        return;
+                    }
+
+                    ImageSource.preloadFont();
+
+                    if (ImageSource._isPreloaded) {
+                        onLoaded();
+                        return;
+                    }
+
+                    setTimeout(doTest, 100);
+                };
+
+                doTest();
             };
 
             ImageSource.preloadFont = function () {
-                if (ImageSource._isPreloaded) {
+                if (ImageSource._hasStartedPreloading) {
                     return;
                 }
 
-                ImageSource._isPreloaded = true;
+                ImageSource._hasStartedPreloading = true;
 
                 var doWork = function () {
                     if (Told.AppSettings && Told.Analytics && Told.Debug && window["fabric"] && fabric.Text) {
@@ -182,6 +214,8 @@ var Told;
                         var wCanvas = WorkingCanvas.getWorkingCanvas();
                         wCanvas.getFabricCanvas().add(myFont);
                         wCanvas.release();
+
+                        ImageSource._isPreloaded = true;
                     } else {
                         setTimeout(doWork, 100);
                     }
@@ -191,6 +225,7 @@ var Told;
             };
             ImageSource.PUZZLE_FONT = "PuzzleFont";
 
+            ImageSource._hasStartedPreloading = false;
             ImageSource._isPreloaded = false;
             return ImageSource;
         })();
