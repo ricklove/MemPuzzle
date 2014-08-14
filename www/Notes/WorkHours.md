@@ -522,11 +522,29 @@ A refactor is required to solve performance issues:
 
 ### 7:18-7:41
 
-- Retain piece positions on size change
+- Keep piece positions on size change
+
+### 7:42-7:46
+### 7:46-8:02
+
+- Test on Kindle Fire (in browser)
+	- BUG: Font not displaying on first puzzles
+	- BUG: Piece hard to grab after size change
+	- Size Change: GOOD
+	- Performance: GOOD
+
+- Test on Kindle Fire (PhoneGap)
+	- Build PhoneGap
+	- Download
+	- BUG: Font not displaying on first puzzle
+	- Perfomance: GREAT
+	- Size Change: GREAT
 
 ---
 
 # TODO
+
+- Delay resize a bit (instead of resizing live)
 
 - Fix akward puzzle button size
 
@@ -537,5 +555,6 @@ A refactor is required to solve performance issues:
 
 # TODO Maybe
 
+- Size initial ImageSource better to prevent scaling of font image
 - Allow click to place (if in correct location)
 - Create puzzle static canvas for everything but moving pieces
