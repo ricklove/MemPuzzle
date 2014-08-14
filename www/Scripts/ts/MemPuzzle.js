@@ -24,19 +24,18 @@ var Told;
                     selection: false
                 });
 
+                // Handle resize
+                window.onresize = function (event) {
+                    self.resize();
+                };
+
                 Told.log("MemPuzzle_Constructor", "01_A - Will Change Background Color", true);
 
                 canvas.backgroundColor = MemPuzzle.BACKGROUNDCOLOR;
 
                 Told.log("MemPuzzle_Constructor", "01_A - Will Change Canvas Size", true);
 
-                // Multiply resolution by device pixel ratio
-                var dpr = 1;
-
-                // This does not work
-                //if (window.devicePixelRatio !== undefined) dpr = window.devicePixelRatio;
-                canvas.setWidth(document.body.clientWidth * dpr - 20);
-                canvas.setHeight(window.innerHeight * dpr - 30);
+                self.setCanvasSize();
 
                 Told.log("MemPuzzle_Constructor", "02 - Canvas Size Set - width=" + canvas.getWidth() + " height= " + canvas.getHeight(), true);
 
@@ -261,11 +260,7 @@ var Told;
                 return { scale: tRatio, x: sx, y: sy, width: sWidth, height: sHeight };
             };
 
-            MemPuzzle.CalculateColumnsAndRows = function (width, height) {
-                if (width <= 0 || height <= 0) {
-                    return;
-                }
-
+            MemPuzzle.CalculateColumnsAndRows = function (widthOverHeightRatio) {
                 // Create an h*v puzzle
                 var minPieceCount = 6;
                 var minSideCount = 2;
@@ -275,16 +270,14 @@ var Told;
                 var maxRectRatio = 2;
 
                 while ((hSideCount * vSideCount) < minPieceCount) {
-                    var widthHeightRatio = width / height;
+                    if (widthOverHeightRatio > 1) {
+                        widthOverHeightRatio = Math.max(1, widthOverHeightRatio / maxRectRatio);
 
-                    if (widthHeightRatio > 1) {
-                        widthHeightRatio = Math.max(1, widthHeightRatio / maxRectRatio);
-
-                        hSideCount = Math.floor(widthHeightRatio * minSideCount);
+                        hSideCount = Math.floor(widthOverHeightRatio * minSideCount);
                     } else {
-                        widthHeightRatio = Math.min(1, widthHeightRatio * maxRectRatio);
+                        widthOverHeightRatio = Math.min(1, widthOverHeightRatio * maxRectRatio);
 
-                        vSideCount = Math.floor(1 / widthHeightRatio * minSideCount);
+                        vSideCount = Math.floor(1 / widthOverHeightRatio * minSideCount);
                     }
 
                     minSideCount++;
@@ -308,26 +301,55 @@ var Told;
 
                 var canvas = self._canvas;
 
-                //var image = self._workingCanvas;
-                // Clear Puzzle
-                canvas.clear();
-
                 // Set Puzzle complete
                 self._onPuzzleComplete = onPuzzleComplete;
+
+                // Create images
+                var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(imageSource.width / imageSource.height);
+
+                var pImages = self._puzzleImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
+
+                self.drawPuzzle(imageSource, timeToShowCompletedPuzzle);
+            };
+
+            MemPuzzle.prototype.setCanvasSize = function () {
+                var canvas = this._canvas;
+
+                // Multiply resolution by device pixel ratio
+                var dpr = 1;
+
+                // This does not work
+                //if (window.devicePixelRatio !== undefined) dpr = window.devicePixelRatio;
+                canvas.setWidth(document.body.clientWidth * dpr - 20);
+                canvas.setHeight(window.innerHeight * dpr - 30);
+            };
+
+            MemPuzzle.prototype.resize = function () {
+                this.setCanvasSize();
+                this.drawPuzzle(this._imageSource, 0, false);
+            };
+
+            MemPuzzle.prototype.drawPuzzle = function (imageSource, timeToShowCompletedPuzzle, isResize) {
+                if (typeof isResize === "undefined") { isResize = false; }
+                var self = this;
+                var canvas = self._canvas;
+                var pImages = self._puzzleImages;
+
+                // Clear Puzzle
+                canvas.clear();
 
                 // Calculate Image Scale
                 var pPos = self._puzzlePosition = MemPuzzle.CalculatePuzzlePosition(self._canvas.getWidth(), self._canvas.getHeight(), imageSource);
 
-                var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(pPos.width, pPos.height);
-
-                // Create images
-                var pImages = self._puzzleImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
-
+                // Draw images
                 pImages.draw(imageSource, pPos.width, pPos.height);
 
                 // Show puzzle
                 self.showPuzzleOutline(pPos);
-                self.showPuzzleTargetImage(pPos, pImages.whole, timeToShowCompletedPuzzle);
+                if (!isResize) {
+                    self.showPuzzleTargetImage(pPos, pImages.whole, timeToShowCompletedPuzzle);
+                }
+
                 Told.log("MemPuzzle_createPuzzle", "02 - show puzzle outline and target", true);
 
                 // Show pieces

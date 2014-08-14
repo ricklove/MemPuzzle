@@ -512,11 +512,18 @@ A refactor is required to solve performance issues:
 
 - Disable Zoom
 
+### 6:55-7:01
+
+- Update notes
+
+### 7:01-7:17
+
+- Handle size change
+
 ---
 
 # TODO
 
-- Handle screen size change
 
 - Provide sense of progress and accomplishment
 
@@ -525,5 +532,6 @@ A refactor is required to solve performance issues:
 
 # TODO Maybe
 
+- Fix akward puzzle button size
 - Allow click to place (if in correct location)
 - Create puzzle static canvas for everything but moving pieces
