@@ -6,6 +6,8 @@ module Told.MemPuzzle {
 
     export class WorkingCanvas {
 
+        static SHOW_WORKING_CANVAS = false;
+
         static canvasList = <WorkingCanvas[]>[];
 
         static getWorkingCanvas(): WorkingCanvas {
@@ -28,6 +30,10 @@ module Told.MemPuzzle {
                 element.setAttribute('id', '_temp_canvas_' + cList.length);
 
                 document.body.appendChild(element);
+
+                if (!WorkingCanvas.SHOW_WORKING_CANVAS) {
+                    element.setAttribute("style", "display:none");
+                }
 
                 wCanvas = new WorkingCanvas();
                 wCanvas.canvasElement = element;

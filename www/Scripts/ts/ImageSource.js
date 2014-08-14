@@ -29,6 +29,10 @@ var Told;
 
                     document.body.appendChild(element);
 
+                    if (!WorkingCanvas.SHOW_WORKING_CANVAS) {
+                        element.setAttribute("style", "display:none");
+                    }
+
                     wCanvas = new WorkingCanvas();
                     wCanvas.canvasElement = element;
 
@@ -58,6 +62,8 @@ var Told;
             WorkingCanvas.prototype.release = function () {
                 this.isFree = true;
             };
+            WorkingCanvas.SHOW_WORKING_CANVAS = false;
+
             WorkingCanvas.canvasList = [];
             return WorkingCanvas;
         })();

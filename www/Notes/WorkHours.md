@@ -496,6 +496,9 @@ A refactor is required to solve performance issues:
 
 - Only show a single piece at a time
 
+### 5:45-5:47
+
+- Hide working canvases
 
 ---
 
