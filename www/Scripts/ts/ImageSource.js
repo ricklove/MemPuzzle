@@ -31,11 +31,11 @@ var Told;
 
                     wCanvas = new WorkingCanvas();
                     wCanvas.canvasElement = element;
-                    wCanvas.isFree = false;
 
                     cList.push(wCanvas);
                 }
 
+                wCanvas.isFree = false;
                 return wCanvas;
             };
 
@@ -66,6 +66,10 @@ var Told;
         var ImageSource = (function () {
             function ImageSource() {
             }
+            ImageSource.prototype.release = function () {
+                this._workingCanvas.release();
+            };
+
             //createPuzzleFromImage(imgUrl: string) {
             //    var self = this;
             //    fabric.Image.fromURL(imgUrl, function (img) {
@@ -130,6 +134,8 @@ var Told;
                     imageSource.imageOrCanvas = wCanvas.canvasElement;
                     imageSource.width = fCanvas.getWidth();
                     imageSource.height = fCanvas.getHeight();
+
+                    imageSource._workingCanvas = wCanvas;
 
                     onCreated(imageSource);
                 };

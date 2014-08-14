@@ -27,6 +27,18 @@ var Told;
 
                 self.pieces = PuzzleImages.createPieces(columns, rows, widthOverHeightRatio);
             }
+            PuzzleImages.prototype.release = function () {
+                var self = this;
+                self.whole.canvas.release();
+
+                for (var i = 0; i < self.pieces.length; i++) {
+                    self.pieces[i].canvas.release();
+                }
+
+                self.whole = null;
+                self.pieces = null;
+            };
+
             PuzzleImages.createPieces = function (columns, rows, widthOverHeightRatio) {
                 var pieces = [];
 

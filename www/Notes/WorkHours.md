@@ -486,8 +486,8 @@ A refactor is required to solve performance issues:
 
 ### 4:53-
 
-- Fix stack pieces
 - Fix next puzzle
+- Fix stack pieces
 
 
 ---

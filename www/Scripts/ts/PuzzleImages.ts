@@ -67,6 +67,18 @@ module Told.MemPuzzle {
             self.pieces = PuzzleImages.createPieces(columns, rows, widthOverHeightRatio);
         }
 
+        release() {
+            var self = this;
+            self.whole.canvas.release();
+
+            for (var i = 0; i < self.pieces.length; i++) {
+                self.pieces[i].canvas.release();
+            }
+
+            self.whole = null;
+            self.pieces = null;
+        }
+
         static createPieces(columns: number, rows: number, widthOverHeightRatio: number): IPieceImage[] {
             var pieces = <IPieceImage[]>[];
 

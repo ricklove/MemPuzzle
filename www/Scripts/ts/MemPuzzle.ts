@@ -18,6 +18,7 @@ module Told.MemPuzzle {
 
         private _canvas: fabric.ICanvas = null;
 
+        private _imageSource: ImageSource = null;
         private _puzzleImages: PuzzleImages = null;
         private _pieces: IPiece[] = null;
 
@@ -210,8 +211,19 @@ module Told.MemPuzzle {
 
             var self = this;
 
+            // Release current puzzle
+
+            if (self._imageSource !== null) {
+                self._imageSource.release();
+            }
+
+            if (self._puzzleImages !== null) {
+                self._puzzleImages.release();
+            }
+
             Told.MemPuzzle.ImageSource.createImageSourceFromText(text, self._canvas.getWidth(), self._canvas.getHeight(), (imageSource) => {
 
+                self._imageSource = imageSource;
                 self.createPuzzle(imageSource, onPuzzleCreated);
 
             }, shouldUseSans);

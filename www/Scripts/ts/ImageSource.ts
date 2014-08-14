@@ -31,11 +31,11 @@ module Told.MemPuzzle {
 
                 wCanvas = new WorkingCanvas();
                 wCanvas.canvasElement = element;
-                wCanvas.isFree = false;
 
                 cList.push(wCanvas);
             }
 
+            wCanvas.isFree = false;
             return wCanvas;
         }
 
@@ -67,9 +67,16 @@ module Told.MemPuzzle {
 
     export class ImageSource {
 
+        private _workingCanvas: WorkingCanvas;
+
         public imageOrCanvas: any;
         public width: number;
         public height: number;
+
+        release() {
+            this._workingCanvas.release();
+        }
+
 
         //createPuzzleFromImage(imgUrl: string) {
         //    var self = this;
@@ -142,6 +149,8 @@ module Told.MemPuzzle {
                 imageSource.imageOrCanvas = wCanvas.canvasElement;
                 imageSource.width = fCanvas.getWidth();
                 imageSource.height = fCanvas.getHeight();
+
+                imageSource._workingCanvas = wCanvas;
 
                 onCreated(imageSource);
             };

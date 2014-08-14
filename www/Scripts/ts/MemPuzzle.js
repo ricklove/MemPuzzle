@@ -9,6 +9,7 @@ var Told;
         var MemPuzzle = (function () {
             function MemPuzzle(canvasId) {
                 this._canvas = null;
+                this._imageSource = null;
                 this._puzzleImages = null;
                 this._pieces = null;
                 this._puzzlePosition = null;
@@ -174,7 +175,17 @@ var Told;
                 if (typeof shouldUseSans === "undefined") { shouldUseSans = true; }
                 var self = this;
 
+                // Release current puzzle
+                if (self._imageSource !== null) {
+                    self._imageSource.release();
+                }
+
+                if (self._puzzleImages !== null) {
+                    self._puzzleImages.release();
+                }
+
                 Told.MemPuzzle.ImageSource.createImageSourceFromText(text, self._canvas.getWidth(), self._canvas.getHeight(), function (imageSource) {
+                    self._imageSource = imageSource;
                     self.createPuzzle(imageSource, onPuzzleCreated);
                 }, shouldUseSans);
             };
