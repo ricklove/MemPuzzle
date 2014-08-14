@@ -516,26 +516,14 @@ A refactor is required to solve performance issues:
 
 # TODO
 
-- REFACTOR:
-	- Move CreateImageSource and CreatePiece to own files
-	- Remove fabricjs from everything but the last canvas (and possibly image creation canvas)
-		- Remove toDataUrl and use DrawImage directly with multiple canvases
-	- Provide only one moving piece
-		- Create puzzle static canvas for everything but moving pieces
-		- Create fabricjs canvas with only static canvas image and one moving piece
-		- Find bounding box and clip snapshot
-		- Turn off pixel perfect dragging
-		- Allow click to place (if in correct location)
-
 - Handle screen size change
 
 - Provide sense of progress and accomplishment
 
-- BUG: Still font is not being loaded on first puzzle sometimes
+- BUG: Font is not being loaded on first puzzle sometimes
 
 
 # TODO Maybe
 
-- Find the visible pixels in the text and resize image for that
-
-- Spread Out Pieces
+- Allow click to place (if in correct location)
+- Create puzzle static canvas for everything but moving pieces
