@@ -24,6 +24,6 @@
   <!-- Plugins -->
   <!--<gap:plugin name="com.adobe.plugins.fastcanvas" version="1.0.1" />-->
 
-  <icon src="Assets/Icon/icon240.png" />
+  <icon src="Assets/Icons/icon240.png" />
 
 </widget>
