@@ -269,6 +269,8 @@ var Told;
                         var hashNoFont = FontTester.createSimpleImageHash(wCanvas);
 
                         var testPuzzleFont = function () {
+                            Told.log("ImageSource_preloadFont_testPuzzleFont", "TESTING", true);
+
                             var puzzleFont = new fabric.Text(text, {
                                 fontFamily: fontName,
                                 fontSize: fontSize,
@@ -302,7 +304,7 @@ var Told;
                             }
 
                             if (isReady) {
-                                Told.log("ImageSource_preloadFont", "END - Font is Ready", true);
+                                Told.log("ImageSource_preloadFont", "END - SUCCESS - Font is Ready", true);
 
                                 FontTester._isPuzzleFontReady = true;
                                 wCanvas.release();

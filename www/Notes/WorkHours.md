@@ -575,7 +575,7 @@ A refactor is required to solve performance issues:
 
 - Refactor preload font
 
-### 14:37-14:45
+### 14:37-14:48
 
 - Add font logging
 
