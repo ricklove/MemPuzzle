@@ -100,7 +100,8 @@ var Told;
             };
 
             PuzzleImages.drawPieces = function (pieces, whole) {
-                var DEBUG = false;
+                var DEBUG = true;
+                var useStraightEdges = false;
 
                 // Get working canvas
                 var wCanvas = Told.MemPuzzle.WorkingCanvas.getWorkingCanvas();
@@ -125,6 +126,12 @@ var Told;
                         top = Math.ceil(top);
                         bottom = Math.ceil(bottom);
 
+                        // Bounds
+                        var bLeft = left;
+                        var bTop = top;
+                        var bRight = right;
+                        var bBottom = bottom;
+
                         // Clear canvas
                         ctx.clearRect(0, 0, width, height);
 
@@ -140,12 +147,55 @@ var Told;
                         // Set clip
                         ctx.save();
                         ctx.beginPath();
-                        ctx.moveTo(left, top);
-                        ctx.lineTo(right, top);
-                        ctx.lineTo(right, bottom);
-                        ctx.lineTo(left, bottom);
 
-                        //ctx.lineTo(left, top);
+                        if (useStraightEdges) {
+                            ctx.moveTo(left, top);
+                            ctx.lineTo(right, top);
+                            ctx.lineTo(right, bottom);
+                            ctx.lineTo(left, bottom);
+                            //ctx.lineTo(left, top);
+                        } else {
+                            // Use edges
+                            var topEdgePoints = piece.topEdge.getPoints({ x: left, y: top }, { x: right, y: top }, false);
+                            var rightEdgePoints = piece.rightEdge.getPoints({ x: right, y: top }, { x: right, y: bottom }, false);
+                            var bottomEdgePoints = piece.bottomEdge.getPoints({ x: right, y: bottom }, { x: left, y: bottom }, true);
+                            var leftEdgePoints = piece.leftEdge.getPoints({ x: left, y: bottom }, { x: left, y: top }, true);
+
+                            ctx.moveTo(left, top);
+
+                            PuzzleImages.curveThroughPoints(ctx, topEdgePoints);
+                            PuzzleImages.curveThroughPoints(ctx, rightEdgePoints);
+                            PuzzleImages.curveThroughPoints(ctx, bottomEdgePoints);
+                            PuzzleImages.curveThroughPoints(ctx, leftEdgePoints);
+
+                            // Calculate bounds
+                            var pad = 2;
+
+                            var getBounds = function (points) {
+                                for (var iPoint = 0; iPoint < points.length; iPoint++) {
+                                    var p = points[iPoint];
+
+                                    if (p.x - pad < bLeft) {
+                                        bLeft = p.x - pad;
+                                    }
+                                    if (p.x + pad > bRight) {
+                                        bRight = p.x + pad;
+                                    }
+                                    if (p.y - pad < bTop) {
+                                        bTop = p.y - pad;
+                                    }
+                                    if (p.y + pad > bBottom) {
+                                        bBottom = p.y + pad;
+                                    }
+                                }
+                            };
+
+                            getBounds(topEdgePoints);
+                            getBounds(rightEdgePoints);
+                            getBounds(bottomEdgePoints);
+                            getBounds(leftEdgePoints);
+                        }
+
                         ctx.closePath();
                         ctx.clip();
 
@@ -153,13 +203,7 @@ var Told;
                         ctx.drawImage(whole.canvas.canvasElement, 0, 0, width, height);
                         ctx.restore();
 
-                        // TODO: Use edges to calculate bounds
-                        // Calculate bounds
-                        var bLeft = left;
-                        var bTop = top;
-                        var bRight = right;
-                        var bBottom = bottom;
-
+                        // Bounds size
                         var bWidth = bRight - bLeft;
                         var bHeight = bBottom - bTop;
 
@@ -212,8 +256,6 @@ var Told;
                 if (typeof makeOutsideFlat === "undefined") { makeOutsideFlat = true; }
                 var hSideCount = columns;
                 var vSideCount = rows;
-                var pWidth = 1;
-                var pHeight = 1;
 
                 var hEdges = [];
                 var vEdges = [];
@@ -238,11 +280,15 @@ var Told;
                         if (!makeOutsideFlat) {
                             if (hIsStraight) {
                                 hIsStraight = false;
+
+                                // top=inset, bottom=outset (reversed)
                                 hIsInset = (v === 0);
                             }
 
                             if (vIsStraight) {
                                 vIsStraight = false;
+
+                                // right=inset, left=outset (reversed)
                                 vIsInset = (h !== 0);
                             }
                         }
@@ -258,7 +304,7 @@ var Told;
             PuzzleImages.createPuzzleEdge = function (circleReductionRatio, isInset, isStraight) {
                 if (typeof isInset === "undefined") { isInset = true; }
                 if (typeof isStraight === "undefined") { isStraight = false; }
-                var rPoints = [];
+                var randomPoints = [];
 
                 if (!isStraight) {
                     // Get unit shape
@@ -297,11 +343,11 @@ var Told;
                             u = { x: u.x + xRand, y: u.y + yRand };
                         }
 
-                        rPoints.push(u);
+                        randomPoints.push(u);
                     }
                 } else {
                     // Straight
-                    rPoints = [{ x: 0, y: 0 }, { x: 1, y: 0 }];
+                    randomPoints = [{ x: 0, y: 0 }, { x: 1, y: 0 }];
                 }
 
                 // Calculation of final points
@@ -325,18 +371,18 @@ var Told;
                         };
                     }
 
-                    var uPoints = rPoints;
+                    var uPoints = randomPoints;
 
                     if (isReversed) {
                         uPoints = uPoints.map(function (p) {
-                            return p;
+                            return { x: 1 - p.x, y: -p.y };
                         }).reverse();
                     }
 
                     var finalPoints = [];
 
-                    for (var i = 0; i < rPoints.length; i++) {
-                        var u = rPoints[i];
+                    for (var i = 0; i < uPoints.length; i++) {
+                        var u = uPoints[i];
 
                         // Make final point
                         finalPoints.push({
@@ -348,7 +394,19 @@ var Told;
                     return finalPoints;
                 };
 
-                return { unitPoints: rPoints, getPoints: calculateFinalPoints };
+                return { unitPoints: randomPoints, getPoints: calculateFinalPoints };
+            };
+
+            // Based on: http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
+            PuzzleImages.curveThroughPoints = function (ctx, points) {
+                for (var i = 0; i < points.length - 2; i++) {
+                    var xc = (points[i].x + points[i + 1].x) / 2;
+                    var yc = (points[i].y + points[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+                }
+
+                // Last Point
+                ctx.quadraticCurveTo(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y);
             };
             return PuzzleImages;
         })();

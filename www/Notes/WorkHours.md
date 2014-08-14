@@ -466,12 +466,16 @@ A refactor is required to solve performance issues:
 
 ### 6:05-6:10
 
-- Round clipping to pixels
+- Round piece edges to pixels
 
 
-### NEXT
+## Period 8
+
+### 3:25-4:03
 
 - Use real edges as clip
+- Calculate actual bounds
+
 
 ---
 
