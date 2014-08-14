@@ -6,7 +6,7 @@ module Told.MemPuzzle {
 
     export class WorkingCanvas {
 
-        static SHOW_WORKING_CANVAS = false;
+        static SHOW_WORKING_CANVAS = true;
 
         static canvasList = <WorkingCanvas[]>[];
 
@@ -197,9 +197,9 @@ module Told.MemPuzzle {
                     return;
                 }
 
-                ImageSource.preloadFont();
+                FontTester.preloadFont();
 
-                if (ImageSource._isPreloaded) {
+                if (FontTester.isPuzzleFontReady()) {
                     onLoaded();
                     return;
                 }
@@ -210,60 +210,132 @@ module Told.MemPuzzle {
             doTest();
         }
 
+    }
+
+    class FontTester {
+
+        public static isPuzzleFontReady() {
+            FontTester.preloadFont();
+            return FontTester._isPuzzleFontReady;
+        }
+
+        private static _isPuzzleFontReady = false;
+
+
         private static _hasStartedPreloading = false;
         private static _isPreloaded = false;
         private static _attempts = 0;
+
         static preloadFont() {
 
-            if (ImageSource._hasStartedPreloading) {
+            if (FontTester._hasStartedPreloading) {
                 return;
             }
 
-            ImageSource._hasStartedPreloading = true;
+            FontTester._hasStartedPreloading = true;
 
             var doWork = () => {
-                if (Told.AppSettings
-                    && Told.Analytics
-                    && Told.Debug
-                    && window["fabric"]
-                    && fabric.Text) {
+
+                if (Told.AppSettings &&
+                    Told.Analytics &&
+                    Told.Debug &&
+                    window["fabric"] &&
+                    fabric.Text) {
 
                     Told.log("ImageSource_preloadFont", "BEGIN", true);
 
                     var fontName = ImageSource.PUZZLE_FONT;
                     var text = "O";
                     var fontSize = 20;
+                    var color = "rgb(100,100,100)";
 
-                    var myFont = new fabric.Text(text, <fabric.ITextOptions> {
-                        fontFamily: fontName,
+                    var defaultFont = new fabric.Text(text, <fabric.ITextOptions> {
+                        //fontFamily: fontName,
                         fontSize: fontSize,
                         top: 0,
                         left: 0,
+                        color: color
                     });
 
-                    myFont.setColor("rgb(100,100,100)");
+                    var unknownFont = new fabric.Text(text, <fabric.ITextOptions> {
+                        fontFamily: "NOT_REAL_KJKJBJV",
+                        fontSize: fontSize,
+                        top: 0,
+                        left: 0,
+                        color: color
+                    });
+
+                    var noFont = new fabric.Text(text, <fabric.ITextOptions> {
+                        fontFamily: "NOFONT",
+                        fontSize: fontSize,
+                        top: 0,
+                        left: 0,
+                        color: color
+                    });
 
                     var wCanvas = WorkingCanvas.getWorkingCanvas();
                     var fCanvas = wCanvas.getFabricCanvas();
-                    fCanvas.add(myFont);
                     fCanvas.setDimensions({ width: fontSize / 2, height: fontSize });
                     fCanvas.backgroundColor = "white";
                     fCanvas.renderAll();
 
-                    // Evaluate
-                    var isNonWhite = ImageSource.evaluateIfAnyPixelHasColor(wCanvas);
+                    var hashBlank = FontTester.createSimpleImageHash(wCanvas);
 
-                    wCanvas.release();
+                    fCanvas.clear();
+                    fCanvas.add(defaultFont);
+                    fCanvas.renderAll();
 
-                    if (isNonWhite) {
-                        ImageSource._isPreloaded = isNonWhite;
-                    } else {
-                        ImageSource._attempts++;
+                    var hashDefault = FontTester.createSimpleImageHash(wCanvas);
 
-                        if (ImageSource._attempts < 10) {
-                            setTimeout(doWork, 1000);
+                    fCanvas.clear();
+                    fCanvas.add(unknownFont);
+                    fCanvas.renderAll();
+
+                    var hashUnknown = FontTester.createSimpleImageHash(wCanvas);
+
+                    fCanvas.clear();
+                    fCanvas.add(noFont);
+                    fCanvas.renderAll();
+
+                    var hashNoFont = FontTester.createSimpleImageHash(wCanvas);
+
+                    var testPuzzleFont = () => {
+                        var puzzleFont = new fabric.Text(text, <fabric.ITextOptions> {
+                            fontFamily: fontName,
+                            fontSize: fontSize,
+                            top: 0,
+                            left: 0,
+                            color: color
+                        });
+
+                        fCanvas.clear();
+                        fCanvas.add(puzzleFont);
+                        fCanvas.renderAll();
+
+                        var hashPuzzleFont = FontTester.createSimpleImageHash(wCanvas);
+
+                        var isReady = hashPuzzleFont !== hashBlank
+                            && hashPuzzleFont !== hashDefault
+                            && hashPuzzleFont !== hashUnknown
+                            && hashPuzzleFont !== hashNoFont;
+
+                        if (isReady) {
+                            FontTester._isPuzzleFontReady = true;
+                            wCanvas.release();
+                        } else {
+
+                            if (FontTester._attempts < 10) {
+
+                                FontTester._attempts++;
+                                setTimeout(testPuzzleFont, 200 * FontTester._attempts * FontTester._attempts);
+
+                            } else {
+                                wCanvas.release();
+                            }
                         }
                     }
+
+                    testPuzzleFont();
 
                 } else {
                     setTimeout(doWork, 100);
@@ -273,81 +345,39 @@ module Told.MemPuzzle {
             doWork();
         }
 
-        private static evaluateIfAnyPixelHasColor(workingCanvas: WorkingCanvas) {
-
+        private static createSimpleImageHash(workingCanvas: WorkingCanvas) {
             var ctx = workingCanvas.getContext();
             var imageData = ctx.getImageData(0, 0, workingCanvas.canvasElement.width, workingCanvas.canvasElement.height);
             var data = imageData.data;
 
             // Go through image diagonally looking for non-white pixel
             var i = 1;
-            var skipSize = 17;
+            var skipSize = (Math.floor(imageData.width / 2.7) * 3) - 7;
+            skipSize = Math.max(17, skipSize);
+
+            var hash = 23;
+            var rotation = Math.pow(2, 28) - 1;
 
             while (i < data.length) {
 
-                i += skipSize;
-
-                if (data[i] !== 255 && data[0] !== 0) {
-                    return true;
+                var d = data[i];
+                if (d === 255) {
+                    hash *= 17 * i;
+                } else if (d === 0) {
+                    hash *= 23 * i;
+                } else {
+                    hash *= 29 * i * d;
                 }
+
+                hash %= rotation;
+
+                i += skipSize;
             }
 
-            return false;
+            return hash;
         }
-
-        //private waitForFont(fontName: string, onLoadedCallback: () => void, onTimeoutCallback: () => void) {
-        //    var self = this;
-
-        //    var text = ".iJk ,@#$1230;',./?";
-
-        //    var offset = -10000;
-        //    var fontsize = 300;
-
-        //    // DEBUG
-        //    offset = 0;
-        //    fontsize = 30;
-
-        //    var noFont = new fabric.Text(text, <fabric.ITextOptions> {
-        //        fontFamily: "NOFONT",
-        //        fontSize: fontsize,
-        //        top: 20 + offset,
-        //    });
-
-        //    var myFont = new fabric.Text(text, <fabric.ITextOptions> {
-        //        fontFamily: fontName,
-        //        fontSize: fontsize,
-        //        top: 120 + offset,
-        //    });
-
-        //    var wCanvas = self.getWorkingCanvas();
-        //    wCanvas.add(noFont);
-        //    wCanvas.add(myFont);
-
-        //    var hasFailed = false;
-        //    setTimeout(() => { hasFailed = true; }, 5000);
-
-        //    var doTest = () => {
-
-        //        if (hasFailed) {
-        //            onTimeoutCallback();
-        //            return;
-        //        }
-
-        //        wCanvas.renderAll();
-
-        //        if (noFont.width !== myFont.width) {
-        //            onLoadedCallback();
-        //            return;
-        //        }
-
-        //        setTimeout(doTest, 100);
-        //    };
-
-        //    doTest();
-        //    //setTimeout(doTest, 100);
-        //}
 
     }
 
-    ImageSource.preloadFont();
+    FontTester.preloadFont();
 }

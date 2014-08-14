@@ -570,14 +570,28 @@ A refactor is required to solve performance issues:
 
 - Prevent blank text
 
+### 14:00-14:23
+### 14:24-14:33
+
+- Refactor preload font
+
 ---
 
 # TODO
 
+- Refactor checking for blank pixel
+	- On fail, then don't use custom font
+
+
 - TEST: BUG: Font is not being loaded on first puzzle sometimes
 	- If needed, do a pixel based evaluation
 
+
 - Publish
+	- Create Media
+		- Icon
+		- Promotional Graphic
+		- Screenshots
 	- Google Play
 	- Amazon App Store
 
