@@ -73,6 +73,8 @@ module Told.MemPuzzle {
 
     export class ImageSource {
 
+        static PUZZLE_FONT = "PuzzleFont";
+
         private _workingCanvas: WorkingCanvas;
 
         public imageOrCanvas: any;
@@ -119,7 +121,7 @@ module Told.MemPuzzle {
 
             Told.log("ImageSource_createImageSourceFromText", "BEGIN - text:" + text, true);
 
-            var puzzleFontName = "PuzzleFont";
+            var puzzleFontName = ImageSource.PUZZLE_FONT;
             var serifFontName = "DOES NOT EXIST";
 
             var doWork = () => {
@@ -178,6 +180,47 @@ module Told.MemPuzzle {
             //}
         }
 
+        private static _isPreloaded = false;
+        static preloadFont() {
+
+            if (ImageSource._isPreloaded) {
+                return;
+            }
+
+            ImageSource._isPreloaded = true;
+
+            var doWork = () => {
+                if (
+                    Told.AppSettings
+                    && Told.Analytics
+                    && Told.Debug
+                    && window["fabric"]
+                    && fabric.Text) {
+
+                    Told.log("ImageSource_preloadFont", "BEGIN", true);
+
+                    var fontName = ImageSource.PUZZLE_FONT;
+                    var text = "test";
+                    var fontSize = 20;
+
+                    var myFont = new fabric.Text(text, <fabric.ITextOptions> {
+                        fontFamily: fontName,
+                        fontSize: fontSize,
+                        top: 10,
+                    });
+
+                    var wCanvas = WorkingCanvas.getWorkingCanvas();
+                    wCanvas.getFabricCanvas().add(myFont);
+                    wCanvas.release();
+
+                } else {
+                    setTimeout(doWork, 100);
+                }
+            };
+
+            doWork();
+        }
+
         //private waitForFont(fontName: string, onLoadedCallback: () => void, onTimeoutCallback: () => void) {
         //    var self = this;
 
@@ -232,4 +275,5 @@ module Told.MemPuzzle {
 
     }
 
+    ImageSource.preloadFont();
 }

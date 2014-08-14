@@ -100,7 +100,7 @@ var Told;
                 if (typeof shouldUseSans === "undefined") { shouldUseSans = false; }
                 Told.log("ImageSource_createImageSourceFromText", "BEGIN - text:" + text, true);
 
-                var puzzleFontName = "PuzzleFont";
+                var puzzleFontName = ImageSource.PUZZLE_FONT;
                 var serifFontName = "DOES NOT EXIST";
 
                 var doWork = function () {
@@ -157,9 +157,46 @@ var Told;
                 //    doWork();
                 //}
             };
+
+            ImageSource.preloadFont = function () {
+                if (ImageSource._isPreloaded) {
+                    return;
+                }
+
+                ImageSource._isPreloaded = true;
+
+                var doWork = function () {
+                    if (Told.AppSettings && Told.Analytics && Told.Debug && window["fabric"] && fabric.Text) {
+                        Told.log("ImageSource_preloadFont", "BEGIN", true);
+
+                        var fontName = ImageSource.PUZZLE_FONT;
+                        var text = "test";
+                        var fontSize = 20;
+
+                        var myFont = new fabric.Text(text, {
+                            fontFamily: fontName,
+                            fontSize: fontSize,
+                            top: 10
+                        });
+
+                        var wCanvas = WorkingCanvas.getWorkingCanvas();
+                        wCanvas.getFabricCanvas().add(myFont);
+                        wCanvas.release();
+                    } else {
+                        setTimeout(doWork, 100);
+                    }
+                };
+
+                doWork();
+            };
+            ImageSource.PUZZLE_FONT = "PuzzleFont";
+
+            ImageSource._isPreloaded = false;
             return ImageSource;
         })();
         MemPuzzle.ImageSource = ImageSource;
+
+        ImageSource.preloadFont();
     })(Told.MemPuzzle || (Told.MemPuzzle = {}));
     var MemPuzzle = Told.MemPuzzle;
 })(Told || (Told = {}));

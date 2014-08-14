@@ -550,11 +550,17 @@ A refactor is required to solve performance issues:
 
 - Lock correct pieces
 
-### 11:12-
+### 11:12-11:22
 
 - Calculate rows and columns based on text
 	- 2 rows per line
 	- 1 column per max line length
+
+### 11:23-11:26
+### 11:32-11:41
+
+- Preload font
+
 
 ---
 
@@ -562,13 +568,12 @@ A refactor is required to solve performance issues:
 
 - BUG: Font is not being loaded on first puzzle sometimes
 
-- Provide sense of progress and accomplishment
-	- Trophy Pictures (With Progress Indication)
-
-- Delay resize a bit (instead of resizing live)
 
 # TODO Maybe
 
+- Provide sense of progress and accomplishment
+	- Trophy Pictures (With Progress Indication)
+- Delay resize a bit (instead of resizing live)
 - Size initial ImageSource better to prevent scaling of font image
 - Allow click to place (if in correct location)
 - Create puzzle static canvas for everything but moving pieces
