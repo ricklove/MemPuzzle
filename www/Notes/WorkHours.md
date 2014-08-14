@@ -476,9 +476,19 @@ A refactor is required to solve performance issues:
 - Use real edges as clip
 - Calculate actual bounds
 
-### 4:04-
+### 4:04-4:32
 
 - Create pieces from PieceImages
+
+### 4:33-4:52
+
+- Fix snap and puzzle complete logic
+
+### 4:53-
+
+- Fix stack pieces
+- Fix next puzzle
+
 
 ---
 

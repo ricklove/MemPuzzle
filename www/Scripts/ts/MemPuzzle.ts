@@ -18,6 +18,9 @@ module Told.MemPuzzle {
 
         private _canvas: fabric.ICanvas = null;
 
+        private _puzzleImages: PuzzleImages = null;
+        private _pieces: IPiece[] = null;
+
         private _puzzlePosition: IPuzzlePosition = null;
         private _onPuzzleComplete = () => { };
 
@@ -83,14 +86,13 @@ module Told.MemPuzzle {
                     // Snap to target
                     if (self.canPieceSnapInPlace(<IPiece> target['_piece'])) {
 
-                        // TODO: Implement this
-                        //target.setLeft(self._puzzleX);
-                        //target.setTop(self._puzzleY);
+                        var aTarget = self.getActualTarget(<IPiece> target['_piece']);
+                        target.setLeft(aTarget.x);
+                        target.setTop(aTarget.y);
 
                         // Lock when correct
                         //target.lockMovementX = true;
                         //target.lockMovementY = true;
-
                     }
                 },
                 'object:modified': function (e: any) {
@@ -104,28 +106,36 @@ module Told.MemPuzzle {
 
         }
 
+        private getActualTarget(piece: IPiece) {
+            var self = this;
+            return { x: piece.pieceImage.targetX + self._puzzlePosition.x, y: piece.pieceImage.targetY + self._puzzlePosition.y };
+        }
+
         private canPieceSnapInPlace(piece: IPiece) {
             var self = this;
             var snapPercent = MemPuzzle.SNAP_PERCENT;
+            var snapRadius = Math.min(piece.pieceImage.width, piece.pieceImage.height) / 100 * snapPercent;
 
-            var snapRadius = Math.min(piece.width, piece.height) / 100 * snapPercent;
+            var actualTarget = self.getActualTarget(piece);
 
-            var nearness = Math.abs(piece.targetImageLeft - piece.image.left) + Math.abs(piece.targetImageTop - piece.image.top);
+            var nearness = Math.abs(actualTarget.x - piece.fabricImage.left) + Math.abs(actualTarget.y - piece.fabricImage.top);
             return nearness < snapRadius;
         }
 
         private checkForComplete() {
             var self = this;
             var pieces = self._pieces;
-            var puzzleX = self._puzzleX;
-            var puzzleY = self._puzzleY;
+            var puzzleX = self._puzzlePosition.x;
+            var puzzleY = self._puzzlePosition.y;
 
             var correctCount = 0;
 
             for (var i = 0; i < pieces.length; i++) {
                 var piece = pieces[i];
 
-                if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
+                var pTarget = self.getActualTarget(piece);
+
+                if (piece.fabricImage.left !== pTarget.x || piece.fabricImage.top !== pTarget.y) {
                     // return;
                 } else {
                     correctCount++;
@@ -144,56 +154,56 @@ module Told.MemPuzzle {
             }
         }
 
-        stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
-            var self = this;
-            var pieces = self._pieces;
-            var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
-            var scale = self._puzzleScale;
+        //stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
+        //    var self = this;
+        //    var pieces = self._pieces;
+        //    var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
+        //    var scale = self._puzzleScale;
 
-            var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
-            var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
+        //    var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
+        //    var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
 
-            // Use snapshots
-            //pieces = self._snapshots;
-            //scale = 1;
+        //    // Use snapshots
+        //    //pieces = self._snapshots;
+        //    //scale = 1;
 
 
-            var piecesNotLocked = <IPiece[]>[];
+        //    var piecesNotLocked = <IPiece[]>[];
 
-            for (var i = 0; i < pieces.length; i++) {
+        //    for (var i = 0; i < pieces.length; i++) {
 
-                var piece = pieces[i];
+        //        var piece = pieces[i];
 
-                if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
+        //        if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
 
-                    piecesNotLocked.push(piece);
-                }
-            }
+        //            piecesNotLocked.push(piece);
+        //        }
+        //    }
 
-            var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
+        //    var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
 
-            if (shouldSpreadOut) {
-                piecesNotLocked = RandomOrder(piecesNotLocked);
-            } else {
-                gap = 0;
-            }
+        //    if (shouldSpreadOut) {
+        //        piecesNotLocked = RandomOrder(piecesNotLocked);
+        //    } else {
+        //        gap = 0;
+        //    }
 
-            for (var i = 0; i < piecesNotLocked.length; i++) {
-                var piece = piecesNotLocked[i];
+        //    for (var i = 0; i < piecesNotLocked.length; i++) {
+        //        var piece = piecesNotLocked[i];
 
-                // Move to stack
-                // NOTE: This ignores the piece button
+        //        // Move to stack
+        //        // NOTE: This ignores the piece button
 
-                piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
-                piece.image.setTop(STACK_Y - piece.y * scale);
-                //piece.image.bringToFront();
+        //        piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
+        //        piece.image.setTop(STACK_Y - piece.y * scale);
+        //        //piece.image.bringToFront();
 
-                piece.image.scale(scale);
-            }
+        //        piece.image.scale(scale);
+        //    }
 
-            self._canvas.renderAll();
-            //setTimeout(self._canvas.renderAll, 10);
-        }
+        //    self._canvas.renderAll();
+        //    //setTimeout(self._canvas.renderAll, 10);
+        //}
 
 
         public createPuzzleFromText(text: string, onPuzzleCreated = () => { }, shouldUseSans = true) {
@@ -293,7 +303,9 @@ module Told.MemPuzzle {
             var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(pPos.width, pPos.height);
 
             // Create images
-            var pImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
+            var pImages = self._puzzleImages =
+                new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
+
             pImages.draw(imageSource, pPos.width, pPos.height);
 
             // Show puzzle
@@ -302,11 +314,15 @@ module Told.MemPuzzle {
             Told.log("MemPuzzle_createPuzzle", "02 - show puzzle outline and target", true);
 
             // Show pieces
+            var pieces = self._pieces = <IPiece[]>[];
+
             for (var i = 0; i < pImages.pieces.length; i++) {
 
                 var pieceImage = pImages.pieces[i];
 
-                self.showPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
+                var piece = self.showPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
+
+                pieces.push(piece);
             }
 
         }
@@ -387,7 +403,7 @@ module Told.MemPuzzle {
         }
 
 
-        private showPiece(pos: IPoint, piece: IPieceImage) {
+        private showPiece(pos: IPoint, pieceImage: IPieceImage) {
             Told.log("MemPuzzle_showPiece", "01 - BEGIN", true);
 
             var self = this;
@@ -396,7 +412,7 @@ module Told.MemPuzzle {
             var x = pos.x;
             var y = pos.y;
 
-            var fImage = new fabric.Image(<any>piece.canvas.canvasElement, {});
+            var fImage = new fabric.Image(<any>pieceImage.canvas.canvasElement, {});
 
             Told.log("MemPuzzle_showPiece", "02 - Image Created - width=" + fImage.width + " height= " + fImage.height, true);
 
@@ -414,7 +430,12 @@ module Told.MemPuzzle {
                 //selectable: true,
             });
 
+            var piece = { fabricImage: fImage, pieceImage: pieceImage };
+            fImage["_piece"] = piece;
+
             canvas.add(fImage);
+
+            return piece;
         }
     }
 
@@ -427,13 +448,8 @@ module Told.MemPuzzle {
     }
 
     interface IPiece {
-        image: fabric.IImage;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-        targetImageLeft: number;
-        targetImageTop: number;
+        fabricImage: fabric.IImage;
+        pieceImage: IPieceImage;
     }
 
     function RandomOrder<T>(items: T[]): T[] {

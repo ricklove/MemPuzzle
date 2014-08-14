@@ -9,6 +9,8 @@ var Told;
         var MemPuzzle = (function () {
             function MemPuzzle(canvasId) {
                 this._canvas = null;
+                this._puzzleImages = null;
+                this._pieces = null;
                 this._puzzlePosition = null;
                 this._onPuzzleComplete = function () {
                 };
@@ -69,9 +71,9 @@ var Told;
 
                         // Snap to target
                         if (self.canPieceSnapInPlace(target['_piece'])) {
-                            // TODO: Implement this
-                            //target.setLeft(self._puzzleX);
-                            //target.setTop(self._puzzleY);
+                            var aTarget = self.getActualTarget(target['_piece']);
+                            target.setLeft(aTarget.x);
+                            target.setTop(aTarget.y);
                             // Lock when correct
                             //target.lockMovementX = true;
                             //target.lockMovementY = true;
@@ -86,28 +88,36 @@ var Told;
                     }
                 });
             }
+            MemPuzzle.prototype.getActualTarget = function (piece) {
+                var self = this;
+                return { x: piece.pieceImage.targetX + self._puzzlePosition.x, y: piece.pieceImage.targetY + self._puzzlePosition.y };
+            };
+
             MemPuzzle.prototype.canPieceSnapInPlace = function (piece) {
                 var self = this;
                 var snapPercent = MemPuzzle.SNAP_PERCENT;
+                var snapRadius = Math.min(piece.pieceImage.width, piece.pieceImage.height) / 100 * snapPercent;
 
-                var snapRadius = Math.min(piece.width, piece.height) / 100 * snapPercent;
+                var actualTarget = self.getActualTarget(piece);
 
-                var nearness = Math.abs(piece.targetImageLeft - piece.image.left) + Math.abs(piece.targetImageTop - piece.image.top);
+                var nearness = Math.abs(actualTarget.x - piece.fabricImage.left) + Math.abs(actualTarget.y - piece.fabricImage.top);
                 return nearness < snapRadius;
             };
 
             MemPuzzle.prototype.checkForComplete = function () {
                 var self = this;
                 var pieces = self._pieces;
-                var puzzleX = self._puzzleX;
-                var puzzleY = self._puzzleY;
+                var puzzleX = self._puzzlePosition.x;
+                var puzzleY = self._puzzlePosition.y;
 
                 var correctCount = 0;
 
                 for (var i = 0; i < pieces.length; i++) {
                     var piece = pieces[i];
 
-                    if (piece.image.left !== puzzleX || piece.image.top !== puzzleY) {
+                    var pTarget = self.getActualTarget(piece);
+
+                    if (piece.fabricImage.left !== pTarget.x || piece.fabricImage.top !== pTarget.y) {
                         // return;
                     } else {
                         correctCount++;
@@ -123,54 +133,41 @@ var Told;
                 }
             };
 
-            MemPuzzle.prototype.stackPieces = function (shouldStackAll, shouldSpreadOut) {
-                if (typeof shouldStackAll === "undefined") { shouldStackAll = false; }
-                if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = false; }
-                var self = this;
-                var pieces = self._pieces;
-                var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
-                var scale = self._puzzleScale;
-
-                var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
-                var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
-
-                // Use snapshots
-                //pieces = self._snapshots;
-                //scale = 1;
-                var piecesNotLocked = [];
-
-                for (var i = 0; i < pieces.length; i++) {
-                    var piece = pieces[i];
-
-                    if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
-                        piecesNotLocked.push(piece);
-                    }
-                }
-
-                var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
-
-                if (shouldSpreadOut) {
-                    piecesNotLocked = RandomOrder(piecesNotLocked);
-                } else {
-                    gap = 0;
-                }
-
-                for (var i = 0; i < piecesNotLocked.length; i++) {
-                    var piece = piecesNotLocked[i];
-
-                    // Move to stack
-                    // NOTE: This ignores the piece button
-                    piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
-                    piece.image.setTop(STACK_Y - piece.y * scale);
-
-                    //piece.image.bringToFront();
-                    piece.image.scale(scale);
-                }
-
-                self._canvas.renderAll();
-                //setTimeout(self._canvas.renderAll, 10);
-            };
-
+            //stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
+            //    var self = this;
+            //    var pieces = self._pieces;
+            //    var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
+            //    var scale = self._puzzleScale;
+            //    var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
+            //    var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
+            //    // Use snapshots
+            //    //pieces = self._snapshots;
+            //    //scale = 1;
+            //    var piecesNotLocked = <IPiece[]>[];
+            //    for (var i = 0; i < pieces.length; i++) {
+            //        var piece = pieces[i];
+            //        if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
+            //            piecesNotLocked.push(piece);
+            //        }
+            //    }
+            //    var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
+            //    if (shouldSpreadOut) {
+            //        piecesNotLocked = RandomOrder(piecesNotLocked);
+            //    } else {
+            //        gap = 0;
+            //    }
+            //    for (var i = 0; i < piecesNotLocked.length; i++) {
+            //        var piece = piecesNotLocked[i];
+            //        // Move to stack
+            //        // NOTE: This ignores the piece button
+            //        piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
+            //        piece.image.setTop(STACK_Y - piece.y * scale);
+            //        //piece.image.bringToFront();
+            //        piece.image.scale(scale);
+            //    }
+            //    self._canvas.renderAll();
+            //    //setTimeout(self._canvas.renderAll, 10);
+            //}
             MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleCreated, shouldUseSans) {
                 if (typeof onPuzzleCreated === "undefined") { onPuzzleCreated = function () {
                 }; }
@@ -266,7 +263,8 @@ var Told;
                 var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(pPos.width, pPos.height);
 
                 // Create images
-                var pImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
+                var pImages = self._puzzleImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
+
                 pImages.draw(imageSource, pPos.width, pPos.height);
 
                 // Show puzzle
@@ -274,10 +272,15 @@ var Told;
                 self.showPuzzleTargetImage(pPos, pImages.whole, timeToShowCompletedPuzzle);
                 Told.log("MemPuzzle_createPuzzle", "02 - show puzzle outline and target", true);
 
+                // Show pieces
+                var pieces = self._pieces = [];
+
                 for (var i = 0; i < pImages.pieces.length; i++) {
                     var pieceImage = pImages.pieces[i];
 
-                    self.showPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
+                    var piece = self.showPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
+
+                    pieces.push(piece);
                 }
             };
 
@@ -354,7 +357,7 @@ var Told;
                 }, timeToShow);
             };
 
-            MemPuzzle.prototype.showPiece = function (pos, piece) {
+            MemPuzzle.prototype.showPiece = function (pos, pieceImage) {
                 Told.log("MemPuzzle_showPiece", "01 - BEGIN", true);
 
                 var self = this;
@@ -363,7 +366,7 @@ var Told;
                 var x = pos.x;
                 var y = pos.y;
 
-                var fImage = new fabric.Image(piece.canvas.canvasElement, {});
+                var fImage = new fabric.Image(pieceImage.canvas.canvasElement, {});
 
                 Told.log("MemPuzzle_showPiece", "02 - Image Created - width=" + fImage.width + " height= " + fImage.height, true);
 
@@ -376,7 +379,12 @@ var Told;
                     hasControls: false
                 });
 
+                var piece = { fabricImage: fImage, pieceImage: pieceImage };
+                fImage["_piece"] = piece;
+
                 canvas.add(fImage);
+
+                return piece;
             };
             MemPuzzle.SNAP_PERCENT = 35;
             MemPuzzle.PADDING_PERCENT = 30;
