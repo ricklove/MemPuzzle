@@ -134,41 +134,45 @@ var Told;
                 }
             };
 
-            //stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
-            //    var self = this;
-            //    var pieces = self._pieces;
-            //    var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
-            //    var scale = self._puzzleScale;
-            //    var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
-            //    var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
-            //    // Use snapshots
-            //    //pieces = self._snapshots;
-            //    //scale = 1;
-            //    var piecesNotLocked = <IPiece[]>[];
-            //    for (var i = 0; i < pieces.length; i++) {
-            //        var piece = pieces[i];
-            //        if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
-            //            piecesNotLocked.push(piece);
-            //        }
-            //    }
-            //    var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
-            //    if (shouldSpreadOut) {
-            //        piecesNotLocked = RandomOrder(piecesNotLocked);
-            //    } else {
-            //        gap = 0;
-            //    }
-            //    for (var i = 0; i < piecesNotLocked.length; i++) {
-            //        var piece = piecesNotLocked[i];
-            //        // Move to stack
-            //        // NOTE: This ignores the piece button
-            //        piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
-            //        piece.image.setTop(STACK_Y - piece.y * scale);
-            //        //piece.image.bringToFront();
-            //        piece.image.scale(scale);
-            //    }
-            //    self._canvas.renderAll();
-            //    //setTimeout(self._canvas.renderAll, 10);
-            //}
+            MemPuzzle.prototype.stackPieces = function (shouldStackAll, shouldSpreadOut) {
+                if (typeof shouldStackAll === "undefined") { shouldStackAll = false; }
+                if (typeof shouldSpreadOut === "undefined") { shouldSpreadOut = false; }
+                var self = this;
+                var pieces = self._pieces;
+                var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
+
+                var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
+                var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
+
+                var piecesNotLocked = [];
+
+                for (var i = 0; i < pieces.length; i++) {
+                    var piece = pieces[i];
+
+                    if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
+                        piecesNotLocked.push(piece);
+                    }
+                }
+
+                var spreadGap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].pieceImage.width)) / piecesNotLocked.length;
+
+                if (shouldSpreadOut) {
+                    piecesNotLocked = RandomOrder(piecesNotLocked);
+                } else {
+                    spreadGap = 0;
+                }
+
+                for (var i = 0; i < piecesNotLocked.length; i++) {
+                    var piece = piecesNotLocked[i];
+
+                    // Move to stack
+                    piece.fabricImage.setLeft(STACK_X + spreadGap * i);
+                    piece.fabricImage.setTop(STACK_Y);
+                }
+
+                self._canvas.renderAll();
+            };
+
             MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleCreated, shouldUseSans) {
                 if (typeof onPuzzleCreated === "undefined") { onPuzzleCreated = function () {
                 }; }
@@ -293,6 +297,9 @@ var Told;
 
                     pieces.push(piece);
                 }
+
+                // Stack pieces
+                self.stackPieces();
             };
 
             MemPuzzle.prototype.showPuzzleOutline = function (pPos) {
@@ -384,9 +391,9 @@ var Told;
                 fImage.set({
                     left: x,
                     top: y,
-                    perPixelTargetFind: true,
-                    targetFindTolerance: 4,
-                    hasBorders: false,
+                    //perPixelTargetFind: true,
+                    //targetFindTolerance: 4,
+                    hasBorders: true,
                     hasControls: false
                 });
 

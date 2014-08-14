@@ -155,56 +155,44 @@ module Told.MemPuzzle {
             }
         }
 
-        //stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
-        //    var self = this;
-        //    var pieces = self._pieces;
-        //    var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
-        //    var scale = self._puzzleScale;
+        stackPieces(shouldStackAll= false, shouldSpreadOut= false) {
+            var self = this;
+            var pieces = self._pieces;
+            var S_PERCENT = MemPuzzle.STACK_PADDING_PERCENT;
 
-        //    var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
-        //    var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
+            var STACK_X = S_PERCENT / 100 * self._canvas.getWidth();
+            var STACK_Y = S_PERCENT / 100 * self._canvas.getHeight();
 
-        //    // Use snapshots
-        //    //pieces = self._snapshots;
-        //    //scale = 1;
+            var piecesNotLocked = <IPiece[]>[];
 
+            for (var i = 0; i < pieces.length; i++) {
 
-        //    var piecesNotLocked = <IPiece[]>[];
+                var piece = pieces[i];
 
-        //    for (var i = 0; i < pieces.length; i++) {
+                if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
 
-        //        var piece = pieces[i];
+                    piecesNotLocked.push(piece);
+                }
+            }
 
-        //        if (shouldStackAll || !self.canPieceSnapInPlace(piece)) {
+            var spreadGap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].pieceImage.width)) / piecesNotLocked.length;
 
-        //            piecesNotLocked.push(piece);
-        //        }
-        //    }
+            if (shouldSpreadOut) {
+                piecesNotLocked = RandomOrder(piecesNotLocked);
+            } else {
+                spreadGap = 0;
+            }
 
-        //    var gap = (self._canvas.getWidth() - (2 * STACK_X) - (pieces[0].width * scale)) / piecesNotLocked.length;
+            for (var i = 0; i < piecesNotLocked.length; i++) {
+                var piece = piecesNotLocked[i];
 
-        //    if (shouldSpreadOut) {
-        //        piecesNotLocked = RandomOrder(piecesNotLocked);
-        //    } else {
-        //        gap = 0;
-        //    }
+                // Move to stack
+                piece.fabricImage.setLeft(STACK_X + spreadGap * i);
+                piece.fabricImage.setTop(STACK_Y);
+            }
 
-        //    for (var i = 0; i < piecesNotLocked.length; i++) {
-        //        var piece = piecesNotLocked[i];
-
-        //        // Move to stack
-        //        // NOTE: This ignores the piece button
-
-        //        piece.image.setLeft(STACK_X - piece.x * scale + gap * i);
-        //        piece.image.setTop(STACK_Y - piece.y * scale);
-        //        //piece.image.bringToFront();
-
-        //        piece.image.scale(scale);
-        //    }
-
-        //    self._canvas.renderAll();
-        //    //setTimeout(self._canvas.renderAll, 10);
-        //}
+            self._canvas.renderAll();
+        }
 
 
         public createPuzzleFromText(text: string, onPuzzleCreated = () => { }, shouldUseSans = true) {
@@ -337,6 +325,9 @@ module Told.MemPuzzle {
                 pieces.push(piece);
             }
 
+            // Stack pieces
+            self.stackPieces();
+
         }
 
         private showPuzzleOutline(pPos: IPuzzlePosition) {
@@ -432,10 +423,10 @@ module Told.MemPuzzle {
                 left: x,
                 top: y,
 
-                perPixelTargetFind: true,
-                targetFindTolerance: 4,
+                //perPixelTargetFind: true,
+                //targetFindTolerance: 4,
 
-                hasBorders: false,
+                hasBorders: true,
                 hasControls: false,
                 //lockMovementX: false,
                 //lockMovementY: false,

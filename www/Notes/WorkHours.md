@@ -484,9 +484,12 @@ A refactor is required to solve performance issues:
 
 - Fix snap and puzzle complete logic
 
-### 4:53-
+### 4:53-5:07
 
 - Fix next puzzle
+
+### 5:08-
+
 - Fix stack pieces
 
 
