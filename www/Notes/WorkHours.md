@@ -504,6 +504,14 @@ A refactor is required to solve performance issues:
 
 - Reduce radius size
 
+### 5:52-5:53
+
+- Publish & Test on Website
+
+### 6:50-6:51
+
+- Disable Zoom
+
 ---
 
 # TODO
