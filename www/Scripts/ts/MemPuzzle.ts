@@ -146,6 +146,7 @@ module Told.MemPuzzle {
             if (correctCount !== pieces.length) {
 
                 Told.log("CheckForComplete", "Correct Pieces = " + correctCount, true);
+                self.showOnePiece();
 
             } else {
 
@@ -192,6 +193,51 @@ module Told.MemPuzzle {
             }
 
             self._canvas.renderAll();
+        }
+
+        showOnePiece() {
+            var self = this;
+            var pieces = self._pieces;
+
+            var piecesNotLocked = <IPiece[]>[];
+            var pieceToShow: IPiece = null;
+
+            var isVisible = (p: IPiece) => {
+                return self._canvas._objects.indexOf(p.fabricImage) > 0;
+            };
+
+            for (var i = 0; i < pieces.length; i++) {
+
+                var piece = pieces[i];
+
+                if (!self.canPieceSnapInPlace(piece)) {
+
+                    piecesNotLocked.push(piece);
+
+                    if (isVisible(piece)) {
+                        pieceToShow = piece;
+                    }
+                }
+            }
+
+            if (pieceToShow === null) {
+                pieceToShow = RandomItem(piecesNotLocked);
+            }
+
+            for (var i = 0; i < piecesNotLocked.length; i++) {
+                var piece = piecesNotLocked[i];
+
+                if (piece !== pieceToShow) {
+                    if (isVisible(piece)) {
+                        piece.fabricImage.remove();
+                    }
+                } else {
+                    if (!isVisible(piece)) {
+                        self._canvas.add(piece.fabricImage);
+                    }
+                }
+            }
+
         }
 
 
@@ -320,13 +366,16 @@ module Told.MemPuzzle {
 
                 var pieceImage = pImages.pieces[i];
 
-                var piece = self.showPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
+                var piece = self.createPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
 
                 pieces.push(piece);
             }
 
             // Stack pieces
             self.stackPieces();
+
+            // Show one piece
+            self.showOnePiece();
 
         }
 
@@ -406,7 +455,7 @@ module Told.MemPuzzle {
         }
 
 
-        private showPiece(pos: IPoint, pieceImage: IPieceImage) {
+        private createPiece(pos: IPoint, pieceImage: IPieceImage) {
             Told.log("MemPuzzle_showPiece", "01 - BEGIN", true);
 
             var self = this;
@@ -426,7 +475,7 @@ module Told.MemPuzzle {
                 //perPixelTargetFind: true,
                 //targetFindTolerance: 4,
 
-                hasBorders: true,
+                hasBorders: false,
                 hasControls: false,
                 //lockMovementX: false,
                 //lockMovementY: false,
@@ -436,7 +485,7 @@ module Told.MemPuzzle {
             var piece = { fabricImage: fImage, pieceImage: pieceImage };
             fImage["_piece"] = piece;
 
-            canvas.add(fImage);
+            //canvas.add(fImage);
 
             return piece;
         }
@@ -453,6 +502,10 @@ module Told.MemPuzzle {
     interface IPiece {
         fabricImage: fabric.IImage;
         pieceImage: IPieceImage;
+    }
+
+    function RandomItem<T>(items: T[]): T {
+        return items[Math.floor(Math.random() * items.length)];
     }
 
     function RandomOrder<T>(items: T[]): T[] {

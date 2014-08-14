@@ -488,9 +488,13 @@ A refactor is required to solve performance issues:
 
 - Fix next puzzle
 
-### 5:08-
+### 5:08-5:16
 
 - Fix stack pieces
+
+### 5:17-5:44
+
+- Only show a single piece at a time
 
 
 ---

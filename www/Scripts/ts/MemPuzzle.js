@@ -127,6 +127,7 @@ var Told;
 
                 if (correctCount !== pieces.length) {
                     Told.log("CheckForComplete", "Correct Pieces = " + correctCount, true);
+                    self.showOnePiece();
                 } else {
                     // Complete
                     Told.log("CheckForComplete", "Puzzle Complete", true);
@@ -171,6 +172,48 @@ var Told;
                 }
 
                 self._canvas.renderAll();
+            };
+
+            MemPuzzle.prototype.showOnePiece = function () {
+                var self = this;
+                var pieces = self._pieces;
+
+                var piecesNotLocked = [];
+                var pieceToShow = null;
+
+                var isVisible = function (p) {
+                    return self._canvas._objects.indexOf(p.fabricImage) > 0;
+                };
+
+                for (var i = 0; i < pieces.length; i++) {
+                    var piece = pieces[i];
+
+                    if (!self.canPieceSnapInPlace(piece)) {
+                        piecesNotLocked.push(piece);
+
+                        if (isVisible(piece)) {
+                            pieceToShow = piece;
+                        }
+                    }
+                }
+
+                if (pieceToShow === null) {
+                    pieceToShow = RandomItem(piecesNotLocked);
+                }
+
+                for (var i = 0; i < piecesNotLocked.length; i++) {
+                    var piece = piecesNotLocked[i];
+
+                    if (piece !== pieceToShow) {
+                        if (isVisible(piece)) {
+                            piece.fabricImage.remove();
+                        }
+                    } else {
+                        if (!isVisible(piece)) {
+                            self._canvas.add(piece.fabricImage);
+                        }
+                    }
+                }
             };
 
             MemPuzzle.prototype.createPuzzleFromText = function (text, onPuzzleCreated, shouldUseSans) {
@@ -293,13 +336,16 @@ var Told;
                 for (var i = 0; i < pImages.pieces.length; i++) {
                     var pieceImage = pImages.pieces[i];
 
-                    var piece = self.showPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
+                    var piece = self.createPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
 
                     pieces.push(piece);
                 }
 
                 // Stack pieces
                 self.stackPieces();
+
+                // Show one piece
+                self.showOnePiece();
             };
 
             MemPuzzle.prototype.showPuzzleOutline = function (pPos) {
@@ -375,7 +421,7 @@ var Told;
                 }, timeToShow);
             };
 
-            MemPuzzle.prototype.showPiece = function (pos, pieceImage) {
+            MemPuzzle.prototype.createPiece = function (pos, pieceImage) {
                 Told.log("MemPuzzle_showPiece", "01 - BEGIN", true);
 
                 var self = this;
@@ -393,15 +439,14 @@ var Told;
                     top: y,
                     //perPixelTargetFind: true,
                     //targetFindTolerance: 4,
-                    hasBorders: true,
+                    hasBorders: false,
                     hasControls: false
                 });
 
                 var piece = { fabricImage: fImage, pieceImage: pieceImage };
                 fImage["_piece"] = piece;
 
-                canvas.add(fImage);
-
+                //canvas.add(fImage);
                 return piece;
             };
             MemPuzzle.SNAP_PERCENT = 35;
@@ -413,6 +458,10 @@ var Told;
             return MemPuzzle;
         })();
         _MemPuzzle.MemPuzzle = MemPuzzle;
+
+        function RandomItem(items) {
+            return items[Math.floor(Math.random() * items.length)];
+        }
 
         function RandomOrder(items) {
             var remaining = items.map(function (p) {
