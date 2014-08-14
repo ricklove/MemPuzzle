@@ -500,6 +500,10 @@ A refactor is required to solve performance issues:
 
 - Hide working canvases
 
+### 5:48-5:51
+
+- Reduce radius size
+
 ---
 
 # TODO

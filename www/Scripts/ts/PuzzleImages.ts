@@ -357,7 +357,10 @@ module Told.MemPuzzle {
 
             if (!isStraight) {
                 // Get unit shape
-                var circleRadius = 0.125 * circleReductionRatio;
+                //var BASE_RADIUS = 0.125;
+                var BASE_RADIUS = 0.1;
+
+                var circleRadius = BASE_RADIUS * circleReductionRatio;
                 var cr = circleRadius;
                 var cr2 = circleRadius * 2;
                 var cr_2 = circleRadius / 2;
