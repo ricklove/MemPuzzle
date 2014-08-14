@@ -520,10 +520,15 @@ A refactor is required to solve performance issues:
 
 - Handle size change
 
+### 7:18-7:41
+
+- Retain piece positions on size change
+
 ---
 
 # TODO
 
+- Fix akward puzzle button size
 
 - Provide sense of progress and accomplishment
 
@@ -532,6 +537,5 @@ A refactor is required to solve performance issues:
 
 # TODO Maybe
 
-- Fix akward puzzle button size
 - Allow click to place (if in correct location)
 - Create puzzle static canvas for everything but moving pieces

@@ -351,7 +351,7 @@ module Told.MemPuzzle {
 
         resize() {
             this.setCanvasSize();
-            this.drawPuzzle(this._imageSource, 0, false);
+            this.drawPuzzle(this._imageSource, 0, true);
         }
 
         private drawPuzzle(imageSource: ImageSource, timeToShowCompletedPuzzle: number, isResize = false) {
@@ -359,6 +359,20 @@ module Told.MemPuzzle {
             var self = this;
             var canvas = self._canvas;
             var pImages = self._puzzleImages;
+
+            var lockedPieces: IPieceImage[] = null;
+            var visiblePiece: IPieceImage = null;
+
+            if (isResize) {
+                var pieces = self._pieces;
+
+                lockedPieces = pieces.filter(p=> self.canPieceSnapInPlace(p)).map(p=> p.pieceImage);
+                visiblePiece = pieces.filter(p=> !self.canPieceSnapInPlace(p) && canvas._objects.indexOf(p.fabricImage) >= 0).map(p=> p.pieceImage)[0];
+
+                if (visiblePiece === undefined) {
+                    visiblePiece = null;
+                }
+            }
 
             // Clear Puzzle
             canvas.clear();
@@ -388,6 +402,28 @@ module Told.MemPuzzle {
                 var piece = self.createPiece({ x: pieceImage.targetX, y: pieceImage.targetY }, pieceImage);
 
                 pieces.push(piece);
+            }
+
+            // Restore locked pieces
+            if (isResize) {
+                for (var i = 0; i < lockedPieces.length; i++) {
+                    var lPiece = lockedPieces[i];
+
+                    var newPiece = pieces.filter(p=> p.pieceImage === lPiece)[0];
+                    var aTarget = self.getActualTarget(newPiece);
+
+                    newPiece.fabricImage.left = aTarget.x;
+                    newPiece.fabricImage.top = aTarget.y;
+                    canvas.add(newPiece.fabricImage);
+                }
+
+                if (visiblePiece !== null) {
+                    var newPiece = pieces.filter(p=> p.pieceImage === visiblePiece)[0];
+                    newPiece.fabricImage.left = 10;
+                    newPiece.fabricImage.top = 10;
+
+                    canvas.add(newPiece.fabricImage);
+                }
             }
 
             // Stack pieces
