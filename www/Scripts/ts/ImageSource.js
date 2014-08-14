@@ -285,7 +285,25 @@ var Told;
 
                             var isReady = hashPuzzleFont !== hashBlank && hashPuzzleFont !== hashDefault && hashPuzzleFont !== hashUnknown && hashPuzzleFont !== hashNoFont;
 
+                            if (hashPuzzleFont === hashBlank) {
+                                Told.log("ImageSource_preloadFont", "FAIL - Same as Blank Font", true);
+                            }
+
+                            if (hashPuzzleFont === hashDefault) {
+                                Told.log("ImageSource_preloadFont", "FAIL - Same as Default Font", true);
+                            }
+
+                            if (hashPuzzleFont === hashUnknown) {
+                                Told.log("ImageSource_preloadFont", "FAIL - Same as Unknown Font", true);
+                            }
+
+                            if (hashPuzzleFont === hashNoFont) {
+                                Told.log("ImageSource_preloadFont", "FAIL - Same as No File Font", true);
+                            }
+
                             if (isReady) {
+                                Told.log("ImageSource_preloadFont", "END - Font is Ready", true);
+
                                 FontTester._isPuzzleFontReady = true;
                                 wCanvas.release();
                             } else {
