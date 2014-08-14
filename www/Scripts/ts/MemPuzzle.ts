@@ -261,7 +261,9 @@ module Told.MemPuzzle {
                 self._puzzleImages.release();
             }
 
-            Told.MemPuzzle.ImageSource.createImageSourceFromText(text, self._canvas.getWidth(), self._canvas.getHeight(), (imageSource) => {
+            var targetSize = MemPuzzle.CalculateTargetSize(self._canvas.getWidth(), self._canvas.getHeight());
+
+            Told.MemPuzzle.ImageSource.createImageSourceFromText(text, targetSize.width, targetSize.height, (imageSource) => {
 
                 self._imageSource = imageSource;
                 self.createPuzzle(imageSource, onPuzzleCreated);
@@ -269,8 +271,7 @@ module Told.MemPuzzle {
             }, shouldUseSans);
         }
 
-        private static CalculatePuzzlePosition(clientWidth: number, clientHeight: number, imageSource: ImageSource) {
-
+        private static CalculateTargetSize(clientWidth: number, clientHeight: number): ITargetSize {
             var PADDING_PERCENT = MemPuzzle.PADDING_PERCENT;
 
             // Calculate Image Scale
@@ -278,6 +279,19 @@ module Told.MemPuzzle {
 
             var width = clientWidth - padding * 2;
             var height = clientHeight - padding * 2;
+
+            return { width: width, height: height, padding: padding };
+        }
+
+
+
+        private static CalculatePuzzlePosition(clientWidth: number, clientHeight: number, imageSource: ImageSource) {
+
+            var targetSize = MemPuzzle.CalculateTargetSize(clientWidth, clientHeight);
+
+            var width = targetSize.width;
+            var height = targetSize.height;
+            var padding = targetSize.padding;
 
             var rWidth = width / imageSource.width;
             var rHeight = height / imageSource.height;
@@ -556,6 +570,12 @@ module Told.MemPuzzle {
 
             return piece;
         }
+    }
+
+    interface ITargetSize {
+        width: number;
+        height: number;
+        padding: number;
     }
 
     interface IPuzzlePosition {

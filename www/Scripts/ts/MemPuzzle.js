@@ -235,13 +235,15 @@ var Told;
                     self._puzzleImages.release();
                 }
 
-                Told.MemPuzzle.ImageSource.createImageSourceFromText(text, self._canvas.getWidth(), self._canvas.getHeight(), function (imageSource) {
+                var targetSize = MemPuzzle.CalculateTargetSize(self._canvas.getWidth(), self._canvas.getHeight());
+
+                Told.MemPuzzle.ImageSource.createImageSourceFromText(text, targetSize.width, targetSize.height, function (imageSource) {
                     self._imageSource = imageSource;
                     self.createPuzzle(imageSource, onPuzzleCreated);
                 }, shouldUseSans);
             };
 
-            MemPuzzle.CalculatePuzzlePosition = function (clientWidth, clientHeight, imageSource) {
+            MemPuzzle.CalculateTargetSize = function (clientWidth, clientHeight) {
                 var PADDING_PERCENT = MemPuzzle.PADDING_PERCENT;
 
                 // Calculate Image Scale
@@ -249,6 +251,16 @@ var Told;
 
                 var width = clientWidth - padding * 2;
                 var height = clientHeight - padding * 2;
+
+                return { width: width, height: height, padding: padding };
+            };
+
+            MemPuzzle.CalculatePuzzlePosition = function (clientWidth, clientHeight, imageSource) {
+                var targetSize = MemPuzzle.CalculateTargetSize(clientWidth, clientHeight);
+
+                var width = targetSize.width;
+                var height = targetSize.height;
+                var padding = targetSize.padding;
 
                 var rWidth = width / imageSource.width;
                 var rHeight = height / imageSource.height;

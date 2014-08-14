@@ -562,12 +562,16 @@ A refactor is required to solve performance issues:
 
 - Preload font
 
+### 11:50-12:05
+
+- Resize ImageSource to prevent scaling
 
 ---
 
 # TODO
 
-- BUG: Font is not being loaded on first puzzle sometimes
+- TEST: BUG: Font is not being loaded on first puzzle sometimes
+- Size initial ImageSource better to prevent scaling of font image
 
 
 # TODO Maybe
@@ -575,7 +579,6 @@ A refactor is required to solve performance issues:
 - Provide sense of progress and accomplishment
 	- Trophy Pictures (With Progress Indication)
 - Delay resize a bit (instead of resizing live)
-- Size initial ImageSource better to prevent scaling of font image
 - Allow click to place (if in correct location)
 - Create puzzle static canvas for everything but moving pieces
 
