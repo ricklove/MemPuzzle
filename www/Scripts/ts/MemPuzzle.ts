@@ -294,9 +294,14 @@ module Told.MemPuzzle {
             return <IPuzzlePosition> { scale: tRatio, x: sx, y: sy, width: sWidth, height: sHeight };
         }
 
-        private static CalculateColumnsAndRows(widthOverHeightRatio: number) {
+        private static CalculateColumnsAndRows(widthOverHeightRatio: number, textLineCount: number = null, textMaxLineLength: number= null) {
 
-            // Create an h*v puzzle
+            // If text
+            if (textLineCount >= 1 && textMaxLineLength >= 1) {
+                return { columns: textMaxLineLength, rows: Math.max(2, textLineCount) };
+            }
+
+            // If not text
             var minPieceCount = 6;
             var minSideCount = 2;
             var hSideCount = minSideCount;
@@ -336,7 +341,7 @@ module Told.MemPuzzle {
             self._onPuzzleComplete = onPuzzleComplete;
 
             // Create images
-            var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(imageSource.width / imageSource.height);
+            var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(imageSource.width / imageSource.height, imageSource.textLineCount, imageSource.textMaxLineLength);
 
             var pImages = self._puzzleImages =
                 new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);

@@ -79,6 +79,10 @@ module Told.MemPuzzle {
         public width: number;
         public height: number;
 
+        public text: string;
+        public textLineCount: number;
+        public textMaxLineLength: number;
+
         release() {
             this._workingCanvas.release();
         }
@@ -157,6 +161,10 @@ module Told.MemPuzzle {
                 imageSource.height = fCanvas.getHeight();
 
                 imageSource._workingCanvas = wCanvas;
+
+                imageSource.text = text;
+                imageSource.textLineCount = 1;
+                imageSource.textMaxLineLength = text.length;
 
                 onCreated(imageSource);
             };

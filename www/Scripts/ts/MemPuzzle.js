@@ -265,8 +265,15 @@ var Told;
                 return { scale: tRatio, x: sx, y: sy, width: sWidth, height: sHeight };
             };
 
-            MemPuzzle.CalculateColumnsAndRows = function (widthOverHeightRatio) {
-                // Create an h*v puzzle
+            MemPuzzle.CalculateColumnsAndRows = function (widthOverHeightRatio, textLineCount, textMaxLineLength) {
+                if (typeof textLineCount === "undefined") { textLineCount = null; }
+                if (typeof textMaxLineLength === "undefined") { textMaxLineLength = null; }
+                // If text
+                if (textLineCount >= 1 && textMaxLineLength >= 1) {
+                    return { columns: textMaxLineLength, rows: Math.max(2, textLineCount) };
+                }
+
+                // If not text
                 var minPieceCount = 6;
                 var minSideCount = 2;
                 var hSideCount = minSideCount;
@@ -310,7 +317,7 @@ var Told;
                 self._onPuzzleComplete = onPuzzleComplete;
 
                 // Create images
-                var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(imageSource.width / imageSource.height);
+                var pColumnsRows = MemPuzzle.CalculateColumnsAndRows(imageSource.width / imageSource.height, imageSource.textLineCount, imageSource.textMaxLineLength);
 
                 var pImages = self._puzzleImages = new Told.MemPuzzle.PuzzleImages(pColumnsRows.columns, pColumnsRows.rows, imageSource.width / imageSource.height);
 

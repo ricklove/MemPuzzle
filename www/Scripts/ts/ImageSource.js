@@ -143,6 +143,10 @@ var Told;
 
                     imageSource._workingCanvas = wCanvas;
 
+                    imageSource.text = text;
+                    imageSource.textLineCount = 1;
+                    imageSource.textMaxLineLength = text.length;
+
                     onCreated(imageSource);
                 };
 

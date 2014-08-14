@@ -550,16 +550,17 @@ A refactor is required to solve performance issues:
 
 - Lock correct pieces
 
+### 11:12-
+
+- Calculate rows and columns based on text
+	- 2 rows per line
+	- 1 column per max line length
 
 ---
 
 # TODO
 
 - BUG: Font is not being loaded on first puzzle sometimes
-
-- Calculate rows and columns based on text
-	- 2 rows per line
-	- 1 column per max line length
 
 - Provide sense of progress and accomplishment
 	- Trophy Pictures (With Progress Indication)
