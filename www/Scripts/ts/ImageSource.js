@@ -62,7 +62,7 @@ var Told;
             WorkingCanvas.prototype.release = function () {
                 this.isFree = true;
             };
-            WorkingCanvas.SHOW_WORKING_CANVAS = true;
+            WorkingCanvas.SHOW_WORKING_CANVAS = false;
 
             WorkingCanvas.canvasList = [];
             return WorkingCanvas;
