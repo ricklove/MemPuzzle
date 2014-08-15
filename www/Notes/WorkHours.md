@@ -590,7 +590,9 @@ A refactor is required to solve performance issues:
 
 - Create growing tree to represent progress
 
+### 6:26-7:16
 
+- Add tree to canvas
 
 ---
 

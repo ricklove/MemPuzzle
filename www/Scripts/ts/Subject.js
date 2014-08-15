@@ -62,6 +62,8 @@ var Told;
                     }, true);
 
                     self.drawProgress();
+
+                    self._puzzle.addDecoration(self._canvasProgress, 0.7, 0.05, 0.25, 0.9);
                 };
 
                 SubjectController.prototype.drawProgress = function () {
@@ -78,11 +80,17 @@ var Told;
 
                     var wCanvas = self._canvasProgress;
                     var ctx = wCanvas.getContext();
-                    var width = 400;
-                    var height = 800;
 
-                    var actualWidth = width * 1.5;
-                    var actualHeight = height * 0.7;
+                    //var width = 400;
+                    //var height = 800;
+                    var width = window.innerWidth * 0.25;
+                    var height = width * 2;
+
+                    //var actualWidth = width * 1.5;
+                    //var actualHeight = height * 0.7;
+                    var actualWidth = width * 2.25;
+                    var actualHeight = height * 1.5;
+
                     var xOffset = (actualWidth - width) / 2;
                     var yOffset = (actualHeight - height);
 

@@ -363,6 +363,79 @@ module Told.MemPuzzle {
             self.drawPuzzle(imageSource, timeToShowCompletedPuzzle);
         }
 
+        private _decorations: IDecoration[] = [];
+
+        addDecoration(decorationCanvas: WorkingCanvas, xRatio: number, yRatio: number, widthRatio: number, heightRatio: number) {
+            var self = this;
+            var matches = self._decorations.filter(d=> d.canvas === decorationCanvas);
+
+            var d: IDecoration = null;
+
+            if (matches.length > 0) {
+                d = matches[0];
+            } else {
+                d = <IDecoration>{
+                    canvas: decorationCanvas,
+                    image: new fabric.Image(<any>decorationCanvas.canvasElement, {
+                        selectable: false,
+                        hasBorders: false,
+                        hasControls: false,
+                    }),
+                };
+            }
+
+            d.xRatio = xRatio;
+            d.yRatio = yRatio;
+            d.widthRatio = widthRatio;
+            d.heightRatio = heightRatio;
+
+            self._decorations.push(d);
+
+            self.drawDecoration(d);
+        }
+
+        private drawDecorations() {
+            var self = this;
+            var decs = self._decorations;
+
+            for (var i = 0; i < decs.length; i++) {
+
+                var d = decs[i];
+                self.drawDecoration(d);
+            }
+        }
+
+        private drawDecoration(decoration: IDecoration) {
+            var self = this;
+            var canvas = self._canvas;
+
+            var d = decoration;
+
+            var w = canvas.getWidth();
+            var h = canvas.getHeight();
+
+            if (canvas._objects.indexOf(d.image) >= 0) {
+                d.image.remove();
+            }
+
+            d.image.left = d.xRatio * w;
+            d.image.top = d.yRatio * h;
+
+            // Scale without distortion
+            var minScale = Math.min(
+                d.widthRatio * w / d.canvas.canvasElement.width,
+                d.heightRatio * h / d.canvas.canvasElement.height);
+
+            d.image.width = minScale * d.canvas.canvasElement.width;
+            d.image.height = minScale * d.canvas.canvasElement.height;
+
+            // Center
+            d.image.left += (d.image.width - d.widthRatio * w) / 2;
+            d.image.top -= (d.image.height - d.heightRatio * h) / 2;
+
+            canvas.add(d.image);
+        }
+
         private setCanvasSize() {
             var canvas = this._canvas;
 
@@ -379,6 +452,7 @@ module Told.MemPuzzle {
             this.setCanvasSize();
             this.drawPuzzle(this._imageSource, 0, true);
         }
+
 
         private drawPuzzle(imageSource: ImageSource, timeToShowCompletedPuzzle: number, isResize = false) {
 
@@ -403,12 +477,16 @@ module Told.MemPuzzle {
             // Clear Puzzle
             canvas.clear();
 
+
             // Calculate Image Scale
             var pPos = self._puzzlePosition =
                 MemPuzzle.CalculatePuzzlePosition(self._canvas.getWidth(), self._canvas.getHeight(), imageSource);
 
             // Draw images
             pImages.draw(imageSource, pPos.width, pPos.height);
+
+            // Draw decorations
+            self.drawDecorations();
 
             // Show puzzle
             self.showPuzzleOutline(pPos);
@@ -589,6 +667,15 @@ module Told.MemPuzzle {
     interface IPiece {
         fabricImage: fabric.IImage;
         pieceImage: IPieceImage;
+    }
+
+    interface IDecoration {
+        canvas: WorkingCanvas;
+        image: fabric.IImage;
+        xRatio: number;
+        yRatio: number;
+        widthRatio: number;
+        heightRatio: number;
     }
 
     function RandomItem<T>(items: T[]): T {

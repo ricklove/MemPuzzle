@@ -15,6 +15,7 @@ var Told;
                 this._puzzlePosition = null;
                 this._onPuzzleComplete = function () {
                 };
+                this._decorations = [];
                 Told.log("MemPuzzle_Constructor", "01 - BEGIN - Will Create fabric Canvas", true);
 
                 var self = this;
@@ -336,6 +337,76 @@ var Told;
                 self.drawPuzzle(imageSource, timeToShowCompletedPuzzle);
             };
 
+            MemPuzzle.prototype.addDecoration = function (decorationCanvas, xRatio, yRatio, widthRatio, heightRatio) {
+                var self = this;
+                var matches = self._decorations.filter(function (d) {
+                    return d.canvas === decorationCanvas;
+                });
+
+                var d = null;
+
+                if (matches.length > 0) {
+                    d = matches[0];
+                } else {
+                    d = {
+                        canvas: decorationCanvas,
+                        image: new fabric.Image(decorationCanvas.canvasElement, {
+                            selectable: false,
+                            hasBorders: false,
+                            hasControls: false
+                        })
+                    };
+                }
+
+                d.xRatio = xRatio;
+                d.yRatio = yRatio;
+                d.widthRatio = widthRatio;
+                d.heightRatio = heightRatio;
+
+                self._decorations.push(d);
+
+                self.drawDecoration(d);
+            };
+
+            MemPuzzle.prototype.drawDecorations = function () {
+                var self = this;
+                var decs = self._decorations;
+
+                for (var i = 0; i < decs.length; i++) {
+                    var d = decs[i];
+                    self.drawDecoration(d);
+                }
+            };
+
+            MemPuzzle.prototype.drawDecoration = function (decoration) {
+                var self = this;
+                var canvas = self._canvas;
+
+                var d = decoration;
+
+                var w = canvas.getWidth();
+                var h = canvas.getHeight();
+
+                if (canvas._objects.indexOf(d.image) >= 0) {
+                    d.image.remove();
+                }
+
+                d.image.left = d.xRatio * w;
+                d.image.top = d.yRatio * h;
+
+                // Scale without distortion
+                var minScale = Math.min(d.widthRatio * w / d.canvas.canvasElement.width, d.heightRatio * h / d.canvas.canvasElement.height);
+
+                d.image.width = minScale * d.canvas.canvasElement.width;
+                d.image.height = minScale * d.canvas.canvasElement.height;
+
+                // Center
+                d.image.left += (d.image.width - d.widthRatio * w) / 2;
+                d.image.top -= (d.image.height - d.heightRatio * h) / 2;
+
+                canvas.add(d.image);
+            };
+
             MemPuzzle.prototype.setCanvasSize = function () {
                 var canvas = this._canvas;
 
@@ -389,6 +460,9 @@ var Told;
 
                 // Draw images
                 pImages.draw(imageSource, pPos.width, pPos.height);
+
+                // Draw decorations
+                self.drawDecorations();
 
                 // Show puzzle
                 self.showPuzzleOutline(pPos);
