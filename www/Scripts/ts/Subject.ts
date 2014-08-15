@@ -1,6 +1,33 @@
 ﻿/// <reference path="MemPuzzle.ts"/>
 
 // Subject
+
+declare module tree {
+    enum LeafType {
+        SMALL_LEAVES= 10,
+        MEDIUM_LEAVES= 200,
+        BIG_LEAVES= 500,
+        THIN_LEAVES= 900,
+    }
+
+    /**
+     * @member draw
+     * tree.draw() initializes tthe tree structure
+     *
+     * @param {object} ctx      the canvas context
+     * @param {integer} x       x position to draw on the canvas
+     * @param {integer} y       y position to draw on the canvas
+     * @param {integer} width       width of the canvas
+     * @param {integer} height       height of the canvas
+     * @param {integer} maxDepth    how many branches the tree has
+     * @param {float} spread    how much the tree branches are spread
+     *                          Ranges from 0.3 - 1.
+     * @param {boolean} leaves  draw leaves if set to true    
+     *
+     */
+    function draw(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, maxDepth: number, spread?: number, leaves?: boolean, leaveType?: LeafType);
+}
+
 module Told.MemPuzzle.Subject {
 
     export interface ISubjectProvider {
@@ -72,6 +99,78 @@ module Told.MemPuzzle.Subject {
 
             var entry = self._subject.entries[eIndex];
             self._puzzle.createPuzzleFromText(entry.word, () => { setTimeout(() => { self.gotoNextEntry(); }, 1000); }, true);
+
+            self.drawProgress();
+        }
+
+        private _canvasProgress: WorkingCanvas = null;
+
+        drawProgress() {
+            var self = this;
+            var subject = self._subject;
+
+            // TODO: Base score on something substantial (not just index)
+            var score = self.getEntryIndex();
+            var maxScore = subject.entries.length;
+
+            if (self._canvasProgress === null) {
+                self._canvasProgress = WorkingCanvas.getWorkingCanvas();
+            }
+
+            var wCanvas = self._canvasProgress;
+            var ctx = wCanvas.getContext();
+            var width = 400;
+            var height = 800;
+
+
+            var actualWidth = width * 1.5;
+            var actualHeight = height * 0.7;
+            var xOffset = (actualWidth - width) / 2;
+            var yOffset = (actualHeight - height);
+
+
+            wCanvas.canvasElement.setAttribute("style", "background-color:white");
+            wCanvas.canvasElement.width = actualWidth;
+            wCanvas.canvasElement.height = actualHeight;
+            ctx.clearRect(0, 0, actualWidth, actualHeight);
+
+
+            var wPadding = 0.1 * width / 2;
+            var hPadding = 0.02 * height / 2;
+            var x = wPadding;
+            var y = hPadding;
+            var tWidth = width - wPadding * 2;
+            var tHeight = height - hPadding * 2;
+
+            var minDepth = 2;
+            var maxDepth = 12;
+            var depth = minDepth + (maxDepth - minDepth) * score / maxScore;
+
+            var drawTreeAtSize = (size: number) => {
+                var s = size / 12;
+
+                var stWidth = tWidth * s;
+                var stHeight = tHeight * s;
+                var sX = (width - stWidth) / 2;
+                var sY = (height - stHeight) - hPadding;
+
+                sX += xOffset;
+                sY += yOffset;
+
+                tree.draw(ctx, sX, sY, stWidth, stHeight, size, 0.3, size > 6);
+            };
+
+            drawTreeAtSize(depth);
+
+
+            // TESTING:
+            //drawTreeAtSize(2);
+            //drawTreeAtSize(4);
+            //drawTreeAtSize(6);
+            //drawTreeAtSize(8);
+            //drawTreeAtSize(10);
+            //drawTreeAtSize(12);
+
         }
     }
 }

@@ -11,71 +11,89 @@
 
 var tree = {
 
-    canvas:     '',
-    ctx:        '',
-    height:     0,
-    width:      0,
-    spread:     0.6,
+    canvas: '',
+    ctx: '',
+    height: 0,
+    width: 0,
+    spread: 0.6,
     drawLeaves: true,
-    leavesColor:'',
-    leaveType:  this.MEDIUM_LEAVES,
-    
-    MAX_BRANCH_WIDTH:   20,
-    SMALL_LEAVES:       10,
-    MEDIUM_LEAVES:      200,
-    BIG_LEAVES:         500,
-    THIN_LEAVES:        900,
-    
+    leavesColor: '',
+    leaveType: this.MEDIUM_LEAVES,
+
+    maxDepth: 12,
+
+    MAX_BRANCH_WIDTH: 20,
+    SMALL_LEAVES: 10,
+    MEDIUM_LEAVES: 200,
+    BIG_LEAVES: 500,
+    THIN_LEAVES: 900,
+
     /**
      * @member draw
      * tree.draw() initializes tthe tree structure
      *
      * @param {object} ctx      the canvas context
-     * @param {integer} h       height of the canvas
+     * @param {integer} x       x position to draw on the canvas
+     * @param {integer} y       y position to draw on the canvas
      * @param {integer} w       width of the canvas
+     * @param {integer} h       height of the canvas
      * @param {float} spread    how much the tree branches are spread
      *                          Ranges from 0.3 - 1.
      * @param {boolean} leaves  draw leaves if set to true    
      *
      */
-    draw : function(ctx, h, w, spread, leaves, leaveType) {
+    draw: function (ctx, x, y, w, h, maxDepth, spread, leaves, leaveType) {
         // Set how much the tree branches are spread
-        if(spread >= 0.3 && spread <= 1) {
+        if (spread >= 0.3 && spread <= 1) {
             this.spread = spread;
         } else {
             this.spread = 0.6;
         }
-        
-        if(leaves === true || leaves === false) {
+
+        if (leaves === true || leaves === false) {
             this.drawLeaves = leaves;
         } else {
             this.leaves = true;
         }
-        
-        if(leaveType == this.SMALL_LEAVES || 
-           leaveType == this.MEDIUM_LEAVES || 
-           leaveType == this.BIG_LEAVES || 
+
+        if (leaveType == this.SMALL_LEAVES ||
+           leaveType == this.MEDIUM_LEAVES ||
+           leaveType == this.BIG_LEAVES ||
            leaveType == this.THIN_LEAVES) {
             this.leaveType = leaveType;
         } else {
             this.leaveType = this.MEDIUM_LEAVES;
         }
-        
+
         this.ctx = ctx;
         this.height = h;
         this.width = w;
-        this.ctx.clearRect(0,0,this.width,this.height);
+
+        // MODIFICATION
+
+        this.maxDepth = maxDepth;
+
+        // Don't clear it
+        //this.ctx.clearRect(0, 0, this.width, this.height);
+
         // Center the tree in the window
-        this.ctx.translate(this.width/2,this.height);
+        this.ctx.save();
+        this.ctx.translate(this.width / 2 + x, this.height + y);
         // Set the leaves to a random color
-        this.leavesColor = '#'+(0x1000000+(Math.random())*0xffffff).toString(16).substr(1,6);
+        this.leavesColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6);
         // Set branch thickness
         this.ctx.lineWidth = 1 + (Math.random() * this.MAX_BRANCH_WIDTH);
         this.ctx.lineJoin = 'round';
-        
+
+        // MODIFICATION
+        this.ctx.lineCap = 'round';
+        this.ctx.lineWidth = w * 0.04;
+
         this.branch(0);
+
+        this.ctx.restore();
     },
-    
+
     /**
      * @member branch
      * tree.branch() main tree drawing function
@@ -84,52 +102,97 @@ var tree = {
      *        Keep this value near 12, larger value take linger to render.
      *
      */
-    branch : function(depth) {
-        if (depth < 12) 
-        {
+    branch: function (depth) {
+        if (depth < this.maxDepth) {
             this.ctx.beginPath();
-            this.ctx.moveTo(0,0);
-            this.ctx.lineTo(0,-(this.height)/10);
+
+            // MODIFICATION
+            //this.ctx.moveTo(0, 0);
+            //this.ctx.lineTo(0,-(this.height)/10);
+
+            var yLast = -(this.height) / 10;
+            var xVar = 0.1 * yLast;
+
+            Told.MemPuzzle.PuzzleImages.curveThroughPoints(this.ctx, [
+                //{ x: 0, y: (this.height) / 10 / 10 },
+                { x: 0, y: 0 },
+                { x: xVar * Math.random() - xVar * 0.5, y: yLast * 0.25 },
+                { x: xVar * Math.random() - xVar * 0.5, y: yLast * 0.5 },
+                { x: xVar * Math.random() - xVar * 0.5, y: yLast * 0.75 },
+                { x: 0, y: yLast },
+                //{ x: 0, y: yLast * 1.1 },
+            ]);
+
+            this.ctx.lineWidth = this.ctx.lineWidth * 0.7;
+            this.ctx.lineTo(0, yLast * 1.07);
+            this.ctx.lineWidth = this.ctx.lineWidth / 0.7;
+
+
 
             this.ctx.stroke();
-            
-            this.ctx.translate(0,-this.height/10);
+
+            this.ctx.translate(0, -this.height / 10);
             // Random integer from -0.1 to 0.1
             var randomN = -(Math.random() * 0.1) + 0.1;
 
-            this.ctx.rotate(randomN); 
+            this.ctx.rotate(randomN);
 
-            if ((Math.random() * 1) < this.spread)
-            {
+            if ((Math.random() * 1) < this.spread) {
                 // Draw the left branches
                 this.ctx.rotate(-0.35);
-                this.ctx.scale(0.7,0.7);
+                this.ctx.scale(0.7, 0.7);
                 this.ctx.save();
                 this.branch(depth + 1);
                 // Draw the right branches
-                this.ctx.restore();  
+                this.ctx.restore();
                 this.ctx.rotate(0.6);
                 this.ctx.save();
-                this.branch(depth + 1);   
-                this.ctx.restore();        
+                this.branch(depth + 1);
+                this.ctx.restore();
             }
-            else 
-            { 
+            else {
                 this.branch(depth);
             }
 
         }
-        else
-        {   
+        else {
             // Now that we have done drawing branches, draw the leaves
-            if(this.drawLeaves) {
+            if (this.drawLeaves) {
                 var lengthFactor = 200;
-                if(this.leaveType === this.THIN_LEAVES) {
+                if (this.leaveType === this.THIN_LEAVES) {
                     lengthFactor = 10;
                 }
-                this.ctx.fillStyle = this.leavesColor;
-                this.ctx.fillRect(0, 0, this.leaveType, lengthFactor);
+
+                // MODIFIED
+                var leafWidth = this.leaveType * 0.2;
+                var leafLength = lengthFactor;
+
+                var oldColor = this.ctx.strokeStyle;
+                var oldWidth = this.ctx.lineWidth;
+                var oldLineCap = this.ctx.lineCap;
+                var oldLineJoin = this.ctx.lineJoin;
+
+                this.ctx.strokeStyle = this.leavesColor;
+                this.ctx.lineWidth = leafWidth * 1.5;
+                this.ctx.lineJoin = "miter";
+                this.ctx.lineCap = "round";
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, 0);
+                this.ctx.lineTo(0, -leafLength * 0.5);
+                this.ctx.lineTo(leafWidth * 2, 0);
                 this.ctx.stroke();
+
+                this.ctx.strokeStyle = oldColor;
+                this.ctx.lineWidth = oldWidth;
+                this.ctx.lineCap = oldLineCap;
+                this.ctx.lineJoin = oldLineJoin;
+
+
+                //this.ctx.fillStyle = this.leavesColor;
+                ////this.ctx.fillRect(0, 0, leafLength, leafWidth);
+                //this.ctx.fillRect(0, 0, leafWidth, -leafLength);
+                //this.ctx.stroke();
             }
         }
     }

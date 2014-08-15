@@ -6,7 +6,7 @@ module Told.MemPuzzle {
 
     export class WorkingCanvas {
 
-        static SHOW_WORKING_CANVAS = false;
+        static SHOW_WORKING_CANVAS = true;
 
         static canvasList = <WorkingCanvas[]>[];
 

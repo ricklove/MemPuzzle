@@ -1,11 +1,12 @@
 ﻿/// <reference path="MemPuzzle.ts"/>
+
 var Told;
 (function (Told) {
     (function (MemPuzzle) {
-        // Subject
         (function (Subject) {
             var SubjectController = (function () {
                 function SubjectController(puzzle) {
+                    this._canvasProgress = null;
                     this._puzzle = puzzle;
                     this._subject = null;
                 }
@@ -59,6 +60,70 @@ var Told;
                             self.gotoNextEntry();
                         }, 1000);
                     }, true);
+
+                    self.drawProgress();
+                };
+
+                SubjectController.prototype.drawProgress = function () {
+                    var self = this;
+                    var subject = self._subject;
+
+                    // TODO: Base score on something substantial (not just index)
+                    var score = self.getEntryIndex();
+                    var maxScore = subject.entries.length;
+
+                    if (self._canvasProgress === null) {
+                        self._canvasProgress = Told.MemPuzzle.WorkingCanvas.getWorkingCanvas();
+                    }
+
+                    var wCanvas = self._canvasProgress;
+                    var ctx = wCanvas.getContext();
+                    var width = 400;
+                    var height = 800;
+
+                    var actualWidth = width * 1.5;
+                    var actualHeight = height * 0.7;
+                    var xOffset = (actualWidth - width) / 2;
+                    var yOffset = (actualHeight - height);
+
+                    wCanvas.canvasElement.setAttribute("style", "background-color:white");
+                    wCanvas.canvasElement.width = actualWidth;
+                    wCanvas.canvasElement.height = actualHeight;
+                    ctx.clearRect(0, 0, actualWidth, actualHeight);
+
+                    var wPadding = 0.1 * width / 2;
+                    var hPadding = 0.02 * height / 2;
+                    var x = wPadding;
+                    var y = hPadding;
+                    var tWidth = width - wPadding * 2;
+                    var tHeight = height - hPadding * 2;
+
+                    var minDepth = 2;
+                    var maxDepth = 12;
+                    var depth = minDepth + (maxDepth - minDepth) * score / maxScore;
+
+                    var drawTreeAtSize = function (size) {
+                        var s = size / 12;
+
+                        var stWidth = tWidth * s;
+                        var stHeight = tHeight * s;
+                        var sX = (width - stWidth) / 2;
+                        var sY = (height - stHeight) - hPadding;
+
+                        sX += xOffset;
+                        sY += yOffset;
+
+                        tree.draw(ctx, sX, sY, stWidth, stHeight, size, 0.3, size > 6);
+                    };
+
+                    drawTreeAtSize(depth);
+                    // TESTING:
+                    //drawTreeAtSize(2);
+                    //drawTreeAtSize(4);
+                    //drawTreeAtSize(6);
+                    //drawTreeAtSize(8);
+                    //drawTreeAtSize(10);
+                    //drawTreeAtSize(12);
                 };
                 return SubjectController;
             })();

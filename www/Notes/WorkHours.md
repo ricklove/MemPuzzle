@@ -586,9 +586,9 @@ A refactor is required to solve performance issues:
 
 ## Period 9
 
-### 2014-08-15 3:49-
+### 2014-08-15 3:49-6:25
 
-- Add growing trees to represent progress
+- Create growing tree to represent progress
 
 
 

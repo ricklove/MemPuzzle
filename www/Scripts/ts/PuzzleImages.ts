@@ -454,7 +454,7 @@ module Told.MemPuzzle {
         }
 
         // Based on: http://stackoverflow.com/questions/7054272/how-to-draw-smooth-curve-through-n-points-using-javascript-html5-canvas
-        private static curveThroughPoints(ctx: CanvasRenderingContext2D, points: IPoint[]) {
+        public static curveThroughPoints(ctx: CanvasRenderingContext2D, points: IPoint[]) {
 
             // Line through points
             //for (var iSide = 0; iSide < side.length; iSide++) {
