@@ -25,7 +25,7 @@ declare module tree {
      * @param {boolean} leaves  draw leaves if set to true    
      *
      */
-    function draw(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, maxDepth: number, spread?: number, leaves?: boolean, leaveType?: LeafType);
+    function draw(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, maxDepth: number, rand: () => number, spread?: number, leaves?: boolean, leaveType?: LeafType);
 }
 
 module Told.MemPuzzle.Subject {
@@ -111,13 +111,18 @@ module Told.MemPuzzle.Subject {
             var self = this;
             var subject = self._subject;
 
-            // TODO: Base score on something substantial (not just index)
-            var score = self.getEntryIndex();
-            var maxScore = subject.entries.length;
-
             if (self._canvasProgress === null) {
                 self._canvasProgress = WorkingCanvas.getWorkingCanvas();
+                self._canvasProgress["seed"] = Math.random();
+                self._canvasProgress["startIndex"] = self.getEntryIndex();
             }
+
+            var seed = self._canvasProgress["seed"];
+            var startIndex = self._canvasProgress["startIndex"];
+
+
+            //var score = self.getEntryIndex();
+            //var maxScore = subject.entries.length;
 
             var wCanvas = self._canvasProgress;
             var ctx = wCanvas.getContext();
@@ -152,7 +157,14 @@ module Told.MemPuzzle.Subject {
 
             var minDepth = 2;
             var maxDepth = 12;
-            var depth = minDepth + (maxDepth - minDepth) * score / maxScore;
+            var scoreIndex = (self.getEntryIndex() - startIndex) % (maxDepth - minDepth);
+            var scoreRatio = scoreIndex / (maxDepth - minDepth);
+
+            if (scoreRatio === 0) {
+                seed = self._canvasProgress["seed"] = Math.random();
+            }
+
+            var depth = minDepth + (maxDepth - minDepth) * scoreRatio;
 
             var drawTreeAtSize = (size: number) => {
                 var s = size / 12;
@@ -165,7 +177,7 @@ module Told.MemPuzzle.Subject {
                 sX += xOffset;
                 sY += yOffset;
 
-                tree.draw(ctx, sX, sY, stWidth, stHeight, size, 0.3, size > 6);
+                tree.draw(ctx, sX, sY, stWidth, stHeight, size, SubjectController.createRand(seed), 0.3, size > 6);
             };
 
             drawTreeAtSize(depth);
@@ -179,6 +191,21 @@ module Told.MemPuzzle.Subject {
             //drawTreeAtSize(10);
             //drawTreeAtSize(12);
 
+        }
+
+        static createRand(seed: number) {
+
+            seed *= 233280;
+
+            var rand = function (max= 1, min= 0) {
+
+                seed = (seed * 9301 + 49297) % 233280;
+                var rnd = seed / 233280;
+
+                return min + rnd * (max - min);
+            };
+
+            return rand;
         }
     }
 }

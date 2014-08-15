@@ -594,6 +594,10 @@ A refactor is required to solve performance issues:
 
 - Add tree to canvas
 
+### 7:17-7:53
+
+- Grow tree after each answer
+
 ---
 
 # TODO

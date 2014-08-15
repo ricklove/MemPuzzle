@@ -21,6 +21,7 @@ var tree = {
     leaveType: this.MEDIUM_LEAVES,
 
     maxDepth: 12,
+    rand: Math.random,
 
     MAX_BRANCH_WIDTH: 20,
     SMALL_LEAVES: 10,
@@ -42,7 +43,7 @@ var tree = {
      * @param {boolean} leaves  draw leaves if set to true    
      *
      */
-    draw: function (ctx, x, y, w, h, maxDepth, spread, leaves, leaveType) {
+    draw: function (ctx, x, y, w, h, maxDepth, rand, spread, leaves, leaveType) {
         // Set how much the tree branches are spread
         if (spread >= 0.3 && spread <= 1) {
             this.spread = spread;
@@ -72,6 +73,7 @@ var tree = {
         // MODIFICATION
 
         this.maxDepth = maxDepth;
+        this.rand = rand || Math.random;
 
         // Don't clear it
         //this.ctx.clearRect(0, 0, this.width, this.height);
@@ -80,9 +82,9 @@ var tree = {
         this.ctx.save();
         this.ctx.translate(this.width / 2 + x, this.height + y);
         // Set the leaves to a random color
-        this.leavesColor = '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6);
+        this.leavesColor = '#' + (0x1000000 + (rand()) * 0xffffff).toString(16).substr(1, 6);
         // Set branch thickness
-        this.ctx.lineWidth = 1 + (Math.random() * this.MAX_BRANCH_WIDTH);
+        this.ctx.lineWidth = 1 + (rand() * this.MAX_BRANCH_WIDTH);
         this.ctx.lineJoin = 'round';
 
         // MODIFICATION
@@ -103,6 +105,8 @@ var tree = {
      *
      */
     branch: function (depth) {
+        var rand = this.rand;
+
         if (depth < this.maxDepth) {
             this.ctx.beginPath();
 
@@ -116,9 +120,9 @@ var tree = {
             Told.MemPuzzle.PuzzleImages.curveThroughPoints(this.ctx, [
                 //{ x: 0, y: (this.height) / 10 / 10 },
                 { x: 0, y: 0 },
-                { x: xVar * Math.random() - xVar * 0.5, y: yLast * 0.25 },
-                { x: xVar * Math.random() - xVar * 0.5, y: yLast * 0.5 },
-                { x: xVar * Math.random() - xVar * 0.5, y: yLast * 0.75 },
+                { x: xVar * rand() - xVar * 0.5, y: yLast * 0.25 },
+                { x: xVar * rand() - xVar * 0.5, y: yLast * 0.5 },
+                { x: xVar * rand() - xVar * 0.5, y: yLast * 0.75 },
                 { x: 0, y: yLast },
                 //{ x: 0, y: yLast * 1.1 },
             ]);
@@ -133,11 +137,11 @@ var tree = {
 
             this.ctx.translate(0, -this.height / 10);
             // Random integer from -0.1 to 0.1
-            var randomN = -(Math.random() * 0.1) + 0.1;
+            var randomN = -(rand() * 0.1) + 0.1;
 
             this.ctx.rotate(randomN);
 
-            if ((Math.random() * 1) < this.spread) {
+            if ((rand() * 1) < this.spread) {
                 // Draw the left branches
                 this.ctx.rotate(-0.35);
                 this.ctx.scale(0.7, 0.7);
