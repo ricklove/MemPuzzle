@@ -579,18 +579,22 @@ A refactor is required to solve performance issues:
 
 - Add font logging
 
+### 16:30-17:58
+
+- Create icons
+
+
+## Period 9
+
+### 2014-08-15 3:49-
+
+- Add growing trees to represent progress
+
+
 
 ---
 
 # TODO
-
-- Refactor checking for blank pixel
-	- On fail, then don't use custom font
-
-
-- TEST: BUG: Font is not being loaded on first puzzle sometimes
-	- If needed, do a pixel based evaluation
-
 
 - Publish
 	- Create Media
