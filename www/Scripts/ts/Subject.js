@@ -97,7 +97,7 @@ var Told;
                     var xOffset = (actualWidth - width) / 2;
                     var yOffset = (actualHeight - height);
 
-                    wCanvas.canvasElement.setAttribute("style", "background-color:white");
+                    //wCanvas.canvasElement.setAttribute("style", "background-color:white");
                     wCanvas.canvasElement.width = actualWidth;
                     wCanvas.canvasElement.height = actualHeight;
                     ctx.clearRect(0, 0, actualWidth, actualHeight);
